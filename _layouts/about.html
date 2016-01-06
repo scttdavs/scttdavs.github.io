@@ -9,12 +9,17 @@
 
     <div class='gradient-bar'></div>
 
+    <div class='full-width'>
+      <img src="/images/pano.jpg">
+    </div>
+
     <div class='group'>
       <section class='main article-list'>
-        {{ content }}
+        <div class='article-item group'>
+          {{ content }}
+        </div>
       </section>
-
-      {% include default_aside.html %}
+      {% include about_aside.html %}
     </div>
 
     {% include footer.html %}

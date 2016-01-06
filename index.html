@@ -3,17 +3,14 @@ layout: default
 title: Writing
 ---
 
-<div class='group'>
-  <section class='main article-list'>
-    {% for post in site.posts %}
-      <div class='article-item full-article group'>
-        <h1>
-          {{ post.title }}
-        </h1>
-        <span class='date'>
-          {{ post.date | date: "%b %-d, %Y" }}
-        </span>
-      </div>
-    {% endfor %}
-  </section>
-</div>
+{% for post in site.posts %}
+  <div class='article-item full-article group'>
+    <h1>
+      {{ post.title }}
+    </h1>
+    <span class='date'>
+      {{ post.date | date: "%b %-d, %Y" }}
+    </span>
+    {{ post.content truncatewords:75}}
+  </div>
+{% endfor %}
