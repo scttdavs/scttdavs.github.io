@@ -6,7 +6,7 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
 
   <title>Caching model associations in rails</title>
-  <meta name="description" content="You’ll find this post in your _posts directory. Go ahead and edit it and re-build the site to see your changes. You can rebuild the site in many different wa...">
+  <meta name="description" content="I’ve been working on a project recently called www.explorableplaces.com, and I added memcached caching with Dalli. So I’m basically trying to cache anything ...">
 
   <meta content='width=device-width, initial-scale=1.0, maximum-scale=1' name='viewport'>
   <meta charset='utf-8'>
@@ -78,19 +78,54 @@
   </span>
 
   <div class="post-content" itemprop="articleBody">
-    <p>You’ll find this post in your <code class="highlighter-rouge">_posts</code> directory. Go ahead and edit it and re-build the site to see your changes. You can rebuild the site in many different ways, but the most common way is to run <code class="highlighter-rouge">jekyll serve</code>, which launches a web server and auto-regenerates your site when a file is updated.</p>
+    <p>I’ve been working on a project recently called <a href="http://www.explorableplaces.com">www.explorableplaces.com</a>, and I added memcached caching with <a href="https://github.com/mperham/dalli">Dalli</a>. So I’m basically trying to cache anything and everything that can help our performance.</p>
 
-<p>To add new posts, simply add a file in the <code class="highlighter-rouge">_posts</code> directory that follows the convention <code class="highlighter-rouge">YYYY-MM-DD-name-of-post.ext</code> and includes the necessary <!--more--> front matter. Take a look at the source for this post to get an idea about how it works.</p>
+<p>Normally, you will see guides and articles show you caching with an example like this:</p>
 
-<p>Jekyll also offers powerful support for code snippets:</p>
+<figure class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="k">def</span> <span class="nf">cached_images</span>
+  <span class="no">Rails</span><span class="p">.</span><span class="nf">cache</span><span class="p">.</span><span class="nf">fetch</span><span class="p">([</span><span class="s1">'Articles'</span><span class="p">,</span> <span class="nb">id</span><span class="p">,</span> <span class="s1">'images'</span><span class="p">,</span> <span class="n">updated_at</span><span class="p">.</span><span class="nf">to_i</span><span class="p">])</span> <span class="k">do</span>
+    <span class="n">images</span><span class="p">.</span><span class="nf">to_a</span>
+  <span class="k">end</span>
+<span class="k">end</span></code></pre></figure>
 
-<figure class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="k">def</span> <span class="nf">print_hi</span><span class="p">(</span><span class="nb">name</span><span class="p">)</span>
-  <span class="nb">puts</span> <span class="s2">"Hi, </span><span class="si">#{</span><span class="nb">name</span><span class="si">}</span><span class="s2">"</span>
-<span class="k">end</span>
-<span class="n">print_hi</span><span class="p">(</span><span class="s1">'Tom'</span><span class="p">)</span>
-<span class="c1">#=&gt; prints 'Hi, Tom' to STDOUT.</span></code></pre></figure>
+<p>And while this now works, if I eager load an association, it will not <!--more--> call my “images_cached” method but the default one instead, so no gain there.</p>
 
-<p>Check out the <a href="http://jekyllrb.com/docs/home">Jekyll docs</a> for more info on how to get the most out of Jekyll. File all bugs/feature requests at <a href="https://github.com/jekyll/jekyll">Jekyll’s GitHub repo</a>. If you have questions, you can ask them on <a href="https://talk.jekyllrb.com/">Jekyll Talk</a>.</p>
+<p>When I was thinking about this more and more, a lightbulb went off in my head. Instead, you can do something like this:</p>
+
+<figure class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="k">class</span> <span class="nc">Article</span> <span class="o">&lt;</span> <span class="no">ActiveRecord</span><span class="o">::</span><span class="no">Base</span>
+  <span class="ss">has_many: :images</span>
+  <span class="ss">has_many: :cached_images</span><span class="p">,</span> <span class="ss">class_name: </span><span class="s2">"Image"</span>
+
+  <span class="k">def</span> <span class="nf">cached_images</span>
+    <span class="no">Rails</span><span class="p">.</span><span class="nf">cache</span><span class="p">.</span><span class="nf">fetch</span><span class="p">([</span><span class="s1">'Articles'</span><span class="p">,</span> <span class="nb">id</span><span class="p">,</span> <span class="s1">'images'</span><span class="p">,</span> <span class="n">updated_at</span><span class="p">.</span><span class="nf">to_i</span><span class="p">])</span> <span class="k">do</span>
+      <span class="k">super</span><span class="p">.</span><span class="nf">to_a</span>
+    <span class="k">end</span>
+  <span class="k">end</span>
+<span class="k">end</span></code></pre></figure>
+
+<h2 id="so-whats-going-on-here">So What’s Going On Here?</h2>
+
+<p>This adds a new association that basically just returns all an article’s images. So why did I create a new one? Well we still need our controllers to work with creating new images like “@article.images.new”. Also, the advantage here is now I can eager load images: “Article.all.includes(:cached_images)” which will return all cached images with each article.</p>
+
+<p>When it’s run, rails tries to fetch it from the cache using a key created from the array of values passed into it. If it finds something, it returns it. And if not, it runs the code in the block and returns that (which is then cached for future use). In that block, super just calls the original “images” method to make the call to the db and get those images.</p>
+
+<h2 id="updatedat-what-are-these-keys">Updated_at? What Are These Keys?</h2>
+
+<p>Why do I have “updated_at” in there? Basically, once the model is updated, this would mean the key would be updated, and essentially expire the old cached value, fetching a new one. This is a safer feature so your data doesn’t get stale. For our example, if the article has an id of 5, then our key would look something like “Articles/5/images/1448145415”.</p>
+
+<p>You may have wondered, what if I update an image? Then the cache will not be expired but I will still get old data? We can easily fix that in our images model:</p>
+
+<figure class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="k">class</span> <span class="nc">Image</span> <span class="o">&lt;</span> <span class="no">ActiveRecord</span><span class="o">::</span><span class="no">Base</span>
+  <span class="ss">belongs_to: :article</span><span class="p">,</span> <span class="ss">touch: </span><span class="kp">true</span>
+<span class="k">end</span></code></pre></figure>
+
+<p>With “touch: true”, whenever the image is created, updated or destroyed, it will touch the article it belongs to, updating its “updated_at” time. Sweet!</p>
+
+<h2 id="and-toa">And To_a?</h2>
+
+<p>And you may also be wondering why “.to_a”. Well, without that, it will actually just cache the ActiveRecord association and not the values. That’s bad, and would just throw an error on us if we try to retrieve it. Calling “to_a” on it forces that association to actually make the call and get our data, which is returned as an array so we can cache it.</p>
+
+<p>That’s it, hope you found this as useful as I did!</p>
 
 
   </div>
