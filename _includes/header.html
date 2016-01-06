@@ -1,4 +1,4 @@
-<header class="site-header">
+<!-- <header class="site-header">
 
   <div class="wrapper">
 
@@ -24,4 +24,18 @@
 
   </div>
 
+</header> -->
+<header>
+  <h1><a href="{{ site.url }}/"><img src="{{ site.url }}/images/sdlogo.svg" alt="Scott Davis"></a></h1>
+  <nav>
+    <ul>
+      {% for my_page in site.pages %}
+        {% if my_page.title %}
+          <li>
+            <a href="{{ my_page.url }}">{{ my_page.title }}</a>
+          </li>
+        {% endif %}
+      {% endfor %}
+    </ul>
+  </nav>
 </header>

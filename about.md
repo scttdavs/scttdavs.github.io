@@ -1,15 +1,18 @@
 ---
-layout: page
+layout: default
 title: About
+aside: about
 permalink: /about/
 ---
 
-This is the base Jekyll theme. You can find out more info about customizing your Jekyll theme, as well as basic Jekyll usage documentation at [jekyllrb.com](http://jekyllrb.com/)
+## about scott
 
-You can find the source code for the Jekyll new theme at:
-{% include icon-github.html username="jglovier" %} /
-[jekyll-new](https://github.com/jglovier/jekyll-new)
+I'm a graphic designer and front end developer by trade. I live and work in New York City with my amazing fiance,
+[Meg.](https://twitter.com/_margaretmac)
+I work full time as a front end engineer with
+[eBay,](http://www.ebay.com)
+but I also freelance as well. Simplicity drives what I do in both design and development. It makes for both elegant and functional websites. Bright and vigrant colors, and the latest and greatest in development tools and languages also keep me going.
 
-You can find the source code for Jekyll at
-{% include icon-github.html username="jekyll" %} /
-[jekyll](https://github.com/jekyll/jekyll)
+This site is the latest in a long line of iterations, all intended to be the last. I redesigned it this time to add a section for writing, as I want to make that a more important part of my process. As I work on projects, I encounter problems and issues that I think are common for all designers and developers and it would help others, as well as myself, to write them down, lest I repeat them again.
+
+I may occasionally write about something not work related, and that's ok too.

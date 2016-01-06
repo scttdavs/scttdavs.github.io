@@ -1,53 +1,604 @@
 ---
 # Only the main Sass file needs front matter (the dashes are enough)
 ---
-@charset "utf-8";
+// Import partials from `sass_dir` (defaults to `_sass`)
+@import "_normalize.scss";
+@import "_bourbon.scss";
+
+// Variables
+
+$offred: #EF4F50;
+$offblue: #00D2E0;
+$offmiddle: #779098;
+$offmiddle-dark: #2f464d;
+$lightgray: #F7F7F7;
+$mediumgray: #E8E8E8;
+$hgi: #F15A24;
+$badge-size: 100px;
+
+@mixin vertical-align {
+  position: relative;
+  top: 50%;
+  @include transform(translateY(-50%));
+}
+
+// Fonts
+
+@import url(http://fonts.googleapis.com/css?family=Lato:400,700|Vollkorn);
 
 
+* {
+  -moz-box-sizing: border-box;
+  box-sizing: border-box;
+}
 
-// Our variables
-$base-font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
-$base-font-size:   16px;
-$base-font-weight: 400;
-$small-font-size:  $base-font-size * 0.875;
-$base-line-height: 1.5;
+a {
+  text-decoration: none;
+}
 
-$spacing-unit:     30px;
-
-$text-color:       #111;
-$background-color: #fdfdfd;
-$brand-color:      #2a7ae2;
-
-$grey-color:       #828282;
-$grey-color-light: lighten($grey-color, 40%);
-$grey-color-dark:  darken($grey-color, 25%);
-
-// Width of the content area
-$content-width:    800px;
-
-$on-palm:          600px;
-$on-laptop:        800px;
-
-
-
-// Use media queries like this:
-// @include media-query($on-palm) {
-//     .wrapper {
-//         padding-right: $spacing-unit / 2;
-//         padding-left: $spacing-unit / 2;
-//     }
-// }
-@mixin media-query($device) {
-    @media screen and (max-width: $device) {
-        @content;
+body {
+  padding: 0 40px 0 170px;
+  @media (max-width: 1024px) {
+    padding: 68px 40px 0;
+  }
+  @media (max-width: 480px) {
+    padding: 68px 25px 0;
+  }
+  &.work {
+    padding-left: 115px;
+    padding-right: 0;
+    @media (max-width: 1024px) {
+      padding-left: 0;
+      padding-right: 0;
     }
+  }
+}
+
+p {
+  text-rendering: optimizeLegibility;
+  a {
+    color: darken($offblue, 10%);
+    &:hover {
+      color: $offred
+    }
+  }
+}
+
+::selection {
+  color: $offred;
+  background: transparent;
+}
+::-moz-selection {
+  color: $offred;
+  background: transparent;
+}
+
+img {
+  max-width: 100%;
+  max-height: 100%;
+}
+
+h1 {
+  font: 400 28px "Lato", sans-serif;
+  text-transform: uppercase;
+  color: $offred;
+}
+
+h2 {
+  font: 400 22px "Lato", sans-serif;
+  margin-bottom: 25px;
+  color: $offred;
+  text-transform: capitalize;
+}
+
+h3 {
+  font: 700 16px "Lato", sans-serif;
+  margin-bottom: 10px;
+  color: $offmiddle-dark;
+  text-transform: uppercase;
+}
+
+h5 {
+  font: 700 12px "Lato", sans-serif;
+  margin-bottom: 10px;
+  color: $offmiddle;
+  text-transform: uppercase;
+}
+
+.group:after {
+  content: "";
+  display: table;
+  clear: both;
+}
+
+.text-center {
+  text-align: center;
+}
+
+.gradient-bar {
+  @include background-image(linear-gradient(to right, #00d2e0 0%,#ef4f50 100%));
+  height: 3px;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 999;
+}
+
+// Nav
+
+header {
+  z-index: 998;
+  width: 115px;
+  position: fixed;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  padding: 40px 25px 25px;
+  text-align: center;
+  background-color: $lightgray;
+  @media (max-width: 1024px) {
+    bottom: auto;
+    width: 100%;
+    padding: 25px 25px;
+  }
+  h1 {
+    margin: 0;
+    @media (max-width: 1024px) {
+      display: inline-block;
+      margin-right: 10px;
+    }
+  }
+}
+
+nav {
+  @media (max-width: 1024px) {
+    display: inline-block;
+  }
+  ul {
+    list-style: none;
+    padding: 0;
+    margin-top: 40px;
+    @media (max-width: 1024px) {
+      display: inline-block;
+      margin: 0;
+    }
+    li {
+      margin: 15px 0;
+      @media (max-width: 1024px) {
+        display: inline-block;
+        margin: 0 10px;
+      }
+      a {
+        font: 400 14px "Lato", sans-serif;
+        color: $offmiddle;
+        text-transform: uppercase;
+        &:hover {
+          color: $offred;
+        }
+      }
+    }
+  }
+}
+
+// Main
+
+.main {
+  padding: 40px 20px;
+  width: 65%;
+  float: left;
+  @media (max-width: 1024px) {
+    padding-left: 0;
+  }
+  @media (max-width: 767px) {
+    width: 100%;
+    float: none;
+    padding-bottom: 0;
+    padding-right: 0;
+  }
+  &.project-main {
+    padding: 0;
+    img {
+      max-height: none;
+    }
+  }
 }
 
 
 
-// Import partials from `sass_dir` (defaults to `_sass`)
-@import
-        "base",
-        "layout",
-        "syntax-highlighting"
-;
+.full-screen {
+  position: fixed;
+  top: 0;
+  left: 115px;
+  right: 0;
+  bottom: 0;
+  @media (max-width: 1024px) {
+    left: 0;
+    top: 68px;
+  }
+}
+
+.full-screen.home {
+  background-image: url('../images/homebg.svg'), url('../images/homebg.jpg');
+  background-size: cover;
+  background-position: center;
+}
+
+// Articles
+
+.article-item, .work-item {
+  margin-bottom: 45px;
+  border-bottom: solid 1px lighten($offmiddle, 35%);
+  padding-bottom: 35px;
+  &:last-child {
+    border-bottom: none;
+  }
+  span.date {
+    font: 400 12px "Lato", sans-serif;
+    color: $offmiddle;
+  }
+  p, li {
+    color: darken($offmiddle, 10%);
+    font: normal 20px/30px "Vollkorn", Georgia;
+  }
+  .excerpt {
+    h2 {
+      color: $offmiddle-dark;
+      margin-top: 30px;
+    }
+  }
+  a.continue {
+    font: bold 12px "Lato", sans-serif;
+    text-transform: uppercase;
+    color: $offred;
+    float: right;
+    &:hover {
+      color: $offblue;
+    }
+  }
+}
+
+.full-article {
+  h2 {
+    color: $offmiddle-dark;
+    margin-top: 50px;
+  }
+}
+
+:not(pre) > code[class*="language-"],
+pre[class*="language-"] {
+  background: $offmiddle-dark;
+}
+
+aside {
+  width: 35%;
+  float: left;
+  @media (max-width: 767px) {
+    width: 100%;
+    float: none;
+  }
+}
+
+.avatar-wrap {
+  text-align: center;
+  padding-top: 50px;
+  @media (max-width: 767px) {
+    padding-top: 20px;
+  }
+}
+
+.avatar {
+  width: 120px;
+  height: 120px;
+  overflow: hidden;
+  display: inline-block;
+  @include transform(rotate(45deg));
+  .pic {
+    @include transform(rotate(-45deg));
+    height: 200px;
+    width: 200px;
+    margin: -35px;
+    background-image: url('../images/me.jpg');
+    background-size: cover;
+  }
+}
+
+p.summary {
+  font: 400 16px "Lato", sans-serif;
+  color: $offmiddle;
+  max-width: 220px;
+  margin: 45px auto 0;
+  strong {
+    font-weight: 700;
+    color: $offmiddle-dark;
+  }
+}
+
+// About
+
+.get-in-touch {
+  margin-top: 45px;
+  @media (max-width: 767px) {
+    margin-top: 0;
+  }
+}
+
+.full-width {
+  margin: 0 -40px 0 -95px;
+}
+
+.col-4 {
+  width: 33.333333%;
+  float: left;
+}
+
+.col-8 {
+  width: 66.666666%;
+  float: left;
+  min-height: 1px;
+}
+
+a.icon {
+  font-size: 24px;
+  color: darken($offblue, 10%);
+  &:hover{
+    color: $offred;
+  }
+  &.codepen {
+    background-image: url('../images/codepen.svg');
+    background-size: cover;
+    background-repeat: no-repeat;
+    width: 28px;
+    height: 28px;
+    display: inline-block;
+    &:hover {
+      background-image: url('../images/codepen-red.svg')
+    }
+  }
+}
+
+// Work
+
+figure.work-item {
+  margin: 0;
+  padding: 30px;
+  position: relative;
+  height: 250px;
+  border-bottom: 0;
+  //overflow: hidden;
+  text-align: center;
+  @include transition-property (padding);
+  @include transition-duration(0.4s);
+  @media (max-width: 710px) {
+    margin-bottom: 250px;
+  }
+  &:hover {
+    @media (min-width: 711px){
+      figcaption.work-details {
+        opacity: 1;
+        @include transform(translateX(0px));
+        @include transition-property (transform, opacity);
+        @include transition-duration(0.4s, 0.1s);
+      }
+      padding-right: 25%;
+    }
+    
+    // @media (max-width: 710px) {
+    //   padding-right: 50%;
+    // }
+  }
+  &:after {
+    content: "";
+    background-size: cover;
+    background-position: center;
+    opacity: 1;
+    top: 0; bottom: 0;
+    position: absolute;
+    z-index: -1;
+    background-image: url('../images/work-americasemi-odd.jpg');
+    left: 0; right: 25%;
+  }
+
+  img {
+    display: block;
+    height: 70px;
+    margin-left: auto;
+    margin-right: auto;
+    @include vertical-align;
+  }
+  figcaption.work-details {
+    text-align: center;
+    padding: 25px;
+    position: absolute;
+    opacity: 1;
+    top: 0;
+    bottom: 0;
+    right: 0;
+    max-width: 290px;
+    width: 25%;
+    background-color: $lightgray;
+    right: 0;
+    @include transform(translateX(100%));
+    @include transition-property (transform, opacity);
+    @include transition-duration(0.4s, 0.1s);
+    @include transition-delay(0, 0.3s);
+    @media (max-width: 710px) {
+      width: 100%;
+      max-width: none;
+      height: 250px;
+
+      @include transform(translateX(0px));
+      @include transform(translateY(100%));
+    }
+    h1 {
+      font-size: 22px;
+      color: $offmiddle-dark;
+      margin-bottom: 20px;
+    }
+    a.view-site, a.view-project {
+      font: 400 14px 'Lato', sans-serif;
+      text-transform: uppercase;
+      display: block;
+    }
+    a.view-site {
+      color: $offmiddle;
+      margin-bottom: 20px;
+      &:hover {
+        color: $offmiddle-dark;
+      }
+    }
+    a.view-project {
+      padding: 15px 35px;
+      background-color: $offmiddle;
+      border-radius: 4px;
+      color: $lightgray;
+      &:hover {
+        background-color: $offmiddle-dark;
+      }
+    }
+  }
+}
+
+// Project
+
+.project-main {
+  img {
+    display: block;
+  }
+}
+
+.project-details {
+  text-align: center;
+  padding: 25px;
+  width: 100%;
+  background-color: $lightgray;
+  h1 {
+    font-size: 22px;
+    color: $offmiddle-dark;
+    margin-bottom: 20px;
+  }
+  a.view-site, a.view-project {
+    font: 400 14px 'Lato', sans-serif;
+    text-transform: uppercase;
+    display: block;
+  }
+  a.view-site {
+    color: $offmiddle-dark;
+    margin-bottom: 20px;
+    &:hover {
+      color: $offred;
+    }
+  }
+  a.view-project {
+    padding: 15px 35px;
+    background-color: $offred;
+    border-radius: 4px;
+    color: $lightgray;
+    &:hover {
+      background-color: $offmiddle-dark;
+    }
+  }
+}
+
+.design-code {
+  padding: 15px;
+  text-align: center;
+  cursor: default;
+  p {
+    font: 400 12px 'Lato', sans-serif;
+    color: $offmiddle;
+  }
+  span {
+    font: 400 12px 'Lato', sans-serif;
+    text-transform: uppercase;
+    display: inline-block;
+    color: white;
+    padding: 10px 15px;
+    border-radius: 4px;
+    cursor: default;
+    &.designed {
+      background-color: $offblue;
+      margin-right: 3px;
+      //border-radius: 4px 0 0 4px;
+      @media (max-width: 1000px) and (min-width: 767px) {
+        margin-right: auto;
+      }
+      &.disabled {
+        background-color: lighten(gray, 45%);
+      }
+    }
+    &.coded {
+      background-color: $offred;
+      //border-radius: 0 4px 4px 0;
+      &.disabled {
+        background-color: lighten(gray, 45%);
+      }
+    }
+    &.amp {
+      color: $offmiddle;
+      padding: 0;
+      margin-right: 3px;
+      font-size: 10px;
+      &.disabled {
+        color: lighten(gray, 40%);
+      }
+      @media (max-width: 1000px) and (min-width: 767px) {
+        margin-right: auto;
+      }
+    }
+    @media (max-width: 1000px) and (min-width: 767px) {
+      display: block;
+      max-width: 90px;
+      margin: 5px auto;
+    }
+  }
+}
+
+.project-description {
+  font: normal 16px/1.75 "Vollkorn", serif;
+  color: $offmiddle-dark;
+  padding: 15px 30px;
+}
+
+.work-full-screen {
+  overflow: hidden;
+}
+
+
+
+// Footer
+
+footer {
+  background-color: darken($lightgray, 10%);
+  margin-left: -95px;
+  width: -webkit-calc( 100% + 135px);
+  width: calc( 100% + 135px);
+  @media(max-width: 767px) {
+    margin: 45px -25px 0;
+    width: auto;
+  }
+  .footer-inner {
+    padding: 25px;
+    text-align: center;
+    font: 400 14px "Lato", sans-serif;
+    color: $offmiddle;
+    @media(max-width: 767px) {
+      padding: 25px 0;
+    }
+  }
+  a {
+    color: darken($offmiddle, 10%);
+    &:hover {
+      color: $offmiddle;
+    }
+  }
+}
+
+.work footer {
+  margin-left: 0;
+  width: 100%;
+  @media(max-width: 767px) {
+    margin: 0;
+    width: auto;
+  }
+}
