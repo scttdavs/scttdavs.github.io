@@ -11,6 +11,11 @@ title: Writing
     <span class='date'>
       {{ post.date | date: "%b %-d, %Y" }}
     </span>
-    {{ post.content truncatewords:75}}
+    <div class='excerpt'>
+      {{ post.excerpt }}
+    </div>
+    <a href="{{ post.url }}" class="continue">continue reading</a>
+    
   </div>
+
 {% endfor %}

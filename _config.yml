@@ -17,3 +17,9 @@ github_username:  scttdavs
 
 # Build settings
 markdown: kramdown
+
+# Outputting
+permalink: blog/:title
+
+# Other
+excerpt_separator: <!--more-->
