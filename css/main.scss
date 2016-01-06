@@ -4,6 +4,7 @@
 // Import partials from `sass_dir` (defaults to `_sass`)
 @import "_normalize.scss";
 @import "_bourbon.scss";
+@import "_prism.scss";
 
 // Variables
 
@@ -62,6 +63,10 @@ p {
       color: $offred
     }
   }
+}
+
+figure {
+  margin: 0;
 }
 
 ::selection {
