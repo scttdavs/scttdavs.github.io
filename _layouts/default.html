@@ -9,12 +9,12 @@
 
     <div class='gradient-bar'></div>
 
-    <div class='group'>
+    <div class='group' itemscope itemtype="http://schema.org/Blog">
       <section class='main article-list'>
         {{ content }}
       </section>
 
-      {% include default_aside.html %}
+      {% include author_aside.html %}
     </div>
 
     {% include footer.html %}
