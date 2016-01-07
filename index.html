@@ -3,21 +3,22 @@ layout: default
 title: Writing
 ---
 
-{% for post in site.posts %}
-  <div class='article-item full-article group' itemprop="articleBody">
-    <h1 itemprop="name headline">
-      {{ post.title }}
-    </h1>
-    <span class="date">
-      <time datetime="{{ post.date | date_to_xmlschema }}" itemprop="datePublished">
-        {{ post.date | date: "%b %-d, %Y" }}
-      </time>
-    </span>
-    <div class='excerpt' itemprop="articleBody">
-      {{ post.excerpt }}
+<div class="blog-page">
+  {% for post in site.posts %}
+    <div class='article-item full-article group' itemprop="articleBody">
+      <h1 itemprop="name headline">
+        {{ post.title }}
+      </h1>
+      <span class="date">
+        <time datetime="{{ post.date | date_to_xmlschema }}" itemprop="datePublished">
+          {{ post.date | date: "%b %-d, %Y" }}
+        </time>
+      </span>
+      <div class='excerpt' itemprop="articleBody">
+        {{ post.excerpt | remove: '<img>' }}
+      </div>
+      <a href="{{ post.url }}" class="continue" itemprop="url">continue reading</a>
+      
     </div>
-    <a href="{{ post.url }}" class="continue" itemprop="url">continue reading</a>
-    
-  </div>
-
-{% endfor %}
+  {% endfor %}
+</div>
