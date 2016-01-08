@@ -1,6 +1,6 @@
 ## Scott Davis' Website
 
-This is the code for my website sco.ttdavis.com or scttdavs.github.io.
+This is the code for my website [sco.ttdavis.com](sco.ttdavis.com) or [scttdavs.github.io](scttdavs.github.io).
 
 ## License
 The following directories and their contents are Copyright Scott Davis. You may not reuse anything therein without my permission:
