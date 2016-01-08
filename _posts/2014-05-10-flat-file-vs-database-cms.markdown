@@ -46,17 +46,17 @@ I would consider using a flat file cms for a personal site or blog (where the de
 
 Here is a list of popular flat file cms’s:
 
-[Getkirby.com](Getkirby.com) free
-[Statamic.com](Statamic.com)
-[Pico.dev7studios.com](Pico.dev7studios.com) free
-[Jekyllrb.com](Jekyllrb.com) free (technically not cms)
-[Siteleaf.com](Siteleaf.com) (static sites only)
+[Getkirby.com](Getkirby.com) free  
+[Statamic.com](Statamic.com)  
+[Pico.dev7studios.com](Pico.dev7studios.com) free  
+[Jekyllrb.com](Jekyllrb.com) free (technically not cms)  
+[Siteleaf.com](Siteleaf.com) (static sites only)  
 
 and a list of great non wordpress cms’s:
 
-[Grabaperch.com](Grabaperch.com)
-[Surrealcms.com](Surrealcms.com) free trial
-[CouchCMS.com](CouchCMS.com) free (pay to whitelabel)
-[AnchorCMS.com](AnchorCMS.com) free
-[Builtwithcraft.com](Builtwithcraft.com) free for simple sites
-[Habariproject.org](Habariproject.org) free
+[Grabaperch.com](Grabaperch.com)  
+[Surrealcms.com](Surrealcms.com) free trial  
+[CouchCMS.com](CouchCMS.com) free (pay to whitelabel)  
+[AnchorCMS.com](AnchorCMS.com) free  
+[Builtwithcraft.com](Builtwithcraft.com) free for simple sites  
+[Habariproject.org](Habariproject.org) free  
