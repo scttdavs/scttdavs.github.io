@@ -6,10 +6,10 @@
 # 'jekyll serve'. If you change this file, please restart the server process.
 
 # Site settings
-title: Scott Davis
+title: Scott Davis | Front End Developer
 email: sc@ttdavis.com
 description: > # this means to ignore newlines until "baseurl:"
-  Developer / Designer
+  Front End Developer / Person
 baseurl: "" # the subpath of your site, e.g. /blog
 url: "http://sco.ttdavis.com" # the base hostname & protocol for your site
 twitter_username: scttdavs
