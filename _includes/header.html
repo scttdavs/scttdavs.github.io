@@ -5,7 +5,7 @@
       {% for my_page in site.pages %}
         {% if my_page.title %}
           <li>
-            <a href="{{ my_page.url }}">{{ my_page.title }}</a>
+            <a href="{{ my_page.url | remove: 'index.html' }}">{{ my_page.title }}</a>
           </li>
         {% endif %}
       {% endfor %}
