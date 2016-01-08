@@ -1,0 +1,42 @@
+// About
+
+.get-in-touch {
+  margin-top: 45px;
+  @media (max-width: 767px) {
+    margin-top: 0;
+  }
+}
+
+.full-width {
+  margin: 0 -40px 0 -95px;
+}
+
+.col-4 {
+  width: 33.333333%;
+  float: left;
+}
+
+.col-8 {
+  width: 66.666666%;
+  float: left;
+  min-height: 1px;
+}
+
+a.icon {
+  font-size: 24px;
+  color: darken($offblue, 10%);
+  &:hover{
+    color: $offred;
+  }
+  &.codepen {
+    background-image: url('../images/codepen.svg');
+    background-size: cover;
+    background-repeat: no-repeat;
+    width: 28px;
+    height: 28px;
+    display: inline-block;
+    &:hover {
+      background-image: url('../images/codepen-red.svg')
+    }
+  }
+}
