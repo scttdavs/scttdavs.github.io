@@ -1,12 +1,26 @@
 .photos-page {
+  @media(max-width: 767px) {
+    margin-bottom: 25px;
+  }
+
   > a {
     width: 48%;
     display: inline-block;
     margin-bottom: 2%;
     float: left;
 
+    @media(max-width: 767px) {
+      width: 100%;
+      margin-bottom: 15px;
+      float: none;
+    }
+
     &:nth-child(odd) {
       margin-right: 2%;
+
+      @media(max-width: 767px) {
+        margin-right: 0;
+      }
     }
   }
 }

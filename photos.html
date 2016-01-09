@@ -4,7 +4,7 @@ title: Photos
 permalink: /photos/
 ---
 
-<div class="photos-page" itemscope itemtype="https://schema.org/ImageGallery">
+<div class="photos-page group" itemscope itemtype="https://schema.org/ImageGallery">
   {% for photo in site.photos reversed %}
     <a href="{{ photo.url }}" class="continue">
       <div class='photo-item group' style="background-image: url('/images/photos/{{ photo.name }}.jpg')" itemscope itemtype="https://schema.org/Photograph">
