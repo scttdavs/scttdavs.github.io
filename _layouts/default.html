@@ -9,7 +9,7 @@
 
     {% include gradient-bar.html %}
 
-    <div class='group' itemscope itemtype="http://schema.org/Blog">
+    <div class='group' {% if page.title == "Writing" %} itemscope itemtype="http://schema.org/Blog"{% endif %}>
       <section class='main article-list'>
         {{ content }}
       </section>

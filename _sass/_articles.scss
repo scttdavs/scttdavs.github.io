@@ -87,9 +87,13 @@ p.summary {
   }
 }
 
-span.date {
+span.date, span.author {
   font: 400 12px "Lato", sans-serif;
   color: $offmiddle;
+
+  span {
+    color: $offmiddle-dark;
+  }
 }
 
 .blog-page img {
