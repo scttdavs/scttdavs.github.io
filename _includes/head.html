@@ -8,7 +8,7 @@
     <meta name="twitter:creator" content="@scttdavs">
     <meta name="twitter:title" content="{{ page.title }}">
     <meta name="twitter:description" content="{{ page.content | strip_html }}">
-    <meta name="twitter:image" content="/images/photos/{{ page.name }}.jpg">
+    <meta name="twitter:image" content="{{ site.url }}/images/photos/{{ page.name }}.jpg">
   {% endif %}
 
   <title>{% if page.title and page.titleIgnore != true %}{{ page.title }} | Scott Davis{% else %}{{ site.title }}{% endif %}</title>
