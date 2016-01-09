@@ -7,11 +7,7 @@
   &:last-child {
     border-bottom: none;
   }
-  span.date {
-    font: 400 12px "Lato", sans-serif;
-    color: $offmiddle;
-  }
-  p, li {
+  li {
     color: darken($offmiddle, 10%);
     font: normal 20px/30px "Vollkorn", Georgia;
   }
@@ -89,6 +85,11 @@ p.summary {
     font-weight: 700;
     color: $offmiddle-dark;
   }
+}
+
+span.date {
+  font: 400 12px "Lato", sans-serif;
+  color: $offmiddle;
 }
 
 .blog-page img {

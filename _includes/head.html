@@ -2,6 +2,15 @@
   <meta charset="utf-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
 
+  {% if page.meta == true %}
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:site" content="@scttdavs">
+    <meta name="twitter:creator" content="@scttdavs">
+    <meta name="twitter:title" content="{{ page.title }}">
+    <meta name="twitter:description" content="{{ page.content | strip_html }}">
+    <meta name="twitter:image" content="/images/photos/{{ page.name }}.jpg">
+  {% endif %}
+
   <title>{% if page.title and page.titleIgnore != true %}{{ page.title }} | Scott Davis{% else %}{{ site.title }}{% endif %}</title>
   <meta name="description" content="{% if page.excerpt %}{{ page.excerpt | strip_html | strip_newlines | truncate: 160 }}{% else %}{{ site.description }}{% endif %}">
 

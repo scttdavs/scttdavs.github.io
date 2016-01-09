@@ -1,0 +1,22 @@
+---
+layout: default
+title: Photos
+permalink: /photos/
+---
+
+<div class="photos-page">
+  {% for photo in site.photos reversed %}
+    <a href="{{ photo.url }}" class="continue">
+      <div class='photo-item group' style="background-image: url('/images/photos/{{ photo.name }}.jpg')">
+        <div class="info">
+          <h2>
+            {{ photo.title }}
+          </h2>
+          <div class='excerpt'>
+            {{ photo.content }}
+          </div>
+        </div>
+      </div>
+    </a>    
+  {% endfor %}
+</div>

@@ -1,0 +1,69 @@
+.photos-page {
+  > a {
+    width: 48%;
+    display: inline-block;
+    margin-bottom: 2%;
+    float: left;
+
+    &:nth-child(odd) {
+      margin-right: 2%;
+    }
+  }
+}
+
+.photo-item {
+  width: 100%;
+  height: 200px;
+  background-size: cover;
+  background-position: center;
+  position: relative;
+  padding: 15px;
+
+  &:after {
+    transition: background-color 0.5s ease;
+    background-color: rgba(0, 0, 0, 0);
+    content: "";
+    display: block;
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 1;
+  }
+
+  &:hover {
+    &:after {
+      background-color: rgba(0, 0, 0, 0.3);
+    }
+
+    h2, .excerpt {
+      opacity: 1;
+    }
+  }
+
+  .info {
+    @include vertical-align();
+    position: relative;
+    text-align: center;
+    z-index: 5;
+  }
+
+  h2, .excerpt {
+    margin-top: 0;
+    color: white;
+    opacity: 0;
+    transition: opacity 0.5s ease;
+  }
+
+}
+
+.photo {
+  img {
+    margin-top: 20px;
+  }
+}
+
+.photo-list {
+  width: 100%;
+}

@@ -126,3 +126,10 @@ h5 {
     }
   }
 }
+
+.article-item, .work-item, .photo {
+  p {
+    color: darken($offmiddle, 10%);
+    font: normal 20px/30px "Vollkorn", Georgia;
+  }
+}
