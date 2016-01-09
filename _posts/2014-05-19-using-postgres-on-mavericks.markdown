@@ -1,6 +1,7 @@
 ---
 layout: post
 title: "Uing PG (postgres) on Mavericks"
+meta: post
 ---
 
 Heroku only uses Postres for databases. That's fine, so you just need install it locally for developement. Well, you are probably pulling your hair out trying to install the pg gem on Mavericks. That's because you can't (as of yet anyway). The good news is there's a quick and easy way.

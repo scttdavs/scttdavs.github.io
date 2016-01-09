@@ -1,6 +1,7 @@
 ---
 layout: post
 title:  "Caching model associations in rails"
+meta: post
 ---
 
 I've been working on a project recently called [www.explorableplaces.com][exp], and I added memcached caching with [Dalli][dalli]. So I'm basically trying to cache anything and everything that can help our performance. 

@@ -1,6 +1,7 @@
 ---
 layout: post
 title:  "Upgrading Bootstrap 2.x to 3"
+meta: post
 ---
 
 ![](/images/bootstrap.jpg)

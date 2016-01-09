@@ -1,6 +1,7 @@
 ---
 layout: post
 title: "Flat File vs Database CMS"
+meta: post
 ---
 
 ## What Is A Flat File CMS?
