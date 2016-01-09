@@ -1,7 +1,7 @@
 ---
 layout: photo
 title: "silver lake"
-date: 2016-01-08
+time: 2016-01-08
 name: silver-lake
 meta: photo
 ---
