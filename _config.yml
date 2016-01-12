@@ -29,3 +29,6 @@ permalink: blog/:title
 
 # Other
 excerpt_separator: <!--more-->
+
+gems:
+  - jekyll-sitemap
