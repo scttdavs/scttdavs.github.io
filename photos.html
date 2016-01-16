@@ -9,7 +9,7 @@ permalink: /photos/
     <div class="photos-page group">
       {% for photo in site.photos reversed %}
         <a href="{{ photo.url }}" class="continue">
-          <div class='photo-item group' style="background-image: url('/images/photos/{{ photo.name }}.jpg')" itemscope itemtype="https://schema.org/Photograph">
+          <div class='photo-item group' style="background-image: url('/images/photos/thumbs/{{ photo.name }}.jpg')" itemscope itemtype="https://schema.org/Photograph">
             <div class="info">
               <h2 itemprop="name">
                 {{ photo.title }}
@@ -27,6 +27,6 @@ permalink: /photos/
       {% endfor %}
     </div>
   </section>
-  
+
   {% include author_aside.html show_extra="true" %}
 </div>

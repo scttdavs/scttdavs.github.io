@@ -35,6 +35,7 @@
 
   &:after {
     transition: background-color 0.5s ease;
+    cursor: pointer;
     background-color: rgba(0, 0, 0, 0);
     content: "";
     display: block;
@@ -44,6 +45,10 @@
     right: 0;
     bottom: 0;
     z-index: 1;
+
+    &:hover {
+      cursor: pointer;
+    }
   }
 
   &:hover {
@@ -61,6 +66,10 @@
     position: relative;
     text-align: center;
     z-index: 5;
+
+    &:hover {
+      cursor: pointer;
+    }
   }
 
   h2, .excerpt {
