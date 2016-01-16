@@ -11,13 +11,19 @@
     <meta name="twitter:image" content="{{ site.url }}/images/photos/{{ page.name }}.jpg">
     <meta name="og:title" content="{{ page.title }}">
     <meta name="og:image" content="{{ site.url }}/images/photos/{{ page.name }}.jpg">
+    <meta name="og:image:height" content="{{ page.height }}">
+    <meta name="og:image:width" content="{{ page.width }}">
     <meta name="og:site_name" content="Scott Davis">    
     <meta name="og:description" content="{{ page.content | strip_html }}">
+
   {% else if page.meta = "post" %}
     <meta name="twitter:card" content="summary" />
     <meta name="twitter:site" content="@scttdavs" />
     <meta name="twitter:title" content="{{ page.title }}" />
     <meta name="twitter:description" content="{{ page.excerpt | strip_html }}" />
+  {% else %}
+    <meta name="og:title" content="{{ page.title }}">
+    <meta name="og:site_name" content="Scott Davis">    
   {% endif %}
 
   <title>{% if page.title and page.titleIgnore != true %}{{ page.title }} | Scott Davis{% else %}{{ site.title }}{% endif %}</title>
