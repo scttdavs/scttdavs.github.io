@@ -1,8 +1,11 @@
 ---
 layout: post
 title: "Converting My Site to Jekyll"
+photo: jekyll
 meta: post
 ---
+
+![](/images/jekyll.jpg)
 
 ## Background (tldr, how I did it next section)
 
@@ -78,7 +81,7 @@ Also what is very important is [Front Matter][frontmatter]. Front Matter is the 
 
 Any of these variables are available with the page variable, so `page.title` for instance. Any variable associated with your site (and set in the _config.yml file) are available on the site variable: `site.url`. More on variables [here][variables].
 
-There is a quite a bit that will probably be involved in making your templates and layouts for your site, but that's not what this post is about. So I'll leave that to you. But once that is done, time to put that shit up on the web!
+You can have a look at my finished site repo [here][my-site] for reference. There is a quite a bit that will probably be involved in making your templates and layouts for your site, but that's not what this post is about. So I'll leave that to you. But once that is done, time to put that shit up on the web!
 
 ## Github hosting
 
@@ -109,3 +112,4 @@ Feel the sun shining on your face? The nice cool breeze? The ease of deploying t
 [liquid]: https://docs.shopify.com/themes/liquid-documentation/basics
 [couch]: http://www.couchcms.com/
 [custom-domain]: https://help.github.com/articles/setting-up-a-custom-domain-with-github-pages/
+[my-site]: https://github.com/scttdavs/scttdavs.github.io
