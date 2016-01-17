@@ -1,6 +1,6 @@
 ---
 layout: post
-title:  "Caching model associations in rails"
+title: "Caching model associations in rails"
 meta: post
 ---
 

@@ -1,0 +1,93 @@
+---
+layout: post
+title: "Converting My Site to Jekyll"
+meta: post
+---
+
+## Background
+
+I first built my personal site over 10 years ago. I didn't know much about web development then (even if I thought I did), so at first I stuck to what I knew most, flash. Those were the days, an entirely animated site. It may have been hell to maintain, and even to use sometimes, but they sure were fun to build.
+
+After flash went out of style, very quickly, I just wanted a simple site but one where I could add content without having to add <!--more--> a new static page. I didn't know rails or node then, so making an app was pretty much out of the question. So I turned to what was in favor then, Wordpress. Converting my site to Wordpress was pretty easy and before long I had my custom designed and built site. I could login and add a piece to my portfolio in a few minutes. But Wordpress had its own problems. It wasn't very enjoyable to work in for one. The dashboard was messy, plugins seemed like an easy solution, but in reality were a mess. Often they conflicted with each other, or you had to search around to find the best one that actually works for what you're trying to do. I defintely felt tied up and limited to what I could do with it.
+
+Around that time, some actual CMSs started to come about. I saw one recommended on twitter and decided to give it a shot, converting my site once again to CouchCMS this time. Couch was heaven compared to Wordpress. Simple to set up, drop the tags in your HTML files, no need to convert to Wordpress' complicated template system. And again, this was fine for a while, some things became apparent here too. I still forget how I set it up, password, log in portal, it's still php, and I'm still having to ftp all my changes whenever I want to add a part of my site. The kicker was when I got a security update that I needed to patch from them or else I would be at risk of being hacked. It was time yet again for a change.
+
+Enter Jekyll. Now I've known about Jekyll for a few years, but by then, my site was up and running fine and I didn't have a desire to switch then. My how times have changed. I dived right in and within a day I had my site up. Even better with Jekyll, you can get free hosting with Github Pages (since that's what they run on and Github created Jekyll). So with my site now running Jekyll, I get:
+
+- Free hosting
+- custom domain names easily added
+- no more ftp, just push changes to repo and watch them go live
+- free backups, it's all on github after all
+- no dbs, even more portable should I decide to switch hosts (for some reason)
+- secure, no need to log in and keep passwords, nothing to hack into or get because nothing sensitive is there
+
+I'll go over the basic steps of how I did it below. Jekyll has really good documentation, but I feel it's not great as a first introduction, but more as reference and deep diving into features.
+
+## What is Jekyll?
+
+Jekyll is a static site generator. That means no logging in, no databases, just files sitting on your server and people viewing them. With Jekyll, you create templates for your site, add content via separate files (one file for each post, for example), and jekyll processes the whole thing, pumping out all the static files you need for your site. So with a lot of code reuse, we have just a few templates, our content, and then a whole lot of output. 
+
+## Installing Jekyll
+
+This may be the most technical part of the process, just getting the necessary tools installed. But first, you need to install Jekyll, so in terminal:
+
+{% highlight shell %}
+gem install jekyll
+{% endhighlight %}
+
+And then create your project wherever you want it:
+
+{% highlight shell %}
+jekyll new kickass-site
+{% endhighlight %}
+
+and then change directories to your site run your server. You don't need to do this *on* your server to view your site, but it's what generates all your files for you locally.
+
+{% highlight shell %}
+cd kickass-site
+jekyll serve
+jekyll new my-awesome-site
+{% endhighlight %}
+
+Open up your kickass site in your favorite editor and get to work!
+
+## Jekyll File Structure
+
+When you open up your site you'll see a lot is created for you. I'll go over each one to explain them. 
+
+Folders starting with `_` are special. They are used by Jekyll for specific purposes. For example `_posts` is where all your posts live, not rocket science. `_includes` are where partials live. So you can do:
+
+{% highlight liquid %}
+{% raw %}
+{% include footer.html %}
+{% endraw %}
+{% endhighlight %}
+
+in your template to include a footer you made. By default, it will look in the `_includes` folder. `_layouts` are where your layouts live, which probably all of your pages will have a layout associated with them. `_site` is where all your converted files for your static site live. This should never be used for anything else. If you upload your site to your own host, these are the contents that you upload.
+I think the rest are easily understood. There is a `_drafts` folder you can create yourself for drafing posts. When you run your server with a `--drafts` flag, it will convert these for you for previewing them.
+
+## Templates and Layouts and... Front Matter?
+
+Jekyll uses liquid templating developed by Shopify. So if you have any syntax questions revolving around that, you know what to google. Liquid is extremely simple and similar to a lot of other simple templating languages, like mustache and handlebars. You can review some samples on Jekyll's site.
+
+Important here to note though is Front Matter. Front Matter is the meta information denoted at the top of every page and post (or any other content you added). It includes basics such as title, which layout to use with it, and any other information you want passed along up the chain that is usefor for your site. 
+
+Any of these variables are available with the page variable, so `page.title` for instance. Any variable associated with your site (and set in the _config.yml file) are available on the site variable: `site.url`. More on variables here.
+
+There is a quite a bit that will probably be involved in making your templates and layouts for your site, but that's not what this post is about. So I'll leave that to you. But once that is done, time to put that shit up on the web.
+
+## Github hosting
+
+Sure, you can pay for your own hosting, but why bother when you can get unlimited free hosting that is super fast? Just upload to github, it's ridiculously easy. First thing's first, create a new repo on github that has this naming scheme: `username.github.io` where "username" is *your* github username. It must be named this way exactly. 
+
+Second, add `_sites` and anything else you don't want on your public repo in your .gitignore file. Github will generate your site for you, so no need to commit the `_site` folder. Also, maybe you have user/admin info stored in `_data`, so you may want to exclude that too.
+
+Third, just push to your repo. That's it. You should be able to visit your site within a couple seconds at *username*.github.io. Woohoo!!! 
+
+## Custom Domain Names
+
+Support for this is easy. First just creat a new file called `CNAME` and on the first line, put your domain name. For mine, I just put "sco.ttdavis.com". Commit to your repo. Next, you'll need to update your DNS settings for your domain. For a apex domain, you'll need to add a new A name. And for subdomains, add a new CNAME. For more info on your case, see here.
+
+## That's it!
+
+Feel the sun shining on your face? The nice cool breeze? The ease of deploying to your freely hosted site in seconds? Feels great to be alive doesn't it?
