@@ -13,6 +13,14 @@ $blue:     #6DC2FD; //  reserved keywords
 $cyan:     #69FFF4; //  strings, numbers
 $green:    #3AE25C; //  operators, other keywords
 
+code.highlighter-rouge {
+    color: $offmiddle-dark;
+    background-color: $lightgray;
+    padding-left: 5px;
+    padding-right: 5px;
+    font-size: 0.9em;
+}
+
 .highlight {
     background-color: $bg-color; color: $body;
 
