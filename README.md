@@ -6,6 +6,7 @@ This is the code for my website [sco.ttdavis.com](http://sco.ttdavis.com) or [sc
 The following directories and their contents are Copyright Scott Davis. You may not reuse anything therein without my permission:
 
 - _posts/
+- _photos/
 - _drafts/
 - images/
 
