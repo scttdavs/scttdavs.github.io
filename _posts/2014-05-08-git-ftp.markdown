@@ -8,13 +8,13 @@ meta: post
 
 There are several tools to help developers deploy changes to their site...that is if they manage their own server. With Rails, maybe the most popular gem is [Capistrano][capistrano]. With it, all you do is type
 
-{% highlight shell %}
+{% highlight console %}
 cap deploy
 {% endhighlight %}
 
-into the terminal and hit enter. It sends only the files that have been updated since your latest Git commit. It's fantastic and very easy to use once you've set it up. If you use Heroku, they have their own CLI (Command Line Interface) with tools to do the exact same thing. Once installed and set up, all you need to type in terminal is
+into the terminal and hit enter. It sends only the files that have been updated since your latest Git commit. It's fantastic and very easy <!--more--> to use once you've set it up. If you use Heroku, they have their own CLI (Command Line Interface) with tools to do the exact same thing. Once installed and set up, all you need to type in terminal is
 
-{% highlight shell %}
+{% highlight console %}
 git push heroku master
 {% endhighlight %}
 
@@ -32,7 +32,7 @@ This all assumes you already use Git to version control all your projects becaus
 
 Using this thing is dead simple, but requires us to use some things a lot of front-end developers may not use. It's worth it, so we'll just have to get over it. Time to fire up terminal! First thing is first, and the easiest way to get this done is install [Homebrew][homebrew]. This should only need one line of code to do this and that's
 
-{% highlight shell %}
+{% highlight console %}
 ruby -e "$(curl -fsSL https://raw.github.com/Homebrew/homebrew/go/install)"
 {% endhighlight %}
 
@@ -40,19 +40,19 @@ Copy and paste that in terminal and hit enter. You may have to install Xcode too
 
 Once installed, run:
 
-{% highlight shell %}
+{% highlight console %}
 brew update
 {% endhighlight %}
 
 then
 
-{% highlight shell %}
+{% highlight console %}
 brew doctor
 {% endhighlight %}
 
 It will probably say you're good to go. If so then all we need to do to install git-ftp is this:
 
-{% highlight shell %}
+{% highlight console %}
 # brew install git
 # brew install curl --with-ssl --with-ssh
 # brew install git-ftp
@@ -64,13 +64,13 @@ Note, if you already have git installed, ignore that first line. Git-ftp should 
 
 Ok, let's get to it. With terminal still open, type "cd" (this stands for change directory). We are going to naviage to your project folder. There are ways to do this in terminal but the easiest method to explain in this tutorial is just to open up finder, locate your project folder and drag and drop it into the terminal window. So your line should now read:
 
-{% highlight shell %}
+{% highlight console %}
 cd /mycomputer/sites/myprojectfolderpath
 {% endhighlight %}
 
 Hit enter, and now type out this line, filled in with your own info of course:
 
-{% highlight shell %}
+{% highlight console %}
 git ftp init -u <user> -p - ftp://host.example.com/public_html
 {% endhighlight %}
 
@@ -78,7 +78,7 @@ Remember not to just paste your ftp url. You need to include the subdirectories 
 
 For every other deployment after that you can use this line:
 
-{% highlight shell %}
+{% highlight console %}
 git ftp push --user <user> --passwd <password> ftp://host.example.com/public_html
 {% endhighlight %}
 

@@ -36,19 +36,19 @@ I'll go over the basic steps of how I did it below as a feel a quick introductio
 
 This may be the most technical part of the process, just getting the necessary tools installed. But first, you need to install Jekyll, so in terminal:
 
-{% highlight shell %}
+{% highlight console %}
 gem install jekyll
 {% endhighlight %}
 
 And then create your project wherever you want it:
 
-{% highlight shell %}
+{% highlight console %}
 jekyll new kickass-site
 {% endhighlight %}
 
 and then change directories to your site and run your server. You don't need to start your server *on* your server to have your site be viewable, but doing this locally is what generates all your files for you.
 
-{% highlight shell %}
+{% highlight console %}
 cd kickass-site
 jekyll serve
 jekyll new my-awesome-site
