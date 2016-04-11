@@ -68,17 +68,15 @@ var lowercase = typist(String, function(str) {
   return null;
 }
 lowercase(3); // Throws TypistError
-
-
 {% endhighlight %}
 
 ## Handling Errors
 
 It would make the most sense to return a `TypeError` when a check fails, but this would be confusing if some type error unrelated to this library occurs. It would be tough to debug and distinguish which came from Typist and which didn't. For that reason, Typist throws its own custom errors that inherit from `TypeError`, including a helpful message:
 
-```
+{% highlight console %}
 TypeError: TypistError: Expected 1,2,3 to be of type String
-```
+{% endhighlight %}
 
 ## Support
 
