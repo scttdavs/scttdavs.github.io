@@ -5,7 +5,7 @@ photo: ssl
 meta: post
 ---
 
-![](/images/ssl.png)
+![](/images/ssl.jpg)
 
 In the past, you would probably only really check if a website used https if you are purchasing something, or *maybe* if you were logging in. In the last few years, there has (rightly) been a large movement to better ensure privacy and security. Why not have every site and every page be encrypted? That's a good question, and one Google has already answered for itself. Not only will Google start [shaming websites that are not https][shaming], they will also [give an SEO boost][seo] to those that are. <!--more-->If your customer's peace of mind wasn't enough, you now have more than enough incentive to make the switch.
 
