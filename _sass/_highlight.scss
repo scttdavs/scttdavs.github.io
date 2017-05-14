@@ -13,6 +13,10 @@ $blue:     #6DC2FD; //  reserved keywords
 $cyan:     #69FFF4; //  strings, numbers
 $green:    #3AE25C; //  operators, other keywords
 
+.pre-wrap pre {
+  white-space: pre-wrap;
+}
+
 code.highlighter-rouge {
     color: $offmiddle-dark;
     background-color: $lightgray;
