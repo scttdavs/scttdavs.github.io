@@ -7,9 +7,11 @@ meta: post
 
 [![](/images/mandelbrot.jpg)](http://sco.ttdavis.com/mandelbrot/?mi=200&er=5&co=true&j=true&ci=0.15&cr=-0.79&zi=0&zr=0&i=0.00366412213740458){:target="\_blank"}
 
-A funny story about me is how I got into web development. It essentially boiled down to me learning, and then becoming obsessed with, [making programs on my TI-83 Plus calculator][ticalc]{:target="\_blank"} in a BASIC-like language designed just for the calculator. This made it a perfect portable IDE for someone learning how to program. I made [minesweeper](http://www.ticalc.org/archives/files/fileinfo/288/28883.html){:target="\_blank"}, [lights out](http://www.ticalc.org/archives/files/fileinfo/295/29524.html){:target="\_blank"}, [D-Star (with custom level editor, I might add)](http://www.ticalc.org/archives/files/fileinfo/296/29633.html){:target="\_blank"}, and a program to view fractals! Well, apparently I forgot<!--more--> to upload that last one. And so began my obsession as an adult to relearn and recreate this with my new fancy web development skills I've picked up in the last 15 years. So basically do it in Javascript.
+A funny story about me is how I got into web development. It essentially boiled down to me learning, and then becoming obsessed with, [making programs on my TI-83 Plus calculator][ticalc]{:target="\_blank"} in a BASIC-like language designed just for the calculator. This made it a perfect portable IDE for someone learning how to program. I made [minesweeper](http://www.ticalc.org/archives/files/fileinfo/288/28883.html){:target="\_blank"}, [lights out](http://www.ticalc.org/archives/files/fileinfo/295/29524.html){:target="\_blank"}, [D-Star (with custom level editor, I might add)](http://www.ticalc.org/archives/files/fileinfo/296/29633.html){:target="\_blank"}, and a program to view fractals! Well, apparently I forgot<!--more--> to upload that last one. And so began my obsession as an adult to relearn and recreate this with my new fancy web development skills I've picked up in the last 15 years. So basically, [I did it in Javascript](http://sco.ttdavis.com/mandelbrot/){:target="\_blank"}.
 
-After some quick digging, I realized I was way smarter as a high schooler than I am now. How did I do this before? Complex numbers, complex plane, how to iterate correctly and determine if it has escaped. And after I figured all that stuff out, I had to tackle more problems, how to zoom in, how to colorize (both grayscale and color as the calculator had neither). This was going to be a tough task.
+After some quick digging, I realized I was way smarter as a high schooler than I am now. How did I do this before? Complex numbers, complex plane, how to iterate correctly and determine if it has escaped toward infinity. And after I figured all that stuff out, I had to tackle more problems, how to zoom in, how to colorize (both grayscale and color as the calculator had neither). This was going to be a tough task.
+
+(Also I'd like to point out all images in this post link to the fractal viewer itself, to see that image live)
 
 ## No Framework
 
@@ -50,7 +52,7 @@ Sweet variable names, no?
 
 ## The End
 
-All in all, this was a lot of fun to work on and hope others enjoy it at least a fraction as much as I did. [Check it out here](http://sco.ttdavis.com/mandelbrot), or just look at my screenshots below to see what all this talk is about.
+All in all, this was a lot of fun to work on and hope others enjoy it at least a fraction as much as I did. [Check it out here](http://sco.ttdavis.com/mandelbrot/){:target="\_blank"}, or just look at my screenshots below to see what all this talk is about (remember they are clickable!).
 
 [![](/images/mandelbrot3.jpg)](http://sco.ttdavis.com/mandelbrot/?mi=250&er=5&co=true&j=true&ci=0.15&cr=-0.79&zi=0.4728578244274809&zr=-0.20152671755725204&i=0.0004637404580152672){:target="\_blank"}
 [![](/images/mandelbrot4.jpg)](http://sco.ttdavis.com/mandelbrot/?mi=150&er=5&co=true&j=true&ci=0.008&cr=0.28&zi=0&zr=0&i=0.00366412213740458){:target="\_blank"}
