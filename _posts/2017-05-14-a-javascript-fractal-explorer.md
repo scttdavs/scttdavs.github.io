@@ -36,7 +36,7 @@ With the absense of i also comes an alternative way of dealing with complex numb
 
 ## Zooming In
 
-Zooming in was not, in and of itself, that difficult. You just save the left, right, top and bottom boundaries and that's that...right? Well, as soon as you open that link in a window with a different aspect ratio, it gets all mucked up. Instead of saving the "viewport window", I needed to save the origin (middle coordinate of the screen), and the delta of values between the x plane (real numbers) and y plane (imaginary numbers). This way I could render and view, at any zoom level, on any device and it will be centered and look correct.
+Zooming in was not, in and of itself, that difficult. When the user clicks and drags a box to zoom in on, just save the left, right, top and bottom boundaries and that's that...right? Well, as soon as you open that link in a window with a different aspect ratio, it gets all mucked up. Instead of saving the "viewport window", I needed to save the origin (middle coordinate of the screen), and the delta of values between the x plane (real numbers) and y plane (imaginary numbers). This way I could render and view, at any zoom level, on any device and it will be centered and look correct.
 
 ## Smoothing Color
 
