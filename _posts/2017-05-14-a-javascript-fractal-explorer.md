@@ -15,7 +15,7 @@ After some quick digging, I realized I was way smarter as a high schooler than I
 
 ## No Framework
 
-I wanted to **not** use a framework, as I did not see the need. This was a single page, single page application. 99% of the work would be done drawing on the canvas, and none of the inputs were related or reliant on any other elements. But I did take a reactive approach, and it was cool to implement my own stateful app that has a `setState` function and batch renders state changes asynchronously. This part was definitely a little tricky but fun to work on.
+I wanted to **not** use a framework, as I did not see the need. This was a single page, single page application. 99% of the work would be done drawing to the canvas, and none of the inputs were related or reliant on any other elements. But, I did take a reactive approach, and it was cool to implement my own stateful app that has a `setState` function and batch renders state changes asynchronously. This part was definitely a little tricky but fun to work on.
 
 ## There's No i in Javascript
 
