@@ -1,6 +1,6 @@
 ---
 layout: post
-title: "Uing PG (postgres) on Mavericks"
+title: "Using PG (postgres) on Mavericks"
 meta: post
 ---
 
