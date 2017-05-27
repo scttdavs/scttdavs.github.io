@@ -23,16 +23,18 @@
   a.continue {
     font: bold 12px "Lato", sans-serif;
     text-transform: uppercase;
-    color: $offred;
     float: right;
+  }
+  a.continue, h2 a {
+    color: $offred;
     &:hover {
-      color: $offblue;
+      color: $darkenedblue;
     }
   }
 }
 
 .full-article {
-  h2 {
+  h3 {
     color: $offmiddle-dark;
     margin-top: 50px;
   }

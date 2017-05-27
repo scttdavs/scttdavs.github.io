@@ -7,9 +7,11 @@ titleIgnore: true
 <div class="blog-page">
   {% for post in site.posts %}
     <div class='article-item full-article group' itemprop="blogPost" itemscope itemtype="http://schema.org/BlogPosting">
-      <h1 itemprop="name headline">
-        {{ post.title }}
-      </h1>
+      <h2 class="main-headline" itemprop="name headline">
+        <a href="{{ post.url }}" itemprop="url">
+          {{ post.title }}
+        </a>
+      </h2>
       <span class="date">
         <time datetime="{{ post.date | date_to_xmlschema }}" itemprop="datePublished">
           {{ post.date | date: "%b %-d, %Y" }}
@@ -19,7 +21,7 @@ titleIgnore: true
         {{ post.excerpt }}
       </div>
       <a href="{{ post.url }}" class="continue" itemprop="url">continue reading</a>
-      
+
     </div>
   {% endfor %}
 </div>

@@ -28,7 +28,7 @@ body {
 p {
   text-rendering: optimizeLegibility;
   a {
-    color: darken($offblue, 10%);
+    color: $darkenedblue;
     &:hover {
       color: $offred
     }
@@ -40,7 +40,7 @@ figure, .highlight {
   border-radius: 5px;
   pre {
     padding: 15px;
-  } 
+  }
 }
 
 ::selection {
@@ -57,7 +57,7 @@ img {
   max-height: 100%;
 }
 
-h1 {
+h1, .main-headline {
   font: 400 28px "Lato", sans-serif;
   text-transform: uppercase;
   color: $offred;
