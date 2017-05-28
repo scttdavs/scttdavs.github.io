@@ -12,9 +12,11 @@
     font: normal 20px/30px "Vollkorn", Georgia;
   }
   .excerpt {
-    h2 {
+    h3 {
+      font: 400 22px "Lato", sans-serif;
       color: $offmiddle-dark;
       margin-top: 30px;
+      text-transform: capitalize;
     }
     p:last-of-type:after {
       content: "\2026";

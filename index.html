@@ -18,7 +18,8 @@ titleIgnore: true
         </time>
       </span>
       <div class='excerpt' itemprop="articleBody">
-        {{ post.excerpt }}
+        <!-- Since we can't have h1s on the homepage, we have to downgrade for the excerpt -->
+        {{ post.excerpt | replace: "h2", "h3" }}
       </div>
       <a href="{{ post.url }}" class="continue" itemprop="url">continue reading</a>
 
