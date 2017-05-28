@@ -40,6 +40,25 @@
   }
 }
 
+.post-content {
+  ol {
+    list-style-type: none;
+    li {
+      counter-increment: count-me;
+
+      &:before {
+        content: counter(count-me) ". ";
+        display: block;
+        position: relative;
+        max-height: 0px;
+        left: -1.3em;
+        top: -0.05em;
+        color: #000000;
+      }
+    }
+  }
+}
+
 :not(pre) > code[class*="language-"],
 pre[class*="language-"] {
   background: $offmiddle-dark;
