@@ -9,6 +9,10 @@
 
 .full-width {
   margin: 0 -40px 0 -95px;
+
+  @media (max-width: 480px) {
+    margin: 0 -25px;
+  }
 }
 
 .col-4 {
