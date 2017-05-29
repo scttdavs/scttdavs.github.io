@@ -5,4 +5,5 @@ gem 'jekyll-sitemap', '>= 1.0.0'
 
 group :jekyll_plugins do
   gem 'github-pages', '>= 138'
+  gem 'jekyll-paginate', '>= 1.1.0'
 end
