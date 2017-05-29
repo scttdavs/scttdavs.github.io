@@ -2,6 +2,8 @@
 layout: default
 title: Writing
 titleIgnore: true
+pagination:
+  enabled: true
 ---
 
 <div class="blog-page">
@@ -26,27 +28,4 @@ titleIgnore: true
   {% endfor %}
 </div>
 
-<div class="pagination">
-  {% if paginator.previous_page %}
-    <a href="{{ paginator.previous_page_path }}" aria-label="previous" class="previous"><</a>
-  {% else %}
-    <span class="previous"><</span>
-  {% endif %}
-  {% for pagination_page in (1..paginator.total_pages) %}
-    {% if paginator.page == pagination_page %}
-      <span class="active">{{ pagination_page }}</span>
-    {% else %}
-      {% if pagination_page == 1 %}
-        <a class="page" href="/">{{ pagination_page }}</a>
-      {% else %}
-        <a class="page" href="/blog/page/{{ pagination_page }}">{{ pagination_page }}</a>
-      {% endif %}
-    {% endif %}
-  {% endfor %}
-
-  {% if paginator.next_page %}
-    <a href="{{ paginator.next_page_path }}" aria-label="next" class="next">></a>
-  {% else %}
-    <span class="next ">></span>
-  {% endif %}
-</div>
+{% include paginator.html %}

@@ -1,0 +1,32 @@
+<div class="pagination">
+  {% if paginator.previous_page %}
+    <a href="{{ paginator.previous_page_path }}" aria-label="previous" class="previous"><</a>
+  {% else %}
+    <span class="previous"><</span>
+  {% endif %}
+  {% for page_num in (1..paginator.total_pages) %}
+    {% if paginator.page == page_num %}
+      <span class="active">{{ page_num }}</span>
+    {% else %}
+        {% if page.layout == "photos" %}
+          {% if page_num == 1 %}
+            <a class="page" href="/photos/">{{ page_num }}</a>
+          {% else %}
+            <a class="page" href="/photos/page/{{ page_num }}">{{ page_num }}</a>
+          {% endif %}
+        {% else %}
+          {% if page_num == 1 %}
+            <a class="page" href="/">{{ page_num }}</a>
+          {% else %}
+            <a class="page" href="/page/{{ page_num }}">{{ page_num }}</a>
+          {% endif %}
+        {% endif %}
+    {% endif %}
+  {% endfor %}
+
+  {% if paginator.next_page %}
+    <a href="{{ paginator.next_page_path }}" aria-label="next" class="next">></a>
+  {% else %}
+    <span class="next ">></span>
+  {% endif %}
+</div>

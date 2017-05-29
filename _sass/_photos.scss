@@ -25,6 +25,14 @@
   }
 }
 
+.photo-list .photos-page { // TODO poor structure here, should redo
+  margin-bottom: 80px; // force down paginator
+}
+
+.photo-container {
+  @include clearfix;
+}
+
 .photo-item {
   width: 100%;
   height: 200px;
