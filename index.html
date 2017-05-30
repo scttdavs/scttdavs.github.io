@@ -1,243 +1,31 @@
-<!DOCTYPE html>
-<html>
+---
+layout: default
+title: Writing
+titleIgnore: true
+pagination:
+  enabled: true
+---
 
-  <head>
-  <meta charset="utf-8">
-  <meta http-equiv="X-UA-Compatible" content="IE=edge">
-
-  
-    <meta property="og:title" content="Writing">
-    <meta property="og:site_name" content="Scott Davis">
-  
-
-  <title>Scott Davis | Front End Developer</title>
-  <meta name="description" content="Front End Developer / Person
-">
-
-  <meta content='width=device-width, initial-scale=1.0, maximum-scale=1' name='viewport'>
-  <meta charset='utf-8'>
-  <meta content='Scott Davis' name='author'>
-  <link href='/favicon.png' rel='shortcut icon' sizes='16x16' type='image/png'>
-  <link rel="stylesheet" href="/css/main.css" type='text/css'>
-  <link rel='stylesheet' href="/fonts/ss-social-regular.css" type='text/css'>
-
-  <link rel="canonical" href="https://sco.ttdavis.com/">
-  <link rel="alternate" type="application/rss+xml" title="Scott Davis | Front End Developer" href="https://sco.ttdavis.com/feed.xml">
-  <script>
-    var _gaq = _gaq || [];
-    _gaq.push(["_setAccount", "UA-9400337-1"]);
-    _gaq.push(["_trackPageview"]);
-    (function () {
-    var e = document.createElement("script");
-    e.type = "text/javascript";
-    e.async = !0;
-    e.src = ("https:" == document.location.protocol ? "https://ssl" : "http://www") + ".google-analytics.com/ga.js";
-    var t = document.getElementsByTagName("script")[0];
-    t.parentNode.insertBefore(e, t)
-    })();
-  </script>
-</head>
-
-
-  <body class='group'>
-
-    <header>
-  <h1><a href="/"><img src="/images/sdlogo.svg" alt="Scott Davis"></a></h1>
-  <nav>
-    <ul>
-      <li>
-        <a href="/">writing</a>
-      </li>
-      <li>
-        <a href="/photos">photos</a>
-      </li>
-      <li>
-        <a href="/about">about</a>
-      </li>
-    </ul>
-  </nav>
-</header>
-
-
-    <div class='gradient-bar'></div>
-
-    <div class='group' itemscope itemtype="http://schema.org/Blog">
-      <section class='main article-list'>
-        <div class="blog-page">
-  
+<div class="blog-page">
+  {% for post in paginator.posts %}
     <div class='article-item full-article group' itemprop="blogPost" itemscope itemtype="http://schema.org/BlogPosting">
       <h2 class="main-headline" itemprop="name headline">
-        <a href="/blog/https-with-github-pages-with-custom-domains" itemprop="url">
-          HTTPS with Github Pages (and Custom Domains)
+        <a href="{{ post.url }}" itemprop="url">
+          {{ post.title }}
         </a>
       </h2>
       <span class="date">
-        <time datetime="2017-05-27T00:00:00-04:00" itemprop="datePublished">
-          May 27, 2017
+        <time datetime="{{ post.date | date_to_xmlschema }}" itemprop="datePublished">
+          {{ post.date | date: "%b %-d, %Y" }}
         </time>
       </span>
       <div class='excerpt' itemprop="articleBody">
-        <p><img src="/images/ssl-ghp.jpg" alt="" /></p>
-
-<p><a href="/blog/converting-my-site-to-jekyll">I’ve posted before</a> about how I converted this site to Jekyll and hosted it on Github Pages. I’m a huge fan of this and it was really exciting last year when they announced support for https with Github pages. But alas, this is for the <code class="highlighter-rouge">github.io</code> urls, not custom domains.</p>
-
-
+        {{ post.excerpt | replace: "h2", "h3" | remove: '<img>' }}
       </div>
-      <a href="/blog/https-with-github-pages-with-custom-domains" class="continue" itemprop="url">continue reading</a>
+      <a href="{{ post.url }}" class="continue" itemprop="url">continue reading</a>
 
     </div>
-  
-    <div class='article-item full-article group' itemprop="blogPost" itemscope itemtype="http://schema.org/BlogPosting">
-      <h2 class="main-headline" itemprop="name headline">
-        <a href="/blog/a-javascript-fractal-explorer" itemprop="url">
-          A Javascript Fractal Explorer
-        </a>
-      </h2>
-      <span class="date">
-        <time datetime="2017-05-14T00:00:00-04:00" itemprop="datePublished">
-          May 14, 2017
-        </time>
-      </span>
-      <div class='excerpt' itemprop="articleBody">
-        <p><a href="http://sco.ttdavis.com/mandelbrot/?mi=200&amp;er=5&amp;co=true&amp;j=true&amp;ci=0.15&amp;cr=-0.79&amp;zi=0&amp;zr=0&amp;i=0.00366412213740458" target="\_blank"><img src="/images/mandelbrot.jpg" alt="" /></a></p>
-
-<p>A funny story about me is how I got into web development. It essentially boiled down to me learning, and then becoming obsessed with, <a href="http://www.ticalc.org/archives/files/authors/62/6241.html" target="\_blank">making programs on my TI-83 Plus calculator</a> in a BASIC-like language designed just for the calculator. This made it a perfect portable IDE for someone learning how to program. I made <a href="http://www.ticalc.org/archives/files/fileinfo/288/28883.html" target="\_blank">minesweeper</a>, <a href="http://www.ticalc.org/archives/files/fileinfo/295/29524.html" target="\_blank">lights out</a>, <a href="http://www.ticalc.org/archives/files/fileinfo/296/29633.html" target="\_blank">D-Star (with custom level editor, I might add)</a>, and a program to view fractals! Well, apparently I forgot</p>
-
-
-      </div>
-      <a href="/blog/a-javascript-fractal-explorer" class="continue" itemprop="url">continue reading</a>
-
-    </div>
-  
-    <div class='article-item full-article group' itemprop="blogPost" itemscope itemtype="http://schema.org/BlogPosting">
-      <h2 class="main-headline" itemprop="name headline">
-        <a href="/blog/the-what-why-and-how-of-https" itemprop="url">
-          The What, Why, and How of HTTPS
-        </a>
-      </h2>
-      <span class="date">
-        <time datetime="2016-09-19T00:00:00-04:00" itemprop="datePublished">
-          Sep 19, 2016
-        </time>
-      </span>
-      <div class='excerpt' itemprop="articleBody">
-        <p><img src="/images/ssl.jpg" alt="" /></p>
-
-<p>In the past, you would probably only really check if a website used https if you are purchasing something, or <em>maybe</em> if you were logging in. In the last few years, there has (rightly) been a large movement to better ensure privacy and security. Why not have every site and every page be encrypted? That’s a good question, and one Google has already answered for itself. Not only will Google start <a href="http://motherboard.vice.com/read/google-will-soon-shame-all-websites-that-are-unencrypted-chrome-https">shaming websites that are not https</a>, they will also <a href="https://webmasters.googleblog.com/2014/08/https-as-ranking-signal.html">give an SEO boost</a> to those that are.</p>
-
-
-      </div>
-      <a href="/blog/the-what-why-and-how-of-https" class="continue" itemprop="url">continue reading</a>
-
-    </div>
-  
-    <div class='article-item full-article group' itemprop="blogPost" itemscope itemtype="http://schema.org/BlogPosting">
-      <h2 class="main-headline" itemprop="name headline">
-        <a href="/blog/type-checking-js" itemprop="url">
-          Type checking in JS, an experiment
-        </a>
-      </h2>
-      <span class="date">
-        <time datetime="2016-04-11T00:00:00-04:00" itemprop="datePublished">
-          Apr 11, 2016
-        </time>
-      </span>
-      <div class='excerpt' itemprop="articleBody">
-        <p><img src="/images/type-check.jpg" alt="" /></p>
-
-<p>There’s a saying I’ve heard that involves developers and straight jackets. One might wear one and say “it’s so constricting, I can’t breathe or move!”, while another will wear the same one and say “Ohh, feels so warm and cozy!”. That’s static typed languages for you.</p>
-
-<p>Anyone who has ever worked with a statically typed language like Java must feel so out of sorts in Javascript.</p>
-
-
-      </div>
-      <a href="/blog/type-checking-js" class="continue" itemprop="url">continue reading</a>
-
-    </div>
-  
-    <div class='article-item full-article group' itemprop="blogPost" itemscope itemtype="http://schema.org/BlogPosting">
-      <h2 class="main-headline" itemprop="name headline">
-        <a href="/blog/what-you-want-to-be-when-youre-grown-up" itemprop="url">
-          What you want to be when you're grown up
-        </a>
-      </h2>
-      <span class="date">
-        <time datetime="2016-02-03T00:00:00-05:00" itemprop="datePublished">
-          Feb 3, 2016
-        </time>
-      </span>
-      <div class='excerpt' itemprop="articleBody">
-        <h3 id="childhood-aspirations">Childhood Aspirations</h3>
-
-<p>Have you ever wanted to do something other than what you do now, that is, now that you’re grown up? I did, a few times actually. When I was much younger, helping animals sounded like a great and noble cause. I mean, I loved our dog, and I loved animals, so it was a match it seems. I even earned the Veterinary Medicine merit badge, so you knew I meant business. But it was during</p>
-
-
-      </div>
-      <a href="/blog/what-you-want-to-be-when-youre-grown-up" class="continue" itemprop="url">continue reading</a>
-
-    </div>
-  
+  {% endfor %}
 </div>
 
-<div class="pagination">
-  
-    <span class="previous"><</span>
-  
-  
-    
-      <span class="active">1</span>
-    
-  
-    
-        
-          
-            <a class="page" href="/page/2">2</a>
-          
-        
-    
-  
-    
-        
-          
-            <a class="page" href="/page/3">3</a>
-          
-        
-    
-  
-
-  
-    <a href="/page/2" aria-label="next" class="next">></a>
-  
-</div>
-
-
-      </section>
-
-      <aside itemprop="creator" itemscope itemtype="http://schema.org/Person">
-  <div class='avatar-wrap'>
-    <div class='avatar'>
-      <meta itemprop="image" content="/images/me.jpg" />
-      <div class='pic'></div>
-    </div>
-  </div>
-  <p class='summary text-center' itemprop="description">
-    <strong itemprop="name">
-      Scott Davis
-    </strong>
-    is a NY-based front end developer.
-  </p>
-  
-</aside>
-
-    </div>
-
-    <footer>
-  <div class='footer-inner'>
-    &copy; 2017 Scott Davis | Front End Developer, made with &hearts; in <strike>Brooklyn</strike> Washington Heights
-  </div>
-</footer>
-
-
-  </body>
-
-</html>
+{% include paginator.html %}

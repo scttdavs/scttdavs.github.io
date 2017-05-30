@@ -1,0 +1,36 @@
+// Footer
+
+footer {
+  background-color: darken($lightgray, 10%);
+  margin-left: -95px;
+  width: -webkit-calc( 100% + 135px);
+  width: calc( 100% + 135px);
+  @media(max-width: 767px) {
+    margin: 45px -25px 0;
+    width: auto;
+  }
+  .footer-inner {
+    padding: 25px;
+    text-align: center;
+    font: 400 14px "Lato", sans-serif;
+    color: $offmiddle;
+    @media(max-width: 767px) {
+      padding: 25px 0;
+    }
+  }
+  a {
+    color: darken($offmiddle, 10%);
+    &:hover {
+      color: $offmiddle;
+    }
+  }
+}
+
+.work footer {
+  margin-left: 0;
+  width: 100%;
+  @media(max-width: 767px) {
+    margin: 0;
+    width: auto;
+  }
+}

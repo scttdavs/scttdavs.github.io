@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html>
+
+  {% include head.html %}
+
+  <body class='group'>
+
+    {% include header.html %}
+
+    {% include gradient-bar.html %}
+
+    <div class='group' itemscope itemtype="http://schema.org/Blog">
+      <section class='main article-list'>
+        {{ content }}
+      </section>
+
+      {% include author_aside.html %}
+    </div>
+
+    {% include footer.html %}
+
+  </body>
+
+</html>
