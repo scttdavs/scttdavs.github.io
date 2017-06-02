@@ -1,0 +1,618 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Scott Davis | Front End Developer</title>
+    <description>Front End Developer / Person
+</description>
+    <link>https://sco.ttdavis.com/</link>
+    <atom:link href="https://sco.ttdavis.com/feed.xml" rel="self" type="application/rss+xml"/>
+    <pubDate>Fri, 02 Jun 2017 12:35:55 -0400</pubDate>
+    <lastBuildDate>Fri, 02 Jun 2017 12:35:55 -0400</lastBuildDate>
+    <generator>Jekyll v3.4.3</generator>
+    
+      <item>
+        <title>HTTPS with Github Pages (and Custom Domains)</title>
+        <description>&lt;p&gt;&lt;img src=&quot;/images/ssl-ghp.jpg&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;a href=&quot;/blog/converting-my-site-to-jekyll&quot;&gt;I’ve posted before&lt;/a&gt; about how I converted this site to Jekyll and hosted it on Github Pages. I’m a huge fan of this and it was really exciting last year when they announced support for https with Github pages. But alas, this is for the &lt;code class=&quot;highlighter-rouge&quot;&gt;github.io&lt;/code&gt; urls, not custom domains.&lt;!--more--&gt; I’m to the point now where I do not want to wait any longer if there are other solutions out there. I would like to avoid the &lt;a href=&quot;https://motherboard.vice.com/en_us/article/google-will-soon-shame-all-websites-that-are-unencrypted-chrome-https&quot;&gt;impending Chrome death mark&lt;/a&gt;, as well as start testing out and using service workers with this site. As it turns out, there is a pretty simple say of doing this using Cloudflare.&lt;/p&gt;
+
+&lt;h2 id=&quot;what-is-cloudflare&quot;&gt;What is Cloudflare&lt;/h2&gt;
+
+&lt;p&gt;In a nutshell, it’s a service for a proxy that lies between origin (your server) and the user. This allows you to serve cached content from their edge CDN servers all over the world, mitigate DDOS attacks, and add SSL support, among many other things.&lt;/p&gt;
+
+&lt;h2 id=&quot;how&quot;&gt;How?&lt;/h2&gt;
+
+&lt;p&gt;There are plenty of tutorials out there on how to do it, &lt;a href=&quot;https://blog.cloudflare.com/secure-and-fast-github-pages-with-cloudflare/&quot;&gt;here’s a great one here&lt;/a&gt;. But if you already have github pages set up, then it just comes down to a few steps:&lt;/p&gt;
+
+&lt;ol&gt;
+  &lt;li&gt;Create a Cloudflare account or log in&lt;/li&gt;
+  &lt;li&gt;Create a new site (even if you did this a long time ago, the new creation steps may have changed)&lt;/li&gt;
+  &lt;li&gt;It will walk you through and scan your DNS settings. Make sure your A or CNAME settings are correct in Cloudflare once it’s done.&lt;/li&gt;
+  &lt;li&gt;Change your nameservers of your domain to match the ones Cloudflare gives you.&lt;/li&gt;
+  &lt;li&gt;Change your SSL settings for you site to use “Full”.&lt;/li&gt;
+  &lt;li&gt;Set a page rule to redirect all traffic to https. I used &lt;code class=&quot;highlighter-rouge&quot;&gt;http://*ttdavis.com/*&lt;/code&gt; to &lt;code class=&quot;highlighter-rouge&quot;&gt;Always use HTTPS&lt;/code&gt;.&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;p&gt;And that’s it! It will most likely take a few hours to update, which sucks because your site will be down in the mean time. But at least it’s simple and it’s free! Now with Cloudflare, Jekyll, and Github Pages, you get free hosting and free SSL certs. 🍻&lt;/p&gt;
+</description>
+        <pubDate>Sat, 27 May 2017 00:00:00 -0400</pubDate>
+        <link>https://sco.ttdavis.com/blog/https-with-github-pages-with-custom-domains</link>
+        <guid isPermaLink="true">https://sco.ttdavis.com/blog/https-with-github-pages-with-custom-domains</guid>
+        
+        
+      </item>
+    
+      <item>
+        <title>A Javascript Fractal Explorer</title>
+        <description>&lt;p&gt;&lt;a href=&quot;http://sco.ttdavis.com/mandelbrot/?mi=200&amp;amp;er=5&amp;amp;co=true&amp;amp;j=true&amp;amp;ci=0.15&amp;amp;cr=-0.79&amp;amp;zi=0&amp;amp;zr=0&amp;amp;i=0.00366412213740458&quot; target=&quot;\_blank&quot;&gt;&lt;img src=&quot;/images/mandelbrot.jpg&quot; alt=&quot;&quot; /&gt;&lt;/a&gt;&lt;/p&gt;
+
+&lt;p&gt;A funny story about me is how I got into web development. It essentially boiled down to me learning, and then becoming obsessed with, &lt;a href=&quot;http://www.ticalc.org/archives/files/authors/62/6241.html&quot; target=&quot;\_blank&quot;&gt;making programs on my TI-83 Plus calculator&lt;/a&gt; in a BASIC-like language designed just for the calculator. This made it a perfect portable IDE for someone learning how to program. I made &lt;a href=&quot;http://www.ticalc.org/archives/files/fileinfo/288/28883.html&quot; target=&quot;\_blank&quot;&gt;minesweeper&lt;/a&gt;, &lt;a href=&quot;http://www.ticalc.org/archives/files/fileinfo/295/29524.html&quot; target=&quot;\_blank&quot;&gt;lights out&lt;/a&gt;, &lt;a href=&quot;http://www.ticalc.org/archives/files/fileinfo/296/29633.html&quot; target=&quot;\_blank&quot;&gt;D-Star (with custom level editor, I might add)&lt;/a&gt;, and a program to view fractals! Well, apparently I forgot&lt;!--more--&gt; to upload that last one. And so began my obsession as an adult to relearn and recreate this with my new fancy web development skills I’ve picked up in the last 15 years. So basically, &lt;a href=&quot;http://sco.ttdavis.com/mandelbrot/&quot; target=&quot;\_blank&quot;&gt;I did it in Javascript&lt;/a&gt;.&lt;/p&gt;
+
+&lt;p&gt;After some quick digging, I realized I was way smarter as a high schooler than I am now. How did I do this before? Complex numbers, complex plane, how to iterate correctly and determine if it has escaped toward infinity. And after I figured all that stuff out, I had to tackle more problems, how to zoom in, how to colorize (both grayscale and color as the calculator had neither). This was going to be a tough task.&lt;/p&gt;
+
+&lt;p&gt;(Also I’d like to point out all images in this post link to the fractal viewer itself, to see that image live)&lt;/p&gt;
+
+&lt;h2 id=&quot;no-framework&quot;&gt;No Framework&lt;/h2&gt;
+
+&lt;p&gt;I wanted to &lt;strong&gt;not&lt;/strong&gt; use a framework, as I did not see the need. This was a single page, single page application. 99% of the work would be done drawing to the canvas, and none of the inputs were related or reliant on any other elements. But, I did take a reactive approach, and it was cool to implement my own stateful app that has a &lt;code class=&quot;highlighter-rouge&quot;&gt;setState&lt;/code&gt; function and batch renders state changes asynchronously. This part was definitely a little tricky but fun to work on.&lt;/p&gt;
+
+&lt;h2 id=&quot;theres-no-i-in-javascript&quot;&gt;There’s No i in Javascript&lt;/h2&gt;
+
+&lt;p&gt;There’s no I in team and the same is true for Javascript. No I’m not talking about &lt;em&gt;that&lt;/em&gt; “i” because I see it there after the r and before the p. I’m talking about &lt;a href=&quot;https://en.wikipedia.org/wiki/Imaginary_number&quot; target=&quot;\_blank&quot;&gt;imaginary numbers&lt;/a&gt;. When I made this on my graphing calculator, of course there is &lt;em&gt;i&lt;/em&gt;, and I used it. It made calculating the equation easy. But with javascript it became a bit more difficult. Luckily, math in general tends to have lots of shortcuts, and that was also the case here. Here’s the magic for calculating Z&lt;sub&gt;new&lt;/sub&gt; = Z&lt;sub&gt;old&lt;/sub&gt;&lt;sup&gt;2&lt;/sup&gt; + C where both Zs and C are complex numbers:&lt;/p&gt;
+
+&lt;div class=&quot;pre-wrap&quot;&gt;
+
+&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-javascript&quot; data-lang=&quot;javascript&quot;&gt;&lt;span class=&quot;nx&quot;&gt;ZNewReal&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;Math&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;pow&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;ZOldReal&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;2&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;-&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;Math&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;pow&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;ZOldImaginary&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;2&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;+&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;Cr&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+&lt;span class=&quot;nx&quot;&gt;ZNewImaginary&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;2&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;*&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;ZOldReal&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;*&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;ZOldImaginary&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;+&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;CImaginary&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+
+&lt;span class=&quot;nx&quot;&gt;absoluteValue&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;Math&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;sqrt&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;Math&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;pow&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;ZNewReal&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;2&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;+&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;Math&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;pow&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;ZNewImaginary&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;2&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;));&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
+
+&lt;/div&gt;
+
+&lt;p&gt;With the absense of i also comes an alternative way of dealing with complex numbers. We must refer to both the &lt;em&gt;real&lt;/em&gt; and &lt;em&gt;imaginary&lt;/em&gt; parts separately (where a complex number is written &lt;code class=&quot;highlighter-rouge&quot;&gt;x + yi&lt;/code&gt;, x being the real part and i being the imaginary part).&lt;/p&gt;
+
+&lt;p&gt;&lt;a href=&quot;http://sco.ttdavis.com/mandelbrot/?mi=450&amp;amp;er=5&amp;amp;co=true&amp;amp;j=false&amp;amp;ci=0.15&amp;amp;cr=-0.79&amp;amp;zi=0.24107896893625036&amp;amp;zr=-0.7312281391638837&amp;amp;i=0.000005938435328825743&quot; target=&quot;\_blank&quot;&gt;&lt;img src=&quot;/images/mandelbrot2.jpg&quot; alt=&quot;&quot; /&gt;&lt;/a&gt;&lt;/p&gt;
+
+&lt;h2 id=&quot;zooming-in&quot;&gt;Zooming In&lt;/h2&gt;
+
+&lt;p&gt;Zooming in was not, in and of itself, that difficult. When the user clicks and drags a box to zoom in on, just save the left, right, top and bottom boundaries and that’s that…right? Well, as soon as you open that link in a window with a different aspect ratio, it gets all mucked up. Instead of saving the “viewport window”, I needed to save the origin (middle coordinate of the screen), and the delta of values between the x plane (real numbers) and y plane (imaginary numbers). This way I could render and view, at any zoom level, on any device and it will be centered and look correct.&lt;/p&gt;
+
+&lt;h2 id=&quot;smoothing-color&quot;&gt;Smoothing Color&lt;/h2&gt;
+
+&lt;p&gt;When rendering, I would get pretty noticable lines where values would change abruptly. While this was mathematically correct, I’ve seen many more examples on the internet that looks much smoother. Since I am a very visual person (why I love working on the front end, and hey, I even have a BFA), this smoother kind of look is what I wanted to go for. A pretty clever way to smooth color, &lt;a href=&quot;http://www.karlsims.com/julia.html&quot; target=&quot;\_blank&quot;&gt;I found here&lt;/a&gt;. That was way easier than I thought it would be!&lt;/p&gt;
+
+&lt;div class=&quot;pre-wrap&quot;&gt;
+
+&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-javascript&quot; data-lang=&quot;javascript&quot;&gt;&lt;span class=&quot;kr&quot;&gt;const&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;newNumberOfIterations&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;actualNumberOfIterations&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;-&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;Math&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;log2&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;Math&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;log2&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;finalAbsoluteValueOfLastIterationResult&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;));&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
+
+&lt;/div&gt;
+
+&lt;p&gt;Sweet variable names, no?&lt;/p&gt;
+
+&lt;h2 id=&quot;the-end&quot;&gt;The End&lt;/h2&gt;
+
+&lt;p&gt;All in all, this was a lot of fun to work on and hope others enjoy it at least a fraction as much as I did. &lt;a href=&quot;http://sco.ttdavis.com/mandelbrot/&quot; target=&quot;\_blank&quot;&gt;Check it out here&lt;/a&gt;, or just look at my screenshots below to see what all this talk is about (remember they are clickable!).&lt;/p&gt;
+
+&lt;p&gt;&lt;a href=&quot;http://sco.ttdavis.com/mandelbrot/?mi=250&amp;amp;er=5&amp;amp;co=true&amp;amp;j=true&amp;amp;ci=0.15&amp;amp;cr=-0.79&amp;amp;zi=0.4728578244274809&amp;amp;zr=-0.20152671755725204&amp;amp;i=0.0004637404580152672&quot; target=&quot;\_blank&quot;&gt;&lt;img src=&quot;/images/mandelbrot3.jpg&quot; alt=&quot;&quot; /&gt;&lt;/a&gt;
+&lt;a href=&quot;http://sco.ttdavis.com/mandelbrot/?mi=150&amp;amp;er=5&amp;amp;co=true&amp;amp;j=true&amp;amp;ci=0.008&amp;amp;cr=0.28&amp;amp;zi=0&amp;amp;zr=0&amp;amp;i=0.00366412213740458&quot; target=&quot;\_blank&quot;&gt;&lt;img src=&quot;/images/mandelbrot4.jpg&quot; alt=&quot;&quot; /&gt;&lt;/a&gt;
+&lt;a href=&quot;http://sco.ttdavis.com/mandelbrot/?mi=50&amp;amp;er=5&amp;amp;co=false&amp;amp;j=true&amp;amp;ci=0&amp;amp;cr=-1.476&amp;amp;zi=0&amp;amp;zr=0&amp;amp;i=0.00366412213740458&quot; target=&quot;\_blank&quot;&gt;&lt;img src=&quot;/images/mandelbrot5.jpg&quot; alt=&quot;&quot; /&gt;&lt;/a&gt;
+&lt;a href=&quot;http://sco.ttdavis.com/mandelbrot/?mi=55&amp;amp;er=5&amp;amp;co=true&amp;amp;j=true&amp;amp;ci=-0.01&amp;amp;cr=0.3&amp;amp;zi=0&amp;amp;zr=0&amp;amp;i=0.00366412213740458&quot; target=&quot;\_blank&quot;&gt;&lt;img src=&quot;/images/mandelbrot6.jpg&quot; alt=&quot;&quot; /&gt;&lt;/a&gt;
+&lt;a href=&quot;http://sco.ttdavis.com/mandelbrot/?mi=50&amp;amp;er=5&amp;amp;co=false&amp;amp;j=true&amp;amp;ci=1.04&amp;amp;cr=-0.162&amp;amp;zi=0&amp;amp;zr=0&amp;amp;i=0.00366412213740458&quot; target=&quot;\_blank&quot;&gt;&lt;img src=&quot;/images/mandelbrot7.jpg&quot; alt=&quot;&quot; /&gt;&lt;/a&gt;
+&lt;a href=&quot;http://sco.ttdavis.com/mandelbrot/?mi=200&amp;amp;er=5&amp;amp;co=false&amp;amp;j=true&amp;amp;ci=0.3&amp;amp;cr=-0.7&amp;amp;zi=0&amp;amp;zr=0&amp;amp;i=0.00366412213740458&quot; target=&quot;\_blank&quot;&gt;&lt;img src=&quot;/images/mandelbrot8.jpg&quot; alt=&quot;&quot; /&gt;&lt;/a&gt;&lt;/p&gt;
+
+</description>
+        <pubDate>Sun, 14 May 2017 00:00:00 -0400</pubDate>
+        <link>https://sco.ttdavis.com/blog/a-javascript-fractal-explorer</link>
+        <guid isPermaLink="true">https://sco.ttdavis.com/blog/a-javascript-fractal-explorer</guid>
+        
+        
+      </item>
+    
+      <item>
+        <title>The What, Why, and How of HTTPS</title>
+        <description>&lt;p&gt;&lt;img src=&quot;/images/ssl.jpg&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;In the past, you would probably only really check if a website used https if you are purchasing something, or &lt;em&gt;maybe&lt;/em&gt; if you were logging in. In the last few years, there has (rightly) been a large movement to better ensure privacy and security. Why not have every site and every page be encrypted? That’s a good question, and one Google has already answered for itself. Not only will Google start &lt;a href=&quot;http://motherboard.vice.com/read/google-will-soon-shame-all-websites-that-are-unencrypted-chrome-https&quot;&gt;shaming websites that are not https&lt;/a&gt;, they will also &lt;a href=&quot;https://webmasters.googleblog.com/2014/08/https-as-ranking-signal.html&quot;&gt;give an SEO boost&lt;/a&gt; to those that are. &lt;!--more--&gt;If your customer’s peace of mind wasn’t enough, you now have more than enough incentive to make the switch.&lt;/p&gt;
+
+&lt;p&gt;I recently decided to do this for &lt;a href=&quot;https://www.explorableplaces.com&quot;&gt;Explorable Places&lt;/a&gt;, for the reasons above and also in preparation of supporting Stripe and credit card payments. While it is simple to make this change, there is a few things worth learning (and documenting) and some snags you may run into.&lt;/p&gt;
+
+&lt;h2 id=&quot;what-is-sslhttps&quot;&gt;What is SSL/HTTPS?&lt;/h2&gt;
+
+&lt;p&gt;Otherwise know as SSL (secure socket layer), HTTPS is a protocol, in the same realm as regular ole HTTP or FTP, that is encrypted and was developed by Netscape. It listens on port 443 as opposed to port 80. You’ll need just a couple things to enable it and start using in on your site: You’ll need a &lt;strong&gt;&lt;em&gt;certificate&lt;/em&gt;&lt;/strong&gt; file and a &lt;strong&gt;&lt;em&gt;private key&lt;/em&gt;&lt;/strong&gt; file.&lt;/p&gt;
+
+&lt;p&gt;Without going into too much detail, the certificate is signed by an authority that the browser trusts (it only trusts known certificate authorities). I’ll get into signing in a bit though. In addition to being signed, the certificate &lt;strong&gt;also contains a public key&lt;/strong&gt; that will be sent to the browsers. When you make a request to the server from your browser, it will encrypt that data with that public key. The data in that request can only be decrypted with the private key residing on the server.&lt;/p&gt;
+
+&lt;p&gt;So the server decrypts the request with its private key and does whatever it needs to with it. It’ll then return a response that it encrypts with said key again. This response in turn can only be decrypted with the public key. It’s actually quite nice how they work together.&lt;/p&gt;
+
+&lt;p&gt;Now it’s important to point out that the data being sent to the browser is encrypted, but that doesn’t mean it’s secure since all it takes to decrypt it is the public key, which anyone has access to. But all data sent &lt;em&gt;to&lt;/em&gt; it, that is locked down. 🔒&lt;/p&gt;
+
+&lt;p&gt;Back to signing the certificate. You could create your own certificate and sign it yourself (as opposed to a known authority) and use that. Many people do this when developing locally or for apps within a private network. But to public facing apps, self-signed certificates can’t be trusted since nobody knows you and you could be up to no good. Browsers will throw up a very scary looking warning page if you sign your own certificate, and basically freak the hell out of anyone visiting your site.&lt;/p&gt;
+
+&lt;p&gt;So you’ll need to purchase one, which will run from very cheap with no paperwork (insures for very little, good for personal sites), to very expensive and lots of paperwork (insures for a lot). The latter requires you to prove your business is who they say they are, and can allow you to include that name next to the URL in the browser. This also looks very nice, so it may be worth it to you if security is particularly a big deal.&lt;/p&gt;
+
+&lt;p&gt;I went with just the plain old domain verification option, which can be issued immediately with no paperwork, I just have to prove that I own the domain. This can be done with an email that is associated with the domain, easy peasy.&lt;/p&gt;
+
+&lt;h2 id=&quot;how-do-i-get-one&quot;&gt;How do I get one&lt;/h2&gt;
+
+&lt;p&gt;Once you’ve decided on what you want and purchased it, you’ll need to request the certificate from the issuing company. To do this, you’ll need a certificate signing request (CSR) file. This can be created with many tools available around the internet, most of which cost money. Or you could do it on the command line with openSSL:&lt;/p&gt;
+
+&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-sh&quot; data-lang=&quot;sh&quot;&gt;openssl req -new -newkey rsa:2048 -nodes -keyout YOUR-DOMAIN.key -out YOUR-DOMAIN.csr&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
+
+&lt;p&gt;This will create a token with 2048 bit encryption, and output your CSR and your private KEY file which you will need for later. When you enter this command, it will prompt you through a set of questions, the only one worth noting is the &lt;code class=&quot;highlighter-rouge&quot;&gt;name&lt;/code&gt; field, which should be your domain name (if you are doing a domain verification certificate like me).&lt;/p&gt;
+
+&lt;p&gt;When finished, submit this CSR to the issuing company and answer whatever other questions they have (it’s very easy), and you will get issued your certificate (CRT) file within a few minutes. You should now have your certificate &lt;code class=&quot;highlighter-rouge&quot;&gt;.crt&lt;/code&gt; and private key &lt;code class=&quot;highlighter-rouge&quot;&gt;.key&lt;/code&gt; files.&lt;/p&gt;
+
+&lt;h2 id=&quot;intermediate-certificate&quot;&gt;Intermediate Certificate&lt;/h2&gt;
+
+&lt;p&gt;Depending on the type of certificate you purchase, you may be required to include an intermediate certificate. An intermediate certificate lies between the domain certificate (yours) and the root certificate of the issuing authority. This is done to ensure its authenticity and maintain the “Chain of Trust”™ because it’s insecure to include the root certificate itself. To include this, you will need to chain them together. Chaining is nothing more than file concatenation.&lt;/p&gt;
+
+&lt;p&gt;You will be able to just download an intermediate certificate from the issuer as there is no customization or CSR needed for them, everyone gets the same one. Then either in a text editor (with no formatting) or through the command line, concatenate the files with your domain certificate first and intermediate second.&lt;/p&gt;
+
+&lt;h2 id=&quot;telling-your-server-to-use-them&quot;&gt;Telling your server to use them&lt;/h2&gt;
+
+&lt;p&gt;Now that you are all set, you’ll need to get your server configured. This includes uploading the chained certificate (or regular domain certificate if you did not need to chain) and the KEY file from the beginning. You can put these anywhere. I have a linux server and put the certificate in &lt;code class=&quot;highlighter-rouge&quot;&gt;/etc/ssl/certs&lt;/code&gt; and the key in &lt;code class=&quot;highlighter-rouge&quot;&gt;/etc/ssl/private&lt;/code&gt;.&lt;/p&gt;
+
+&lt;p&gt;Then in your nginx configuration file (or where ever your server config is), you will need to tell it where those files are. You will also need to tell the server to listen on port 443. For nginx and unicorn this will look something like:&lt;/p&gt;
+
+&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-nginx&quot; data-lang=&quot;nginx&quot;&gt;&lt;span class=&quot;k&quot;&gt;server&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+    &lt;span class=&quot;kn&quot;&gt;listen&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;443&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+    &lt;span class=&quot;kn&quot;&gt;ssl&lt;/span&gt; &lt;span class=&quot;no&quot;&gt;on&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+    &lt;span class=&quot;kn&quot;&gt;ssl_certificate&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;/etc/ssl/certs/YOUR-DOMAIN.crt&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+    &lt;span class=&quot;kn&quot;&gt;ssl_certificate_key&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;/etc/ssl/private/YOUR-DOMAIN.key&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+
+    &lt;span class=&quot;c1&quot;&gt;# EVERYTHING ELSE IS THE SAME AS PORT 80 CONFIG EXCEPT:
+&lt;/span&gt;
+    &lt;span class=&quot;kn&quot;&gt;location&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;@unicorn&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+        &lt;span class=&quot;c1&quot;&gt;# YOU'LL WANT TO ADD THIS TOO IF YOU USE RAILS
+&lt;/span&gt;        &lt;span class=&quot;kn&quot;&gt;proxy_set_header&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;X-Forwarded-Proto&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;https&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+
+        &lt;span class=&quot;c1&quot;&gt;# OTHER SETTINGS ARE THE SAME
+&lt;/span&gt;    &lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
+
+&lt;p&gt;If you use rails, you’ll likely use &lt;code class=&quot;highlighter-rouge&quot;&gt;force_ssl&lt;/code&gt; in your controllers. I use it in the application controller to force https for all routes. It relies on the &lt;code class=&quot;highlighter-rouge&quot;&gt;X-Forwarded-Proto&lt;/code&gt; header to work and is why rails needs it.&lt;/p&gt;
+
+&lt;p&gt;Then just restart your server, for nginx: &lt;code class=&quot;highlighter-rouge&quot;&gt;sudo /etc/init.d/nginx restart&lt;/code&gt;&lt;/p&gt;
+
+&lt;p&gt;Now when you visit your site with &lt;code class=&quot;highlighter-rouge&quot;&gt;https://&lt;/code&gt;, it should work and you should see the little green lock. If not, you may want to troubleshoot with the issuing company to get it resolved. Also, you will need to make sure &lt;strong&gt;ALL&lt;/strong&gt; assets you serve from the page (js, css, images, fonts, etc) are served via SSL as well, or the browser will warn the user, or possibly not work at all.&lt;/p&gt;
+
+&lt;p&gt;Welcome to the secure side! 🔐&lt;/p&gt;
+
+&lt;p&gt;Now I just need to wait for Github to allow for https of github pages with a custom domain and I can revisit this article.&lt;/p&gt;
+
+</description>
+        <pubDate>Mon, 19 Sep 2016 00:00:00 -0400</pubDate>
+        <link>https://sco.ttdavis.com/blog/the-what-why-and-how-of-https</link>
+        <guid isPermaLink="true">https://sco.ttdavis.com/blog/the-what-why-and-how-of-https</guid>
+        
+        
+      </item>
+    
+      <item>
+        <title>Type checking in JS, an experiment</title>
+        <description>&lt;p&gt;&lt;img src=&quot;/images/type-check.jpg&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;There’s a saying I’ve heard that involves developers and straight jackets. One might wear one and say “it’s so constricting, I can’t breathe or move!”, while another will wear the same one and say “Ohh, feels so warm and cozy!”. That’s static typed languages for you.&lt;/p&gt;
+
+&lt;p&gt;Anyone who has ever worked with a statically typed language like Java must feel so out of sorts in Javascript. &lt;!--more--&gt;As such, there are all kinds of libraries out there to check types for you, even entire &lt;a href=&quot;https://www.dartlang.org/&quot;&gt;new languages&lt;/a&gt; that compile to js have looked to solve this problem. Facebook &lt;a href=&quot;http://flowtype.org/&quot;&gt;created an entire library&lt;/a&gt; to add their own annotations that do post processing for checking types. Obviously this is an issue people care about.&lt;/p&gt;
+
+&lt;p&gt;But javascript is a very expressive and dynamic language that should be able to handle something like this with no problem. So that’s what I set out to do, because more or less, I’m a nerd that is interested in this sort of thing.&lt;/p&gt;
+
+&lt;h2 id=&quot;the-basics&quot;&gt;The Basics&lt;/h2&gt;
+
+&lt;p&gt;Usually, we care most about what goes in and what comes out of a function. Asserts can be used to help mediate this and aid in debugging, especially with live data. But this can be tedious, repetitive, and cumbersome. What I wanted was something simple, short and especially readable. A small library called &lt;a href=&quot;https://github.com/scttdavs/typist&quot;&gt;Typist&lt;/a&gt; is what I came up with and here is what it looks like:&lt;/p&gt;
+
+&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-javascript&quot; data-lang=&quot;javascript&quot;&gt;&lt;span class=&quot;kd&quot;&gt;var&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;makeArray&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;typist&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;takes&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;Array&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;String&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;Number&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+                      &lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;does&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;kd&quot;&gt;function&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;input&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;foo&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;bar&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+                        &lt;span class=&quot;nx&quot;&gt;input&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;push&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;foo&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;bar&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
+                        &lt;span class=&quot;k&quot;&gt;return&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;input&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+                      &lt;span class=&quot;p&quot;&gt;})&lt;/span&gt;
+                      &lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;returns&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;Array&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+                      &lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;done&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;();&lt;/span&gt;
+
+&lt;span class=&quot;nx&quot;&gt;makeArray&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;([],&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;1&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;2&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt; &lt;span class=&quot;c1&quot;&gt;// [&quot;1&quot;, 2]&lt;/span&gt;
+&lt;span class=&quot;nx&quot;&gt;makeArray&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;([],&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;2&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt; &lt;span class=&quot;c1&quot;&gt;// Throws TypistError&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
+
+&lt;p&gt;I think just by reading it you can tell what is going on and that is the point, add type checking while maintaining a readable structure that is obvious what its purpose is.&lt;/p&gt;
+
+&lt;p&gt;Typist makes use of some other methods in its API for type checking: &lt;code class=&quot;highlighter-rouge&quot;&gt;typist.check()&lt;/code&gt; which takes an array of types and values to check, and &lt;code class=&quot;highlighter-rouge&quot;&gt;typist[type]()&lt;/code&gt; which takes a value that will be returned only if it is the right type.&lt;/p&gt;
+
+&lt;p&gt;If you were to write out the previous example literally and with those two methods, it would be the same as something like this:&lt;/p&gt;
+
+&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-javascript&quot; data-lang=&quot;javascript&quot;&gt;&lt;span class=&quot;kd&quot;&gt;var&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;makeArray&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;kd&quot;&gt;function&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;input&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;foo&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;bar&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+  &lt;span class=&quot;nx&quot;&gt;typist&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;check&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;([&lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;Array&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;input&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;],&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;String&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;foo&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;],&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;Number&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;bar&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]);&lt;/span&gt;
+
+  &lt;span class=&quot;nx&quot;&gt;input&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;push&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;foo&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;bar&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
+  &lt;span class=&quot;k&quot;&gt;return&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;typist&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;array&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;input&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;};&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
+
+&lt;p&gt;There’s a bit more though, as another option is to use &lt;code class=&quot;highlighter-rouge&quot;&gt;typist(Type, function)&lt;/code&gt; which will return a curried function, that when invoked, will have its return value type checked. If it is the right type, it gets returned and if not, a TypistError is thrown.&lt;/p&gt;
+
+&lt;p&gt;Here are some more examples that allow you to pick and choose the level of type checky-ness you want, the chainable all-in-one example from above to a more granular approach:&lt;/p&gt;
+
+&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-javascript&quot; data-lang=&quot;javascript&quot;&gt;&lt;span class=&quot;kd&quot;&gt;var&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;lowercase&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;kd&quot;&gt;function&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;str&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+  &lt;span class=&quot;k&quot;&gt;return&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;typist&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;string&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;str&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;).&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;toLowerCase&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;();&lt;/span&gt; &lt;span class=&quot;c1&quot;&gt;// returns the string if it is the right type&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+&lt;span class=&quot;nx&quot;&gt;lowercase&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt; &lt;span class=&quot;c1&quot;&gt;// Throws TypistError&lt;/span&gt;
+
+&lt;span class=&quot;kd&quot;&gt;var&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;lowercase&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;kd&quot;&gt;function&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;str&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+  &lt;span class=&quot;k&quot;&gt;if&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;typist&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;is&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;string&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;str&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;))&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+    &lt;span class=&quot;k&quot;&gt;return&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;str&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;toLowerCase&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;();&lt;/span&gt;
+  &lt;span class=&quot;p&quot;&gt;}&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;else&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+    &lt;span class=&quot;c1&quot;&gt;// do something else&lt;/span&gt;
+  &lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+&lt;span class=&quot;nx&quot;&gt;lowercase&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;2&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt; &lt;span class=&quot;c1&quot;&gt;// will hit else branch&lt;/span&gt;
+
+&lt;span class=&quot;kd&quot;&gt;var&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;lowercase&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;typist&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;String&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;kd&quot;&gt;function&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;str&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+  &lt;span class=&quot;k&quot;&gt;return&lt;/span&gt; &lt;span class=&quot;kc&quot;&gt;null&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+&lt;span class=&quot;nx&quot;&gt;lowercase&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;3&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt; &lt;span class=&quot;c1&quot;&gt;// Throws TypistError&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
+
+&lt;h2 id=&quot;handling-errors&quot;&gt;Handling Errors&lt;/h2&gt;
+
+&lt;p&gt;It would make the most sense to return a &lt;code class=&quot;highlighter-rouge&quot;&gt;TypeError&lt;/code&gt; when a check fails, but this would be confusing if some type error unrelated to this library occurs. It would be tough to debug and distinguish which came from Typist and which didn’t. For that reason, Typist throws its own custom errors that inherit from &lt;code class=&quot;highlighter-rouge&quot;&gt;TypeError&lt;/code&gt;, including a helpful message:&lt;/p&gt;
+
+&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-console&quot; data-lang=&quot;console&quot;&gt;&lt;span class=&quot;err&quot;&gt;TypeError: TypistError: Expected 1,2,3 to be of type String&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
+
+&lt;h2 id=&quot;support&quot;&gt;Support&lt;/h2&gt;
+
+&lt;p&gt;Typist is written in ES5 and should work on all versions of node. Due to dev depenencies, Node v4 or higher is required to run the tests.&lt;/p&gt;
+
+</description>
+        <pubDate>Mon, 11 Apr 2016 00:00:00 -0400</pubDate>
+        <link>https://sco.ttdavis.com/blog/type-checking-js</link>
+        <guid isPermaLink="true">https://sco.ttdavis.com/blog/type-checking-js</guid>
+        
+        
+      </item>
+    
+      <item>
+        <title>What you want to be when you're grown up</title>
+        <description>&lt;h2 id=&quot;childhood-aspirations&quot;&gt;Childhood Aspirations&lt;/h2&gt;
+
+&lt;p&gt;Have you ever wanted to do something other than what you do now, that is, now that you’re grown up? I did, a few times actually. When I was much younger, helping animals sounded like a great and noble cause. I mean, I loved our dog, and I loved animals, so it was a match it seems. I even earned the Veterinary Medicine merit badge, so you knew I meant business. But it was during &lt;!--more--&gt; those merit badge requirements I met with an actual Vet and followed him for an afternoon. One teenage employee cleaned cages all day, not exactly the part time job I would look forward to in pursuing my new career. And the Vet himself, he showed me how to neuter a cat. You might think this noble professional would take great care in this procedure. He would carefully make an incision, a couple snips here and there, and then sew him right up, good as new…errr well maybe not &lt;em&gt;as new&lt;/em&gt;.&lt;/p&gt;
+
+&lt;p&gt;Reality it seems, is not as we always picture it. He wrapped his fingers around both cat testes and ripped them out in one motion, tossed them in the trash can on top of some paper and then sewed him up. The cat laying on his back, looking up dazedly around the room, didn’t even seem bothered by the whole ordeal. I looked down horrified at the little pill shaped balls sitting there in the trash next to some discarded mail and wrappers. It was then I realized this is not for me. I would not be helping animals 95% of the time. Instead I would spend most of my day and my career, my life, violently removing animals reproductive organs.&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/images/philmont.jpg&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+
+&lt;h2 id=&quot;adulthood-ish-aspirations&quot;&gt;Adulthood-ish Aspirations&lt;/h2&gt;
+
+&lt;p&gt;I hadn’t worried much about what I was going to major in in college. I settled on graphic design because I like computers and I like computer graphics. Keeping things simple, I stuck with it. My sophomore year though, I had to take a science class and geology fit perfectly into my schedule. The professor was one of the more sleep inducing ones I’ve had, an expert powerpointer if I ever saw one. But despite his poor delivery, and even poorer jokes, I showed up to every class and peeled my eyes open to stay awake because I loved it. Maybe it was the void it filled with actually understanding how the Earth works. Or maybe it was the stories such knowledge inherently told about our planet. It felt a little like learning about what your great grandfather was like and what he did. You felt a fond connection to the past and to this thing you never knew or knew anything about before.&lt;/p&gt;
+
+&lt;p&gt;I’ve had this feeling before too. Also back in my time in Boy Scouts, many of the dads in our troop were geologists. This really was a unique privilege when you are hiking around the mountains as much as you do in scouts. We would come upon some cliffs or other rock formations and one of the dads would tell us not only what kind of rocks they were and how they formed, but he could extrapolate the history of the very ground we stood on for the past several million years. It was magic really. It made your imagination run wild to picture what it was like where you stood 20 million years ago, and even feel special that you can appreciate it, where some other hiker might walk by the same spot never knowing any better of the wonder and history that laid under his feet.&lt;/p&gt;
+
+&lt;p&gt;Yeah, I thought it would be just fine to be a geologist, to be outside all day, away from the office, the desk, the routine and everydayness of a regular job. But reality it seems, is rarely so aligned with our expectations. Those dads in our troop, every single one worked for an oil company. They used their magic to predict, with a certain accuracy, the chances of there being oil beneath a given area. What imagination did this instill, what wonder or joy? None.&lt;/p&gt;
+
+&lt;p&gt;It was a strange coincidence that the two careers I had hoped for equated to either ripping out an animals testicles or pinpointing where to rip out the Earth’s sealed up carbon only to release it back again. Could you boil down all career paths down to the same sort of nihilistic views? Maybe so. But I’m not going to lie, I still think about it whenever I see a mountain, or a canyon or a cliff. I think about the story there that made it, and I think about the history, and I think about maybe taking another geology class.&lt;/p&gt;
+</description>
+        <pubDate>Wed, 03 Feb 2016 00:00:00 -0500</pubDate>
+        <link>https://sco.ttdavis.com/blog/what-you-want-to-be-when-youre-grown-up</link>
+        <guid isPermaLink="true">https://sco.ttdavis.com/blog/what-you-want-to-be-when-youre-grown-up</guid>
+        
+        
+      </item>
+    
+      <item>
+        <title>Converting My Site to Jekyll</title>
+        <description>&lt;p&gt;&lt;img src=&quot;/images/jekyll.jpg&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+
+&lt;h2 id=&quot;background-tldr-how-i-did-it-next-section&quot;&gt;Background (tldr, how I did it next section)&lt;/h2&gt;
+
+&lt;p&gt;I first built my personal site over 10 years ago. I didn’t know much about web development then (even if I thought I did), so at first I stuck to what I knew most, flash. Those were the days, an entirely animated site. It may have been hell to maintain, and even to use sometimes, but they sure were fun to build.&lt;/p&gt;
+
+&lt;p&gt;After flash went out of style, very quickly, I just wanted a simple site but one where I could add content without having to add &lt;!--more--&gt; a new static page. I didn’t know rails or node then, so making an app was pretty much out of the question. So I turned to what was in favor then and still is now, Wordpress. But Wordpress had its own problems. It wasn’t very enjoyable to work in for one. The dashboard was messy, plugins seemed like an easy solution, but in reality were a mess. Often they conflicted with each other, or you had to search around to find the best one that actually works for what you’re trying to do. I defintely felt tied up and limited to what I could do with it.&lt;/p&gt;
+
+&lt;p&gt;Leaving Wordpress, I then switched to an actual CMS, one I’d heard was good: &lt;a href=&quot;http://www.couchcms.com/&quot;&gt;CouchCMS&lt;/a&gt;. Couch was heaven compared to Wordpress. Simple to set up, drop the tags in your HTML files, no need to convert to Wordpress’ forgetful and complicated template system. And again, this was fine for a while, but I would still forget the log in portal url, my password, it’s still dealing with php, and at the end of the day, I’m still having to ftp all my changes whenever I want to add a part of my site (although &lt;a href=&quot;/blog/git-ftp&quot;&gt;this&lt;/a&gt; was pretty helpful). The kicker was when I got a security update that I needed to patch from them or else I would be at risk of being hacked. It was, yet again, time for a change.&lt;/p&gt;
+
+&lt;h2 id=&quot;enter-jekyll&quot;&gt;Enter Jekyll&lt;/h2&gt;
+
+&lt;p&gt;Now I’ve known about Jekyll for a few years, but by then, my site was up and running fine and I didn’t have a desire to switch then. My how times have changed. I dived right in and within a day I had my site essentially done. Even better with Jekyll, you can get free hosting with Github Pages (since that’s what they run on and Github created Jekyll). So with my site now running Jekyll, I get:&lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;Free hosting&lt;/li&gt;
+  &lt;li&gt;custom domain names easily added&lt;/li&gt;
+  &lt;li&gt;no more ftp, just push changes to repo and watch them go live&lt;/li&gt;
+  &lt;li&gt;free backups, it’s all on github after all&lt;/li&gt;
+  &lt;li&gt;no dbs, even more portable should I decide to switch hosts (for some reason)&lt;/li&gt;
+  &lt;li&gt;secure, no need to log in and keep passwords, nothing to hack into or get because nothing sensitive is there&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;I’ll go over the basic steps of how I did it below as a feel a quick introduction helps a lot before turning to Jekyll’s (really good) &lt;a href=&quot;http://jekyllrb.com/docs/home/&quot;&gt;documentation&lt;/a&gt; to learn more and deep dive into specific features.&lt;/p&gt;
+
+&lt;h2 id=&quot;what-is-jekyll&quot;&gt;What is Jekyll?&lt;/h2&gt;
+
+&lt;p&gt;&lt;a href=&quot;http://jekyllrb.com/&quot;&gt;Jekyll&lt;/a&gt; is a static site generator. That means no logging in, no databases, just files sitting on your server and people viewing them. With Jekyll, you create templates for your site, add content via separate files (one file for each post, for example), and jekyll processes the whole thing, pumping out all the static files you need for your site. So with a lot of code reuse, we have just a few templates, our content, and then a whole lot of output.&lt;/p&gt;
+
+&lt;h2 id=&quot;installing-jekyll&quot;&gt;Installing Jekyll&lt;/h2&gt;
+
+&lt;p&gt;This may be the most technical part of the process, just getting the necessary tools installed. But first, you need to install Jekyll, so in terminal:&lt;/p&gt;
+
+&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-console&quot; data-lang=&quot;console&quot;&gt;&lt;span class=&quot;err&quot;&gt;gem install jekyll&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
+
+&lt;p&gt;And then create your project wherever you want it:&lt;/p&gt;
+
+&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-console&quot; data-lang=&quot;console&quot;&gt;&lt;span class=&quot;err&quot;&gt;jekyll new kickass-site&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
+
+&lt;p&gt;and then change directories to your site and run your server. You don’t need to start your server &lt;em&gt;on&lt;/em&gt; your server to have your site be viewable, but doing this locally is what generates all your files for you.&lt;/p&gt;
+
+&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-console&quot; data-lang=&quot;console&quot;&gt;cd kickass-site
+jekyll serve
+&lt;span class=&quot;err&quot;&gt;jekyll new my-awesome-site&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
+
+&lt;p&gt;You can now view your site at &lt;code class=&quot;highlighter-rouge&quot;&gt;http://localhost:4000&lt;/code&gt; Open up your kickass site in your favorite editor and get to work!&lt;/p&gt;
+
+&lt;h2 id=&quot;jekyll-file-structure&quot;&gt;Jekyll File Structure&lt;/h2&gt;
+
+&lt;p&gt;When you open up your site you’ll see a lot is created for you. I’ll go over most of them here to explain.&lt;/p&gt;
+
+&lt;p&gt;Folders starting with &lt;code class=&quot;highlighter-rouge&quot;&gt;_&lt;/code&gt; are special. They are used by Jekyll for specific purposes. For example &lt;code class=&quot;highlighter-rouge&quot;&gt;_posts&lt;/code&gt; is where all your posts live (not rocket science here). &lt;code class=&quot;highlighter-rouge&quot;&gt;_includes&lt;/code&gt; are where partials live. So you can do:&lt;/p&gt;
+
+&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-liquid&quot; data-lang=&quot;liquid&quot;&gt;&lt;span class=&quot;p&quot;&gt;{%&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;nt&quot;&gt;include&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;na&quot;&gt;footer&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;html&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;p&quot;&gt;%}&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
+
+&lt;p&gt;in your template to include a footer you made. By default, Jekyll will look in the &lt;code class=&quot;highlighter-rouge&quot;&gt;_includes&lt;/code&gt; folder. &lt;code class=&quot;highlighter-rouge&quot;&gt;_layouts&lt;/code&gt; are where your layouts live, which probably all of your pages will have a layout associated with them. &lt;code class=&quot;highlighter-rouge&quot;&gt;_site&lt;/code&gt; is where all your converted files for your static site live. This should never be used for anything else. If you upload your site to your own host, these are the contents that you upload.
+I think the rest are easily understood. There is a &lt;code class=&quot;highlighter-rouge&quot;&gt;_drafts&lt;/code&gt; folder you can create yourself for drafing posts. When you run your server with a &lt;code class=&quot;highlighter-rouge&quot;&gt;--drafts&lt;/code&gt; flag, it will convert these for you for previewing them.&lt;/p&gt;
+
+&lt;p&gt;The &lt;code class=&quot;highlighter-rouge&quot;&gt;css&lt;/code&gt; folder comes with a sass file for you. At the top it explains that you need front matter there, but not in any files in the &lt;code class=&quot;highlighter-rouge&quot;&gt;_sass&lt;/code&gt; folder. I’ll explain front matter below, but all files in the &lt;code class=&quot;highlighter-rouge&quot;&gt;_sass&lt;/code&gt; folder will be converted automatically. Jekyll has sass support out of the box now and you can add coffeescript support with a gem. See &lt;a href=&quot;http://jekyllrb.com/docs/assets/&quot;&gt;here&lt;/a&gt; for more about Jekyll assets.&lt;/p&gt;
+
+&lt;h2 id=&quot;templates-and-layouts-and-front-matter&quot;&gt;Templates and Layouts and… Front Matter?&lt;/h2&gt;
+
+&lt;p&gt;Jekyll uses &lt;a href=&quot;https://docs.shopify.com/themes/liquid-documentation/basics&quot;&gt;liquid templating&lt;/a&gt; developed by Shopify. It supports all of the standard &lt;a href=&quot;https://github.com/Shopify/liquid/wiki/Liquid-for-Designers#tags&quot;&gt;tags&lt;/a&gt; and &lt;a href=&quot;https://github.com/Shopify/liquid/wiki/Liquid-for-Designers#standard-filters&quot;&gt;filters&lt;/a&gt; and even a &lt;a href=&quot;http://jekyllrb.com/docs/templates/&quot;&gt;few more&lt;/a&gt;. So if you have any syntax questions revolving around that, you know where to look. But Liquid is extremely simple and similar to a lot of other templating languages, like mustache and handlebars.&lt;/p&gt;
+
+&lt;p&gt;Also what is very important is &lt;a href=&quot;http://jekyllrb.com/docs/frontmatter/&quot;&gt;Front Matter&lt;/a&gt;. Front Matter is the meta information denoted in YAML at the top of every page and post (or any other content you added). It includes basics such as title, which layout to use with it, and any other information you want passed along up the chain that is usefor for your site. Here’s a sample from my site:&lt;/p&gt;
+
+&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-yaml&quot; data-lang=&quot;yaml&quot;&gt;&lt;span class=&quot;s&quot;&gt;layout&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;post&lt;/span&gt;
+&lt;span class=&quot;s&quot;&gt;title&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;Caching&lt;/span&gt;&lt;span class=&quot;nv&quot;&gt; &lt;/span&gt;&lt;span class=&quot;s&quot;&gt;model&lt;/span&gt;&lt;span class=&quot;nv&quot;&gt; &lt;/span&gt;&lt;span class=&quot;s&quot;&gt;associations&lt;/span&gt;&lt;span class=&quot;nv&quot;&gt; &lt;/span&gt;&lt;span class=&quot;s&quot;&gt;in&lt;/span&gt;&lt;span class=&quot;nv&quot;&gt; &lt;/span&gt;&lt;span class=&quot;s&quot;&gt;rails&quot;&lt;/span&gt;
+&lt;span class=&quot;s&quot;&gt;meta&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;post&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
+
+&lt;p&gt;Any of these variables are available with the page variable, so &lt;code class=&quot;highlighter-rouge&quot;&gt;page.title&lt;/code&gt; for instance in my example above, would return that value. Any variable associated with your site (and set in the _config.yml file) are available on the site variable, like: &lt;code class=&quot;highlighter-rouge&quot;&gt;site.url&lt;/code&gt;. More on variables &lt;a href=&quot;http://jekyllrb.com/docs/variables/&quot;&gt;here&lt;/a&gt;.&lt;/p&gt;
+
+&lt;p&gt;You can have a look at my finished site repo &lt;a href=&quot;https://github.com/scttdavs/scttdavs.github.io&quot;&gt;here&lt;/a&gt; for reference and how this may all tie into each other. There is a quite a bit that will probably be involved in making your templates and layouts for your site, but that’s not what this post is about. So I’ll leave that to you. But once that is done, time to put that shit up on the web!&lt;/p&gt;
+
+&lt;h2 id=&quot;github-hosting&quot;&gt;Github hosting&lt;/h2&gt;
+
+&lt;p&gt;Sure, you can pay for your own hosting, but why bother when you can get unlimited free hosting that is super fast? Just upload to github, it’s ridiculously easy. First thing’s first, create a new repo on github that has this naming scheme: &lt;code class=&quot;highlighter-rouge&quot;&gt;username.github.io&lt;/code&gt; where “username” is &lt;em&gt;your&lt;/em&gt; github username. It must be named this way exactly.&lt;/p&gt;
+
+&lt;p&gt;Second, add &lt;code class=&quot;highlighter-rouge&quot;&gt;_sites&lt;/code&gt; and anything else you don’t want on your public repo in your .gitignore file. Github will generate your site for you, so no need to commit the &lt;code class=&quot;highlighter-rouge&quot;&gt;_site&lt;/code&gt; folder. Also, maybe you have user/admin info stored in &lt;code class=&quot;highlighter-rouge&quot;&gt;_data&lt;/code&gt; as &lt;a href=&quot;http://jekyllrb.com/docs/datafiles/&quot;&gt;data files&lt;/a&gt;, so you may want to exclude that too.&lt;/p&gt;
+
+&lt;p&gt;Third, just push to your repo. That’s it. You should be able to visit your site within a couple seconds at &lt;em&gt;username&lt;/em&gt;.github.io. Woohoo!!!&lt;/p&gt;
+
+&lt;h2 id=&quot;custom-domain-names&quot;&gt;Custom Domain Names&lt;/h2&gt;
+
+&lt;p&gt;&lt;a href=&quot;https://help.github.com/articles/setting-up-a-custom-domain-with-github-pages/&quot;&gt;Support&lt;/a&gt; for this is easy. First just creat a new file in the root of your project called &lt;code class=&quot;highlighter-rouge&quot;&gt;CNAME&lt;/code&gt; and on the first line, put your domain name. For mine, I just put “sco.ttdavis.com”. Commit to your repo. Next, you’ll need to update your DNS settings for your domain. For a apex domain, you’ll need to add a new A name. And for subdomains, add a new CNAME. For more info on your case, see here.&lt;/p&gt;
+
+&lt;h2 id=&quot;thats-it&quot;&gt;That’s it!&lt;/h2&gt;
+
+&lt;p&gt;Feel the sun shining on your face? The nice cool breeze? The ease of deploying to your freely hosted site in seconds? Feels great to be alive doesn’t it?&lt;/p&gt;
+
+</description>
+        <pubDate>Tue, 26 Jan 2016 00:00:00 -0500</pubDate>
+        <link>https://sco.ttdavis.com/blog/converting-my-site-to-jekyll</link>
+        <guid isPermaLink="true">https://sco.ttdavis.com/blog/converting-my-site-to-jekyll</guid>
+        
+        
+      </item>
+    
+      <item>
+        <title>Caching model associations in rails</title>
+        <description>&lt;p&gt;I’ve been working on a project recently called &lt;a href=&quot;http://www.explorableplaces.com&quot;&gt;www.explorableplaces.com&lt;/a&gt;, and I added memcached caching with &lt;a href=&quot;https://github.com/mperham/dalli&quot;&gt;Dalli&lt;/a&gt;. So I’m basically trying to cache anything and everything that can help our performance.&lt;/p&gt;
+
+&lt;p&gt;Normally, you will see guides and articles show you caching with an example like this:&lt;/p&gt;
+
+&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-ruby&quot; data-lang=&quot;ruby&quot;&gt;&lt;span class=&quot;k&quot;&gt;def&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;cached_images&lt;/span&gt;
+  &lt;span class=&quot;no&quot;&gt;Rails&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;cache&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;fetch&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;([&lt;/span&gt;&lt;span class=&quot;s1&quot;&gt;'Articles'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;id&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;s1&quot;&gt;'images'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;updated_at&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;to_i&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;])&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;do&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;images&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;to_a&lt;/span&gt;
+  &lt;span class=&quot;k&quot;&gt;end&lt;/span&gt;
+&lt;span class=&quot;k&quot;&gt;end&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
+
+&lt;p&gt;And while this now works, if I eager load an association, it will not &lt;!--more--&gt; call my “images_cached” method but the default one instead, so no gain there.&lt;/p&gt;
+
+&lt;p&gt;When I was thinking about this more and more, a lightbulb went off in my head. Instead, you can do something like this:&lt;/p&gt;
+
+&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-ruby&quot; data-lang=&quot;ruby&quot;&gt;&lt;span class=&quot;k&quot;&gt;class&lt;/span&gt; &lt;span class=&quot;nc&quot;&gt;Article&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;&amp;lt;&lt;/span&gt; &lt;span class=&quot;no&quot;&gt;ActiveRecord&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;::&lt;/span&gt;&lt;span class=&quot;no&quot;&gt;Base&lt;/span&gt;
+  &lt;span class=&quot;ss&quot;&gt;has_many: :images&lt;/span&gt;
+  &lt;span class=&quot;ss&quot;&gt;has_many: :cached_images&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;ss&quot;&gt;class_name: &lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;Image&quot;&lt;/span&gt;
+
+  &lt;span class=&quot;k&quot;&gt;def&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;cached_images&lt;/span&gt;
+    &lt;span class=&quot;no&quot;&gt;Rails&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;cache&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;fetch&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;([&lt;/span&gt;&lt;span class=&quot;s1&quot;&gt;'Articles'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;id&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;s1&quot;&gt;'images'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;updated_at&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;to_i&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;])&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;do&lt;/span&gt;
+      &lt;span class=&quot;k&quot;&gt;super&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;to_a&lt;/span&gt;
+    &lt;span class=&quot;k&quot;&gt;end&lt;/span&gt;
+  &lt;span class=&quot;k&quot;&gt;end&lt;/span&gt;
+&lt;span class=&quot;k&quot;&gt;end&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
+
+&lt;h2 id=&quot;so-whats-going-on-here&quot;&gt;So What’s Going On Here?&lt;/h2&gt;
+
+&lt;p&gt;This adds a new association that basically just returns all an article’s images. So why did I create a new one? Well we still need our controllers to work with creating new images like “@article.images.new”. Also, the advantage here is now I can eager load images: “Article.all.includes(:cached_images)” which will return all cached images with each article.&lt;/p&gt;
+
+&lt;p&gt;When it’s run, rails tries to fetch it from the cache using a key created from the array of values passed into it. If it finds something, it returns it. And if not, it runs the code in the block and returns that (which is then cached for future use). In that block, super just calls the original “images” method to make the call to the db and get those images.&lt;/p&gt;
+
+&lt;h2 id=&quot;updated_at-what-are-these-keys&quot;&gt;Updated_at? What Are These Keys?&lt;/h2&gt;
+
+&lt;p&gt;Why do I have “updated_at” in there? Basically, once the model is updated, this would mean the key would be updated, and essentially expire the old cached value, fetching a new one. This is a safer feature so your data doesn’t get stale. For our example, if the article has an id of 5, then our key would look something like “Articles/5/images/1448145415”.&lt;/p&gt;
+
+&lt;p&gt;You may have wondered, what if I update an image? Then the cache will not be expired but I will still get old data? We can easily fix that in our images model:&lt;/p&gt;
+
+&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-ruby&quot; data-lang=&quot;ruby&quot;&gt;&lt;span class=&quot;k&quot;&gt;class&lt;/span&gt; &lt;span class=&quot;nc&quot;&gt;Image&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;&amp;lt;&lt;/span&gt; &lt;span class=&quot;no&quot;&gt;ActiveRecord&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;::&lt;/span&gt;&lt;span class=&quot;no&quot;&gt;Base&lt;/span&gt;
+  &lt;span class=&quot;ss&quot;&gt;belongs_to: :article&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;ss&quot;&gt;touch: &lt;/span&gt;&lt;span class=&quot;kp&quot;&gt;true&lt;/span&gt;
+&lt;span class=&quot;k&quot;&gt;end&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
+
+&lt;p&gt;With “touch: true”, whenever the image is created, updated or destroyed, it will touch the article it belongs to, updating its “updated_at” time. Sweet!&lt;/p&gt;
+
+&lt;h2 id=&quot;and-to_a&quot;&gt;And To_a?&lt;/h2&gt;
+
+&lt;p&gt;And you may also be wondering why “.to_a”. Well, without that, it will actually just cache the ActiveRecord association and not the values. That’s bad, and would just throw an error on us if we try to retrieve it. Calling “to_a” on it forces that association to actually make the call and get our data, which is returned as an array so we can cache it.&lt;/p&gt;
+
+&lt;p&gt;That’s it, hope you found this as useful as I did!&lt;/p&gt;
+
+</description>
+        <pubDate>Wed, 25 Nov 2015 00:00:00 -0500</pubDate>
+        <link>https://sco.ttdavis.com/blog/caching-model-associations-in-rails</link>
+        <guid isPermaLink="true">https://sco.ttdavis.com/blog/caching-model-associations-in-rails</guid>
+        
+        
+      </item>
+    
+      <item>
+        <title>Upgrading Bootstrap 2.x to 3</title>
+        <description>&lt;p&gt;&lt;img src=&quot;/images/bootstrap.jpg&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;When we started building &lt;a href=&quot;http://eastmeeteast.com/&quot;&gt;EastMeetEast&lt;/a&gt; last August, Bootstrap 3 was still a release candidate. It didn’t seem to make very much sense to implement it on our production site when it may have bugs or be updated and changed frequently.&lt;/p&gt;
+
+&lt;p&gt;After just a few weeks of work, the official release of 3.0 came out. At that point, we were more concerned with getting the product up and out than now backtracking to &lt;!--more--&gt; upgrade to 3. Well the time has come, now 9 months later when things are much more quiet, to tackle this sucker.&lt;/p&gt;
+
+&lt;p&gt;I’m writing this article as I come across common “gotchas” when migrating. For a detailed list of all the changes, you can &lt;a href=&quot;http://getbootstrap.com/components/#navbar&quot;&gt;view them here&lt;/a&gt;.&lt;/p&gt;
+
+&lt;h2 id=&quot;new-grid&quot;&gt;New Grid&lt;/h2&gt;
+
+&lt;p&gt;This is probably the most obvious, but there’s a new grid. It’s pretty simple but is based on “mobile first” design.&lt;/p&gt;
+
+&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-html&quot; data-lang=&quot;html&quot;&gt;&lt;span class=&quot;nt&quot;&gt;&amp;lt;div&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;class=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;span4 offset2&quot;&lt;/span&gt;&lt;span class=&quot;nt&quot;&gt;&amp;gt;&amp;lt;/div&amp;gt;&lt;/span&gt;
+
+//now becomes
+
+&lt;span class=&quot;nt&quot;&gt;&amp;lt;div&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;class=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;col-sm-4 col-md-offset-2&quot;&lt;/span&gt;&lt;span class=&quot;nt&quot;&gt;&amp;gt;&amp;lt;/div&amp;gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
+
+&lt;p&gt;The prefixes sm, md, lg, all refer to the screensizes that the container will be collapsed in. So you can have more than one grid class per element, a “col–4 col-lg-2” or something. There also is no more “row-fluid” class. There is only the “row” class and will always be fluid.&lt;/p&gt;
+
+&lt;h2 id=&quot;helper-classes&quot;&gt;Helper Classes&lt;/h2&gt;
+
+&lt;p&gt;A lot of these have also changed or added new ones. These include:&lt;/p&gt;
+
+&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-html&quot; data-lang=&quot;html&quot;&gt;&lt;span class=&quot;nt&quot;&gt;&amp;lt;label&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;class=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;sr-only&quot;&lt;/span&gt;&lt;span class=&quot;nt&quot;&gt;&amp;gt;&amp;lt;/label&amp;gt;&lt;/span&gt;  // screen reader only, will hide from user's view
+
+&lt;span class=&quot;nt&quot;&gt;&amp;lt;div&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;class=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;hidden-xs&quot;&lt;/span&gt;&lt;span class=&quot;nt&quot;&gt;&amp;gt;&amp;lt;/div&amp;gt;&lt;/span&gt; // will hide on mobile. Follows same prefix convention as grid classes
+
+&lt;span class=&quot;nt&quot;&gt;&amp;lt;div&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;class=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;alert danger-alert&quot;&lt;/span&gt;&lt;span class=&quot;nt&quot;&gt;&amp;gt;&amp;lt;/div&amp;gt;&lt;/span&gt; // error-alert is deprecated&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
+
+&lt;h2 id=&quot;navbar&quot;&gt;Navbar&lt;/h2&gt;
+
+&lt;p&gt;This has changed a lot and is probably better just to &lt;a href=&quot;http://getbootstrap.com/components/#navbar&quot;&gt;read the docs&lt;/a&gt;. The largest difference, though, is there is no more “navbar-inner”.&lt;/p&gt;
+
+&lt;h2 id=&quot;buttons&quot;&gt;Buttons&lt;/h2&gt;
+
+&lt;p&gt;The buttons have simplefied A LOT. They are now flat which makes them super easy to customize. With them, you can edit your buttons with “btn-danger, btn-info, btn-warning, etc” classes, update your Sass/Less variables like “$brandcolor-primary”, or created a custom class with a mixin:&lt;/p&gt;
+
+&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-sass&quot; data-lang=&quot;sass&quot;&gt;&lt;span class=&quot;nc&quot;&gt;.btn-brown&lt;/span&gt; &lt;span class=&quot;err&quot;&gt;{&lt;/span&gt;
+
+  &lt;span class=&quot;k&quot;&gt;@include&lt;/span&gt; &lt;span class=&quot;nd&quot;&gt;btn-variant&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;no&quot;&gt;white&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;no&quot;&gt;brown&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;no&quot;&gt;brown&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;err&quot;&gt;;&lt;/span&gt;
+
+&lt;span class=&quot;err&quot;&gt;}&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
+
+&lt;p&gt;Note: all references to “error” are now “danger”, hence the new class “btn-danger” (and also “alert-danger”)&lt;/p&gt;
+
+&lt;h2 id=&quot;responsive-images&quot;&gt;Responsive Images&lt;/h2&gt;
+
+&lt;p&gt;Responsive images are not responsive out of the box anymore. You’ll need to add a class of “img-responsive” to any image you want to behave that way. You may be able to get around it by just adding&lt;/p&gt;
+
+&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-sass&quot; data-lang=&quot;sass&quot;&gt;&lt;span class=&quot;na&quot;&gt;img&lt;/span&gt;&lt;span class=&quot;err&quot;&gt; { &lt;/span&gt;&lt;span class=&quot;nl&quot;&gt;max-width&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;m&quot;&gt;100%&lt;/span&gt; &lt;span class=&quot;err&quot;&gt;}&lt;/span&gt;
+
+&lt;span class=&quot;c1&quot;&gt;// or
+&lt;/span&gt;
+&lt;span class=&quot;nt&quot;&gt;img&lt;/span&gt; &lt;span class=&quot;err&quot;&gt;{&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;@&lt;/span&gt;&lt;span class=&quot;nt&quot;&gt;extend&lt;/span&gt; &lt;span class=&quot;nc&quot;&gt;.img-responsive&lt;/span&gt; &lt;span class=&quot;err&quot;&gt;}&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
+
+&lt;p&gt;but it may differ case to case, so use your discretion. For instance, in rails, you may have an image helper like “image_tag(256)” that spits out an image with width and height set to 256px. Using max-width alone on this will cause some problems, so it’s best to use the class name. Alternatively, you may have some images styled in such a way that “img-responsive” will break their layout by setting the height to “auto”. Just be aware and careful with these.&lt;/p&gt;
+
+&lt;h2 id=&quot;forms&quot;&gt;Forms&lt;/h2&gt;
+
+&lt;p&gt;If you use bootstraps form styles, they have changed a lot. “Control-group” is now “form-group”, “input-block-level” is now “form-control”. “Controls” and “controls-row” have been removed with no replacement. Have a look at the &lt;a href=&quot;http://getbootstrap.com/migration/&quot;&gt;details&lt;/a&gt; for more specific info. If you have any plugins, gems or other third party software that deals with forms, then you will have to check and see if they need to be updated as well. One such popular one is…&lt;/p&gt;
+
+&lt;h2 id=&quot;simple_form-with-rails&quot;&gt;Simple_form With Rails&lt;/h2&gt;
+
+&lt;p&gt;If you use Rails, and you use the very popular gem simple_form, then you are probably wondering why your forms looks like shit in bootstrap 3. Well, that’s because you need to update your gem. An official release is not out yet as of this posting, but there is a release candidate that you can use. For more info, &lt;a href=&quot;http://blog.plataformatec.com.br/2014/04/bootstrap-3-support-for-simple-form/&quot;&gt;check this out&lt;/a&gt;.&lt;/p&gt;
+
+&lt;p&gt;Those were all the major steps in upgrading our site to Bootstrap 3. It involved some other little adjustments here and there, but those were specific to our site and not as big as these. Good luck!&lt;/p&gt;
+
+</description>
+        <pubDate>Wed, 25 Jun 2014 00:00:00 -0400</pubDate>
+        <link>https://sco.ttdavis.com/blog/upgrading-bootstrap-2-to-3</link>
+        <guid isPermaLink="true">https://sco.ttdavis.com/blog/upgrading-bootstrap-2-to-3</guid>
+        
+        
+      </item>
+    
+      <item>
+        <title>Using PG (postgres) on Mavericks</title>
+        <description>&lt;p&gt;Heroku only uses Postres for databases. That’s fine, so you just need install it locally for developement. Well, you are probably pulling your hair out trying to install the pg gem on Mavericks. That’s because you can’t (as of yet anyway). The good news is there’s a quick and easy way.&lt;/p&gt;
+
+&lt;p&gt;Just install the &lt;a href=&quot;http://postgresapp.com/&quot;&gt;Postgres App&lt;/a&gt;, then install the gem in terminal, pointing it to the new config file.&lt;/p&gt;
+
+&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-ruby&quot; data-lang=&quot;ruby&quot;&gt;&lt;span class=&quot;n&quot;&gt;gem&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;install&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;pg&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;--&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;--&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;with&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;-&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;pg&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;-&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;config&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;sr&quot;&gt;/Applications/&lt;/span&gt;&lt;span class=&quot;no&quot;&gt;Postgres93&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;app&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;/&lt;/span&gt;&lt;span class=&quot;no&quot;&gt;Contents&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;/&lt;/span&gt;&lt;span class=&quot;no&quot;&gt;MacOS&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;/&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;bin&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;/&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;pg_config&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
+
+&lt;p&gt;Now, make &lt;!--more--&gt; sure the config is there first. If you are using another version of the app, you may have a different name there for “Postres93.app”. But that should do it. Run “bundle install” and click the app to get postres running. Your rails project should work fine now.&lt;/p&gt;
+
+</description>
+        <pubDate>Mon, 19 May 2014 00:00:00 -0400</pubDate>
+        <link>https://sco.ttdavis.com/blog/using-postgres-on-mavericks</link>
+        <guid isPermaLink="true">https://sco.ttdavis.com/blog/using-postgres-on-mavericks</guid>
+        
+        
+      </item>
+    
+      <item>
+        <title>Flat File vs Database CMS</title>
+        <description>&lt;h2 id=&quot;what-is-a-flat-file-cms&quot;&gt;What Is A Flat File CMS?&lt;/h2&gt;
+
+&lt;p&gt;…Says just about everyone… “It is kind of cool sounding.” “Is it related to flat design?” “Everything seems to be going flat these days.”&lt;/p&gt;
+
+&lt;p&gt;No, it’s not related at all to any flat design or flat anything else. A flat file CMS means that there is no database. Instead of retrieving content for a single page from a database, an actual html/php/text file is created with that content in &lt;!--more--&gt; it. You could find it and open it up in a text editor and it would have all (or almost all) of the stuff you would see when you view it on the web.&lt;/p&gt;
+
+&lt;p&gt;If you tried this with a traditional database CMS, well, there would be no file there. There would be a single template file with variables for where the content goes:&lt;/p&gt;
+
+&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-html&quot; data-lang=&quot;html&quot;&gt;&lt;span class=&quot;nt&quot;&gt;&amp;lt;:cms&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;show&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;variable_foo_bar&lt;/span&gt; &lt;span class=&quot;nt&quot;&gt;/&amp;gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
+
+&lt;p&gt;It grabs the values of those variables from a database and plugs them in before delivering the generated html/php file to your browser.&lt;/p&gt;
+
+&lt;h2 id=&quot;why-is-this-better-if-at-all&quot;&gt;Why Is This Better, If At All?&lt;/h2&gt;
+
+&lt;p&gt;It does seem like taking a step back in terms of technology, and it is actually, but it offers a couple advantages.&lt;/p&gt;
+
+&lt;p&gt;No database means you don’t have to fool with a database. Need to move your site? Drag and drop that sucka. No more having to migrate the database, which can be a headache to some.
+Security. Traditionally, hackers will go after databases first. If there is no database, there’s nothing to get at.
+Your site is now 100% version controllable. This one may be their biggest selling point. You can use git to add version control to your site. You can do this with any site, but it gets pretty tricky with databases and most don’t do it. This way, your local copy is the same as your controlled copy (on github for example) which is the same as your live copy. You can push or pull changes to any of these. Easy peasy.
+Speed. This is especially true when comparing to wordpress, which is overkill for just about all websites that use it. But if you don’t have to query a database, generate then content, then deliver it, the site tends to load a lot faster.&lt;/p&gt;
+
+&lt;h2 id=&quot;well-is-it-worse-in-any-way&quot;&gt;Well, Is It Worse In Any Way?&lt;/h2&gt;
+
+&lt;p&gt;It can’t all be sunshine and rainbows with a flat file CMS, so there must be some downsides.. And there are. Most CMSs that are flat file don’t allow any dynamic content (basically only have HTML/CSS/JS). Statamic is one that does however, as add-ons which cost extra.&lt;/p&gt;
+
+&lt;p&gt;Databases are amazing for searching. Searching with a flat file CMS (if they even feature it) may not be up to snuff with a database, especially for large sites with thousands of files.&lt;/p&gt;
+
+&lt;p&gt;They can get bloated. Again, for large site, this means thousands of html/php/text files.&lt;/p&gt;
+
+&lt;p&gt;Version controllable is not important to the client. Pretty much any client will log on to the cms from a browser to make changes to their site. They will not make a local version, push it to github, and push it to the server. Very quickly all repositories will be out of sync and create a headache for any developer looking to keep them all the same.&lt;/p&gt;
+
+&lt;p&gt;Maybe someone more code inclined could write a script to keep them in sync when a change is made (I have no idea), but if you are going to do that and are that technically savvy, why not just use a database and back it up?&lt;/p&gt;
+
+&lt;h2 id=&quot;which-should-i-use&quot;&gt;Which Should I Use?&lt;/h2&gt;
+
+&lt;p&gt;Overall, I would stick with the database driven CMS. Other than maybe wordpress, working with a database is easy and not scary once you do it. Your site will be faster and more rich in available features. It will scale well and can work on large and small sites alike.&lt;/p&gt;
+
+&lt;p&gt;I would consider using a flat file cms for a personal site or blog (where the developer/designers themselves are in total control) or small sites and static sites. There won’t be much drop off at all with a small site, so it can and does work well for lots of people and may be the perfect fit for you too.&lt;/p&gt;
+
+&lt;p&gt;Here is a list of popular flat file cms’s:&lt;/p&gt;
+
+&lt;p&gt;&lt;a href=&quot;Getkirby.com&quot;&gt;Getkirby.com&lt;/a&gt; free&lt;br /&gt;
+&lt;a href=&quot;Statamic.com&quot;&gt;Statamic.com&lt;/a&gt;&lt;br /&gt;
+&lt;a href=&quot;Pico.dev7studios.com&quot;&gt;Pico.dev7studios.com&lt;/a&gt; free&lt;br /&gt;
+&lt;a href=&quot;Jekyllrb.com&quot;&gt;Jekyllrb.com&lt;/a&gt; free (technically not cms)&lt;br /&gt;
+&lt;a href=&quot;Siteleaf.com&quot;&gt;Siteleaf.com&lt;/a&gt; (static sites only)&lt;/p&gt;
+
+&lt;p&gt;and a list of great non wordpress cms’s:&lt;/p&gt;
+
+&lt;p&gt;&lt;a href=&quot;Grabaperch.com&quot;&gt;Grabaperch.com&lt;/a&gt;&lt;br /&gt;
+&lt;a href=&quot;Surrealcms.com&quot;&gt;Surrealcms.com&lt;/a&gt; free trial&lt;br /&gt;
+&lt;a href=&quot;CouchCMS.com&quot;&gt;CouchCMS.com&lt;/a&gt; free (pay to whitelabel)&lt;br /&gt;
+&lt;a href=&quot;AnchorCMS.com&quot;&gt;AnchorCMS.com&lt;/a&gt; free&lt;br /&gt;
+&lt;a href=&quot;Builtwithcraft.com&quot;&gt;Builtwithcraft.com&lt;/a&gt; free for simple sites&lt;br /&gt;
+&lt;a href=&quot;Habariproject.org&quot;&gt;Habariproject.org&lt;/a&gt; free&lt;/p&gt;
+</description>
+        <pubDate>Sat, 10 May 2014 00:00:00 -0400</pubDate>
+        <link>https://sco.ttdavis.com/blog/flat-file-vs-database-cms</link>
+        <guid isPermaLink="true">https://sco.ttdavis.com/blog/flat-file-vs-database-cms</guid>
+        
+        
+      </item>
+    
+  </channel>
+</rss>
