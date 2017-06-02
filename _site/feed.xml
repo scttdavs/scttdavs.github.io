@@ -6,15 +6,15 @@
 </description>
     <link>https://sco.ttdavis.com/</link>
     <atom:link href="https://sco.ttdavis.com/feed.xml" rel="self" type="application/rss+xml"/>
-    <pubDate>Fri, 02 Jun 2017 14:33:50 -0400</pubDate>
-    <lastBuildDate>Fri, 02 Jun 2017 14:33:50 -0400</lastBuildDate>
+    <pubDate>Fri, 02 Jun 2017 16:06:57 -0400</pubDate>
+    <lastBuildDate>Fri, 02 Jun 2017 16:06:57 -0400</lastBuildDate>
     <generator>Jekyll v3.4.3</generator>
     
       <item>
         <title>HTTPS with Github Pages (and Custom Domains)</title>
         <description>&lt;p&gt;&lt;img src=&quot;/images/ssl-ghp.jpg&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
 
-&lt;p&gt;&lt;a href=&quot;/blog/converting-my-site-to-jekyll&quot;&gt;I’ve posted before&lt;/a&gt; about how I converted this site to Jekyll and hosted it on Github Pages. I’m a huge fan of this and it was really exciting last year when they announced support for https with Github pages. But alas, this is for the &lt;code class=&quot;highlighter-rouge&quot;&gt;github.io&lt;/code&gt; urls, not custom domains.&lt;!--more--&gt; I’m to the point now where I do not want to wait any longer if there are other solutions out there. I would like to avoid the &lt;a href=&quot;https://motherboard.vice.com/en_us/article/google-will-soon-shame-all-websites-that-are-unencrypted-chrome-https&quot;&gt;impending Chrome death mark&lt;/a&gt;, as well as start testing out and using service workers with this site. As it turns out, there is a pretty simple say of doing this using Cloudflare.&lt;/p&gt;
+&lt;p&gt;&lt;a href=&quot;/blog/converting-my-site-to-jekyll&quot;&gt;I’ve posted before&lt;/a&gt; about how I converted this site to Jekyll and hosted it on Github Pages. I’m a huge fan of this and it was really exciting last year when they announced support for https with Github pages. But alas, this is for the &lt;code class=&quot;highlighter-rouge&quot;&gt;github.io&lt;/code&gt; urls, not custom domains.&lt;!--more--&gt; I’m to the point now where I do not want to wait any longer if there are other solutions out there. I would like to avoid the &lt;a href=&quot;https://motherboard.vice.com/en_us/article/google-will-soon-shame-all-websites-that-are-unencrypted-chrome-https&quot;&gt;impending Chrome death mark&lt;/a&gt;, as well as start testing out and using service workers with this site. As it turns out, there is a pretty simple way of doing this using Cloudflare.&lt;/p&gt;
 
 &lt;h2 id=&quot;what-is-cloudflare&quot;&gt;What is Cloudflare&lt;/h2&gt;
 
@@ -29,7 +29,7 @@
   &lt;li&gt;Create a new site (even if you did this a long time ago, the new creation steps may have changed)&lt;/li&gt;
   &lt;li&gt;It will walk you through and scan your DNS settings. Make sure your A or CNAME settings are correct in Cloudflare once it’s done.&lt;/li&gt;
   &lt;li&gt;Change your nameservers of your domain to match the ones Cloudflare gives you.&lt;/li&gt;
-  &lt;li&gt;Change your SSL settings for you site to use “Full”.&lt;/li&gt;
+  &lt;li&gt;Change your SSL settings for your site to use “Full”.&lt;/li&gt;
   &lt;li&gt;Set a page rule to redirect all traffic to https. I used &lt;code class=&quot;highlighter-rouge&quot;&gt;http://*ttdavis.com/*&lt;/code&gt; to &lt;code class=&quot;highlighter-rouge&quot;&gt;Always use HTTPS&lt;/code&gt;.&lt;/li&gt;
 &lt;/ol&gt;
 
