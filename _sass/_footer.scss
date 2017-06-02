@@ -6,6 +6,10 @@ footer {
   width: -webkit-calc( 100% + 135px);
   width: calc( 100% + 135px);
   @media(max-width: 767px) {
+    margin: 45px -40px 0;
+    width: auto;
+  }
+  @media(max-width: 480px) {
     margin: 45px -25px 0;
     width: auto;
   }
