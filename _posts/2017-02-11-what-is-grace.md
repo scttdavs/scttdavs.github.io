@@ -1,9 +1,11 @@
 ---
 layout: post
 title: "What is grace?"
-photo: ssl
+photo: dict
 meta: post
 ---
+
+![](/images/dict.jpg)
 
 My whole life, I don't think I had given this question too much thought. Despite being raised and confirmed Catholic, it was one of those things that just goes in one ear and comes out the other. Grace is to be graceful, elegant, smooth, whatever. That's about as much as I knew or cared.
 
