@@ -23,10 +23,11 @@ There's no I in team and the same is true for Javascript. No I'm not talking abo
 
 <div class="pre-wrap">
 {% highlight javascript %}
-ZNewReal = Math.pow(ZOldReal, 2) - Math.pow(ZOldImaginary, 2) + Cr;
-ZNewImaginary = 2 * ZOldReal * ZOldImaginary + CImaginary;
+const ZNewReal = Math.pow(ZOldReal, 2) - Math.pow(ZOldImaginary, 2) + Cr;
 
-absoluteValue = Math.sqrt(Math.pow(ZNewReal, 2) + Math.pow(ZNewImaginary, 2));
+const ZNewImaginary = 2 * ZOldReal * ZOldImaginary + CImaginary;
+
+const absoluteValue = Math.sqrt(Math.pow(ZNewReal, 2) + Math.pow(ZNewImaginary, 2));
 {% endhighlight %}
 </div>
 

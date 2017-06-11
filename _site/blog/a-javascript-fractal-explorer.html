@@ -8,7 +8,7 @@
   
     <meta name="twitter:card" content="summary" />
     <meta name="twitter:site" content="@scttdavs" />
-    <meta name="twitter:image" content="https://sco.ttdavis.com/images/mandelbrot2.jpg">
+    <meta name="twitter:image" content="http://localhost:4000/images/mandelbrot2.jpg">
     <meta name="twitter:title" content="A Javascript Fractal Explorer" />
     <meta name="twitter:description" content="
 
@@ -17,8 +17,8 @@ A funny story about me is how I got into web development. It essentially boiled 
 " />
 
     <meta property="og:title" content="A Javascript Fractal Explorer">
-    <meta property="og:url" content="https://sco.ttdavis.com/blog/a-javascript-fractal-explorer">
-    <meta property="og:image" content="https://sco.ttdavis.com/images/mandelbrot2.jpg">
+    <meta property="og:url" content="http://localhost:4000/blog/a-javascript-fractal-explorer">
+    <meta property="og:image" content="http://localhost:4000/images/mandelbrot2.jpg">
     <meta property="og:image:type" content="image/jpeg" />
     <meta property="og:site_name" content="Scott Davis">
     <meta property="og:description" content="
@@ -39,10 +39,11 @@ There’s no I in team and the same is true for Javascript. No I’m not talking
 
 
 
-ZNewReal = Math.pow(ZOldReal, 2) - Math.pow(ZOldImaginary, 2) + Cr;
-ZNewImaginary = 2 * ZOldReal * ZOldImaginary + CImaginary;
+const ZNewReal = Math.pow(ZOldReal, 2) - Math.pow(ZOldImaginary, 2) + Cr;
 
-absoluteValue = Math.sqrt(Math.pow(ZNewReal, 2) + Math.pow(ZNewImaginary, 2));
+const ZNewImaginary = 2 * ZOldReal * ZOldImaginary + CImaginary;
+
+const absoluteValue = Math.sqrt(Math.pow(ZNewReal, 2) + Math.pow(ZNewImaginary, 2));
 
 
 
@@ -90,8 +91,8 @@ All in all, this was a lot of fun to work on and hope others enjoy it at least a
   <link rel="stylesheet" href="/css/main.css" type='text/css'>
   <link rel='stylesheet' href="/fonts/ss-social-regular.css" type='text/css'>
 
-  <link rel="canonical" href="https://sco.ttdavis.com/blog/a-javascript-fractal-explorer">
-  <link rel="alternate" type="application/rss+xml" title="Scott Davis | Front End Developer" href="https://sco.ttdavis.com/feed.xml">
+  <link rel="canonical" href="http://localhost:4000/blog/a-javascript-fractal-explorer">
+  <link rel="alternate" type="application/rss+xml" title="Scott Davis | Front End Developer" href="http://localhost:4000/feed.xml">
   <script>
     var _gaq = _gaq || [];
     _gaq.push(["_setAccount", "UA-9400337-1"]);
@@ -166,10 +167,11 @@ All in all, this was a lot of fun to work on and hope others enjoy it at least a
 
 <div class="pre-wrap">
 
-<figure class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span class="nx">ZNewReal</span> <span class="o">=</span> <span class="nb">Math</span><span class="p">.</span><span class="nx">pow</span><span class="p">(</span><span class="nx">ZOldReal</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span> <span class="o">-</span> <span class="nb">Math</span><span class="p">.</span><span class="nx">pow</span><span class="p">(</span><span class="nx">ZOldImaginary</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span> <span class="o">+</span> <span class="nx">Cr</span><span class="p">;</span>
-<span class="nx">ZNewImaginary</span> <span class="o">=</span> <span class="mi">2</span> <span class="o">*</span> <span class="nx">ZOldReal</span> <span class="o">*</span> <span class="nx">ZOldImaginary</span> <span class="o">+</span> <span class="nx">CImaginary</span><span class="p">;</span>
+<figure class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span class="kr">const</span> <span class="nx">ZNewReal</span> <span class="o">=</span> <span class="nb">Math</span><span class="p">.</span><span class="nx">pow</span><span class="p">(</span><span class="nx">ZOldReal</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span> <span class="o">-</span> <span class="nb">Math</span><span class="p">.</span><span class="nx">pow</span><span class="p">(</span><span class="nx">ZOldImaginary</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span> <span class="o">+</span> <span class="nx">Cr</span><span class="p">;</span>
 
-<span class="nx">absoluteValue</span> <span class="o">=</span> <span class="nb">Math</span><span class="p">.</span><span class="nx">sqrt</span><span class="p">(</span><span class="nb">Math</span><span class="p">.</span><span class="nx">pow</span><span class="p">(</span><span class="nx">ZNewReal</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span> <span class="o">+</span> <span class="nb">Math</span><span class="p">.</span><span class="nx">pow</span><span class="p">(</span><span class="nx">ZNewImaginary</span><span class="p">,</span> <span class="mi">2</span><span class="p">));</span></code></pre></figure>
+<span class="kr">const</span> <span class="nx">ZNewImaginary</span> <span class="o">=</span> <span class="mi">2</span> <span class="o">*</span> <span class="nx">ZOldReal</span> <span class="o">*</span> <span class="nx">ZOldImaginary</span> <span class="o">+</span> <span class="nx">CImaginary</span><span class="p">;</span>
+
+<span class="kr">const</span> <span class="nx">absoluteValue</span> <span class="o">=</span> <span class="nb">Math</span><span class="p">.</span><span class="nx">sqrt</span><span class="p">(</span><span class="nb">Math</span><span class="p">.</span><span class="nx">pow</span><span class="p">(</span><span class="nx">ZNewReal</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span> <span class="o">+</span> <span class="nb">Math</span><span class="p">.</span><span class="nx">pow</span><span class="p">(</span><span class="nx">ZNewImaginary</span><span class="p">,</span> <span class="mi">2</span><span class="p">));</span></code></pre></figure>
 
 </div>
 
