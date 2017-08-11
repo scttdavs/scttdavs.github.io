@@ -4,11 +4,175 @@
     <title>Scott Davis | Front End Developer</title>
     <description>Front End Developer / Person
 </description>
-    <link>https://sco.ttdavis.com/</link>
-    <atom:link href="https://sco.ttdavis.com/feed.xml" rel="self" type="application/rss+xml"/>
-    <pubDate>Sat, 10 Jun 2017 23:00:24 -0400</pubDate>
-    <lastBuildDate>Sat, 10 Jun 2017 23:00:24 -0400</lastBuildDate>
+    <link>http://localhost:4000/</link>
+    <atom:link href="http://localhost:4000/feed.xml" rel="self" type="application/rss+xml"/>
+    <pubDate>Fri, 11 Aug 2017 15:21:32 -0500</pubDate>
+    <lastBuildDate>Fri, 11 Aug 2017 15:21:32 -0500</lastBuildDate>
     <generator>Jekyll v3.4.3</generator>
+    
+      <item>
+        <title>Progressive Rendering with Rails</title>
+        <description>&lt;p&gt;&lt;img src=&quot;/images/prog.jpg&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;At my work, we use &lt;a href=&quot;http://markojs.com&quot;&gt;Marko&lt;/a&gt; as our templating engine, which supports &lt;a href=&quot;https://medium.com/ben-and-dion/progressive-rendering-a-killer-and-under-appreciated-feature-of-the-web-97c789b608c1&quot;&gt;progressive rendering&lt;/a&gt; out of the box. So maybe that is why I took it for granted when I decided I would try to implement the same thing for &lt;a href=&quot;https://www.explorableplaces.com&quot;&gt;Explorable Places&lt;/a&gt;. There are a few pages there that are data-heavy and it would help&lt;!--more--&gt; to start rendering the page right away rather than wait for everything to be loaded and rendered.&lt;/p&gt;
+
+&lt;p&gt;I expected there to be a gem already for this, in some shape or form, but was pleasantly surprised to find out &lt;a href=&quot;http://api.rubyonrails.org/classes/ActionController/Streaming.html&quot;&gt;Rails supports this out of box&lt;/a&gt;, and has since Rails 3! Now, I got this working, but not without a few gotchas I thought I’d share.&lt;/p&gt;
+
+&lt;h2 id=&quot;choose-a-templating-language-that-supports-streaming&quot;&gt;Choose a templating language that supports streaming&lt;/h2&gt;
+
+&lt;p&gt;This may seem obvious, especially since I mentioned it above, but it wasn’t until later I realized I was in a pickle. I chose &lt;a href=&quot;http://haml.info/&quot;&gt;Haml&lt;/a&gt; when I first started the project because I liked it and it was a sort of standard in Rails to begin with, with how well it works with Ruby. I never had streaming the rendering of the page in mind back then. As it turns out, Haml does &lt;a href=&quot;https://github.com/haml/haml/issues/436&quot;&gt;&lt;em&gt;not&lt;/em&gt;&lt;/a&gt; support streaming. In fact, most templates don’t. But &lt;a href=&quot;https://en.wikipedia.org/wiki/ERuby&quot;&gt;ERB&lt;/a&gt; does, and so does &lt;a href=&quot;http://slim-lang.com/&quot;&gt;Slim&lt;/a&gt;. In &lt;a href=&quot;https://medium.com/@mario_chavez/rails-template-engines-performance-9ba18446895d&quot;&gt;benchmarking&lt;/a&gt;, it seems that Slim is actually &lt;em&gt;slightly&lt;/em&gt; faster than ERB, but not enough to make me learn it while getting this up and running, so ERB is what I went with.&lt;/p&gt;
+
+&lt;p&gt;Since I only want a few pages to stream for now, I only needed to convert the layouts, templates and partials that those pages touch. This takes significantly less time than converting the whole site. &lt;a href=&quot;https://haml2erb.org/&quot;&gt;Haml2erb&lt;/a&gt; helped a lot with speeding this process up.&lt;/p&gt;
+
+&lt;h2 id=&quot;avoid-any-middleware-that-alters-the-html-output&quot;&gt;Avoid any middleware that alters the html output.&lt;/h2&gt;
+
+&lt;p&gt;Since we are streaming in chunks, if you have any middleware that alters this, the chunking will be corrupted and invalid and your page won’t even load. You’ll just get a not-so-helpful error message from your browser. I’ve read that this includes New Relic’s gem, but in my case, there were a few others.&lt;/p&gt;
+
+&lt;p&gt;&lt;a href=&quot;https://github.com/flyerhzm/bullet&quot;&gt;Bullet&lt;/a&gt; was easy, but &lt;a href=&quot;https://github.com/MiniProfiler/rack-mini-profiler&quot;&gt;Rack Mini Profiler&lt;/a&gt; was tougher since it loads automatically and I haven’t touched these gems in forever. The mini profiler won’t work even if you choose to log to file only. Both of these gems I had to load conditionally behind an environment variable so I could still use them easily from time to time in development.&lt;/p&gt;
+
+&lt;p&gt;This may be all you need to get things up and running, but in my case, and hopefully in your case too, there should be one more step.&lt;/p&gt;
+
+&lt;h2 id=&quot;monkey-patch-to-get-gzipped-chunks-working&quot;&gt;Monkey patch to get gzipped chunks working&lt;/h2&gt;
+
+&lt;p&gt;The &lt;a href=&quot;https://github.com/rails/rails/blob/v5.1.3/actionpack/lib/action_controller/metal/streaming.rb&quot;&gt;current Rails streaming implementation&lt;/a&gt; works by rendering directly to a chunked body. This means it is chunked, and then gzipped by the &lt;code class=&quot;highlighter-rouge&quot;&gt;Rack::Deflater&lt;/code&gt; middleware that we use (and you should too!). This corrupts the encoding and again, your page won’t load save for a not-so-helpful error message. There is a &lt;a href=&quot;https://stackoverflow.com/questions/7986150/http-streaming-in-rails-not-working-when-using-rackdeflater&quot;&gt;good explanation of this on Stack Overflow&lt;/a&gt; with a link to the Http spec and the example of the monkey patch that I took from.&lt;/p&gt;
+
+&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-ruby&quot; data-lang=&quot;ruby&quot;&gt;&lt;span class=&quot;c1&quot;&gt;# config/application.rb&lt;/span&gt;
+&lt;span class=&quot;n&quot;&gt;config&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;middleware&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;use&lt;/span&gt; &lt;span class=&quot;no&quot;&gt;Rack&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;::&lt;/span&gt;&lt;span class=&quot;no&quot;&gt;Chunked&lt;/span&gt;
+&lt;span class=&quot;n&quot;&gt;config&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;middleware&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;use&lt;/span&gt; &lt;span class=&quot;no&quot;&gt;Rack&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;::&lt;/span&gt;&lt;span class=&quot;no&quot;&gt;Deflater&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
+
+&lt;p&gt;The patch expects you to use the &lt;code class=&quot;highlighter-rouge&quot;&gt;Rack::Chunked&lt;/code&gt; middleware in addition to the Deflater. It overwrites Rails’ implementation of streaming so that it only removes the &lt;code class=&quot;highlighter-rouge&quot;&gt;Content-Length&lt;/code&gt; header and makes sure &lt;em&gt;not&lt;/em&gt; to add the &lt;code class=&quot;highlighter-rouge&quot;&gt;Transfer-Encoding&lt;/code&gt; header. It will rely on the chunked middleware for encoding. It also directly renders the template, rather than to the chunked body, again relying on the middleware to do the chunking. Here is what I used:&lt;/p&gt;
+
+&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-ruby&quot; data-lang=&quot;ruby&quot;&gt;&lt;span class=&quot;k&quot;&gt;module&lt;/span&gt; &lt;span class=&quot;nn&quot;&gt;GzipStreaming&lt;/span&gt;
+  &lt;span class=&quot;k&quot;&gt;def&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;_process_options&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;options&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;stream&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;options&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;delete&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;ss&quot;&gt;:stream&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+
+    &lt;span class=&quot;k&quot;&gt;super&lt;/span&gt;
+
+    &lt;span class=&quot;k&quot;&gt;if&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;stream&lt;/span&gt;
+      &lt;span class=&quot;k&quot;&gt;unless&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;env&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;HTTP_VERSION&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;==&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;HTTP/1.0&quot;&lt;/span&gt;
+        &lt;span class=&quot;n&quot;&gt;headers&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;Cache-Control&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;||=&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;no-cache&quot;&lt;/span&gt;
+        &lt;span class=&quot;n&quot;&gt;headers&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;delete&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;Content-Length&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+        &lt;span class=&quot;n&quot;&gt;options&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;ss&quot;&gt;:stream&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;kp&quot;&gt;true&lt;/span&gt;
+      &lt;span class=&quot;k&quot;&gt;end&lt;/span&gt;
+    &lt;span class=&quot;k&quot;&gt;end&lt;/span&gt;
+
+  &lt;span class=&quot;k&quot;&gt;end&lt;/span&gt;
+
+  &lt;span class=&quot;k&quot;&gt;def&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;_render_template&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;options&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+    &lt;span class=&quot;k&quot;&gt;if&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;options&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;delete&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;ss&quot;&gt;:stream&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+      &lt;span class=&quot;n&quot;&gt;view_renderer&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;render_body&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;view_context&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;options&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+    &lt;span class=&quot;k&quot;&gt;else&lt;/span&gt;
+      &lt;span class=&quot;k&quot;&gt;super&lt;/span&gt;
+    &lt;span class=&quot;k&quot;&gt;end&lt;/span&gt;
+  &lt;span class=&quot;k&quot;&gt;end&lt;/span&gt;
+&lt;span class=&quot;k&quot;&gt;end&lt;/span&gt;
+
+&lt;span class=&quot;k&quot;&gt;module&lt;/span&gt; &lt;span class=&quot;nn&quot;&gt;ActionController&lt;/span&gt;
+  &lt;span class=&quot;k&quot;&gt;class&lt;/span&gt; &lt;span class=&quot;nc&quot;&gt;Base&lt;/span&gt;
+    &lt;span class=&quot;kp&quot;&gt;include&lt;/span&gt; &lt;span class=&quot;no&quot;&gt;GzipStreaming&lt;/span&gt;
+  &lt;span class=&quot;k&quot;&gt;end&lt;/span&gt;
+&lt;span class=&quot;k&quot;&gt;end&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
+
+&lt;p&gt;The result is that the rack middlewares handle this correctly, finally! Good luck and happy rendering!&lt;/p&gt;
+
+</description>
+        <pubDate>Fri, 11 Aug 2017 00:00:00 -0500</pubDate>
+        <link>http://localhost:4000/blog/progressive-rendering-with-rails</link>
+        <guid isPermaLink="true">http://localhost:4000/blog/progressive-rendering-with-rails</guid>
+        
+        
+      </item>
+    
+      <item>
+        <title>On Being a Parent</title>
+        <description>&lt;p&gt;&lt;img src=&quot;/images/ssl-ghp.jpg&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;poop shooting to bassinet&lt;/li&gt;
+  &lt;li&gt;talking in baby conversation&lt;/li&gt;
+  &lt;li&gt;blue stained legs&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;“Scott! I need you!!”.&lt;/p&gt;
+
+&lt;p&gt;“Oh, Meg’s calling me, I got to go. I’ll talk to you later sis.”&lt;/p&gt;
+
+&lt;p&gt;I could tell from the sound in her voice what this was. I ran over to the bathroom, and the look on her face confirmed it.&lt;/p&gt;
+
+&lt;p&gt;“I think my water broke. I went to the bathroom and when I stood up I realized I was all wet. And I’m almost positive I was done, I don’t know what else it could be.”&lt;/p&gt;
+
+&lt;p&gt;I ran to the refrigerator and got the midwife’s card with their emergency number on it. We got the midwife on the phone and she congratulated us and gave us an expectation of what’s to come. It was good news, since it was 10:30 at night, Meg could take a bath to help with the ensuing contractions and try to get some sleep. Once the contractions wake her up and she couldn’t sleep through them, give her another call.&lt;/p&gt;
+
+&lt;p&gt;Sleeping through most of the early labor sounded good to both of us.&lt;/p&gt;
+
+&lt;p&gt;…&lt;/p&gt;
+
+&lt;p&gt;I picked Theo up and was changing his diaper. It was around 6 or so in the morning. He had slept pretty well, but once I had him on the table, I noticed his legs looked like they may be a little bruised. I grabbed diaper, one of the ones from our baby shower and changed him. This one said “You can do it Dad!”. I wish we had kept track of who wrote what message on them!&lt;/p&gt;
+
+&lt;p&gt;I walked into the living room with Meg, “Hey, his legs are looking more bruised. I don’t how this could have happened. Was it the car seat? We didn’t have it THAT tight.. Are babies just that sensitive?”.&lt;/p&gt;
+
+&lt;p&gt;Two days earlier we took him home from the hospital in taxi. We had trouble getting him in the car seat since he was so long and none of us had ever used a car seat. Once we had help from the nurse, he was in but it was definitely a tight fit.&lt;/p&gt;
+
+&lt;p&gt;We’re growing more concerned at this point. “Let’s make an appointment for the pediatrician today if we can”. We both agreed and made the appointment later in the afternoon.&lt;/p&gt;
+
+&lt;p&gt;Meg was holding Theo and despite the bruising he seemed fine and happy. She was talking to him and making faces. She looked down at his little bruised legs and then at his diaper, “You can do it Dad!”. And then back at the bruising, and back at the diaper. The writing was in blue sharpie..&lt;/p&gt;
+
+&lt;p&gt;She called me over and we tried rubbing of the ink from his skin. Off it came. Even brushing your skin lightly on the diaper was enough for the ink to rub off. Holy shit, he’s fine.. and for two days we thought we were the worst, accidentally abusive parents. We’d worried if we’re breaking him on day 2, how will he ever live!&lt;/p&gt;
+
+&lt;p&gt;We immediately threw the rest of the written diapers away.&lt;/p&gt;
+
+&lt;p&gt;…&lt;/p&gt;
+
+&lt;p&gt;I had the app open, Contraction Master. What a name.&lt;/p&gt;
+
+&lt;p&gt;“Ok, tell me when to start”.&lt;/p&gt;
+
+&lt;p&gt;“Now”&lt;/p&gt;
+
+&lt;p&gt;I started the timer and waited. Thirty seconds came and I expected her to tell me when to stop. It kept going and it got to a minute.&lt;/p&gt;
+
+&lt;p&gt;“Ok, it’s over now”.&lt;/p&gt;
+
+&lt;p&gt;A minute seemed a little long. I remember the classes we took, it should start off easy, like 30 seconds for an hour or more. Just a few minutes later, “Ok, another one’s coming!”.&lt;/p&gt;
+
+&lt;p&gt;About 40 minutes later I’d timed 5 or so contractions. Almost all of them were over a minute and some later ones were a minute to a minute and a half. I wondered if Meg was feeling them correctly beginning to end? Or was I timing them wrong? We’re getting a little worried at this point.&lt;/p&gt;
+
+&lt;p&gt;…&lt;/p&gt;
+
+&lt;p&gt;I peaked into the side of Theo’s diaper, “no poop” I said. Meg sat on the bed, reading an article.&lt;/p&gt;
+
+&lt;p&gt;“It’s pretty full though, I’ll still change it.” Due to all the stories I’d heard, getting peed on seemed inevitable. But still, I always stand to the side, never in the line of fire. If he was going to get me, he was going to have to go out of his way to do it.&lt;/p&gt;
+
+&lt;p&gt;I had his diaper off and lubed his bottom up with vaseline, I was getting his diaper ready it happened. A brownish yellow stream of poop shot straight out of his vaseline coated butt, at what must have been only 5 degree angle. It left the changing, pad, the edge of the changing table, and another foot and a half, and plunged straight into the mesh siding of the bassinet, splitting the poop stream into smaller poop streams.&lt;/p&gt;
+
+&lt;p&gt;My eyes were wide open and I just stared in shock. I must have said something because Meg noticed and came running over. What amazing team work we had, without saying much we literally leaped into action. Meg leaped a little bit into the puddle of poop on the floor, but it was ok, because we were on this!&lt;/p&gt;
+
+&lt;p&gt;I used 5, maybe 10 wipes to furiously clean up his butt, and also the changing pad. Thank God we got the kind that doesn’t need the cloth cover! It’s amazing how difficult it is to wipe up poop from the pad while keeping his kicking legs from getting all in it as well.&lt;/p&gt;
+
+&lt;p&gt;Meg worked on the floor, this required some heavy duty paper towels, and several wet wipes to finish the job. Then came the bassinet, the poor poor bassinet. After some soap and water, you could still see some yellow staining if you knew where to look. But what else could we do? Theo made his bed, and now he’ll have to lie in it.&lt;/p&gt;
+
+&lt;p&gt;…&lt;/p&gt;
+
+&lt;p&gt;We had called the midwife again, the other one had finished her shift and Jo had just started. She said to call back when Meg could not talk through a contraction any more. She was visibly in a lot of pain, and it was hard for me to imagine so much she couldn’t talk through. Her water broke about an hour and a half ago. We were supposed to be able to sleep through the night. We hadn’t even been able to finish our dinner after all of this started.&lt;/p&gt;
+
+&lt;p&gt;Her contractions were coming faster and faster. The bath did not help. She was now sitting on the toilet when a particularly bad one hit. She was sitting there because she was feeling nauseous and the tub was close by. She was bent over in pain and vomitted in the tub. I’ve never felt so helpless in my life. So much I also had a heaping of guilt. We called the midwife yet again. I’m sure she loved hearing back from us so soon. This time we had her on the phone again and when another contraction came. She was able to hear Meg through the whole thing. She could nothing but scream and cry out. Bent over her face was red and writhed in agony. It was then and only then, after all the long and close together contractions, after the vomit in the tub, and hearing Meg over the phone that.&lt;/p&gt;
+
+&lt;p&gt;“I think it would be good now to start getting ready to leave. There’s no rush, and I’ll meet you both at the hospital”.&lt;/p&gt;
+
+&lt;p&gt;…&lt;/p&gt;
+
+&lt;p&gt;…&lt;/p&gt;
+
+&lt;p&gt;No rush!? No rush?! I ran around like the proverbial chicken with its head cut off. Our hospital bag was packed but not all the way. I grabbed a sponge and scooped the puke out of the tub and into a bucket that I could flush down the toilet. We couldn’t leave that there for two day.&lt;/p&gt;
+
+&lt;p&gt;I ran around and got a garbage bag, towel, hospital bag and called a car. This was really happening.&lt;/p&gt;
+</description>
+        <pubDate>Fri, 28 Jul 2017 00:00:00 -0500</pubDate>
+        <link>http://localhost:4000/blog/on-being-a-parent</link>
+        <guid isPermaLink="true">http://localhost:4000/blog/on-being-a-parent</guid>
+        
+        
+      </item>
     
       <item>
         <title>HTTPS with Github Pages (and Custom Domains)</title>
@@ -35,9 +199,9 @@
 
 &lt;p&gt;And that’s it! It will most likely take a few hours to update, which sucks because your site will be down in the mean time. But at least it’s simple and it’s free! Now with Cloudflare, Jekyll, and Github Pages, you get free hosting and free SSL certs. 🍻&lt;/p&gt;
 </description>
-        <pubDate>Sat, 27 May 2017 00:00:00 -0400</pubDate>
-        <link>https://sco.ttdavis.com/blog/https-with-github-pages-with-custom-domains</link>
-        <guid isPermaLink="true">https://sco.ttdavis.com/blog/https-with-github-pages-with-custom-domains</guid>
+        <pubDate>Sat, 27 May 2017 00:00:00 -0500</pubDate>
+        <link>http://localhost:4000/blog/https-with-github-pages-with-custom-domains</link>
+        <guid isPermaLink="true">http://localhost:4000/blog/https-with-github-pages-with-custom-domains</guid>
         
         
       </item>
@@ -102,9 +266,9 @@
 &lt;a href=&quot;http://sco.ttdavis.com/mandelbrot/?mi=200&amp;amp;er=5&amp;amp;co=false&amp;amp;j=true&amp;amp;ci=0.3&amp;amp;cr=-0.7&amp;amp;zi=0&amp;amp;zr=0&amp;amp;i=0.00366412213740458&quot; target=&quot;\_blank&quot;&gt;&lt;img src=&quot;/images/mandelbrot8.jpg&quot; alt=&quot;&quot; /&gt;&lt;/a&gt;&lt;/p&gt;
 
 </description>
-        <pubDate>Sun, 14 May 2017 00:00:00 -0400</pubDate>
-        <link>https://sco.ttdavis.com/blog/a-javascript-fractal-explorer</link>
-        <guid isPermaLink="true">https://sco.ttdavis.com/blog/a-javascript-fractal-explorer</guid>
+        <pubDate>Sun, 14 May 2017 00:00:00 -0500</pubDate>
+        <link>http://localhost:4000/blog/a-javascript-fractal-explorer</link>
+        <guid isPermaLink="true">http://localhost:4000/blog/a-javascript-fractal-explorer</guid>
         
         
       </item>
@@ -147,9 +311,9 @@
 
 &lt;p&gt;It was only fitting that his last boat was named Grace, after all. He knew before I did. We read this quote at Sam’s funeral, and it still holds true today as it did then.&lt;/p&gt;
 </description>
-        <pubDate>Sat, 11 Feb 2017 00:00:00 -0500</pubDate>
-        <link>https://sco.ttdavis.com/blog/what-is-grace</link>
-        <guid isPermaLink="true">https://sco.ttdavis.com/blog/what-is-grace</guid>
+        <pubDate>Sat, 11 Feb 2017 00:00:00 -0600</pubDate>
+        <link>http://localhost:4000/blog/what-is-grace</link>
+        <guid isPermaLink="true">http://localhost:4000/blog/what-is-grace</guid>
         
         
       </item>
@@ -227,9 +391,9 @@
 &lt;p&gt;Now I just need to wait for Github to allow for https of github pages with a custom domain and I can revisit this article.&lt;/p&gt;
 
 </description>
-        <pubDate>Mon, 19 Sep 2016 00:00:00 -0400</pubDate>
-        <link>https://sco.ttdavis.com/blog/the-what-why-and-how-of-https</link>
-        <guid isPermaLink="true">https://sco.ttdavis.com/blog/the-what-why-and-how-of-https</guid>
+        <pubDate>Mon, 19 Sep 2016 00:00:00 -0500</pubDate>
+        <link>http://localhost:4000/blog/the-what-why-and-how-of-https</link>
+        <guid isPermaLink="true">http://localhost:4000/blog/the-what-why-and-how-of-https</guid>
         
         
       </item>
@@ -306,9 +470,9 @@
 &lt;p&gt;Typist is written in ES5 and should work on all versions of node. Due to dev depenencies, Node v4 or higher is required to run the tests.&lt;/p&gt;
 
 </description>
-        <pubDate>Mon, 11 Apr 2016 00:00:00 -0400</pubDate>
-        <link>https://sco.ttdavis.com/blog/type-checking-js</link>
-        <guid isPermaLink="true">https://sco.ttdavis.com/blog/type-checking-js</guid>
+        <pubDate>Mon, 11 Apr 2016 00:00:00 -0500</pubDate>
+        <link>http://localhost:4000/blog/type-checking-js</link>
+        <guid isPermaLink="true">http://localhost:4000/blog/type-checking-js</guid>
         
         
       </item>
@@ -333,9 +497,9 @@
 
 &lt;p&gt;It was a strange coincidence that the two careers I had hoped for equated to either ripping out an animals testicles or pinpointing where to rip out the Earth’s sealed up carbon only to release it back again. Could you boil down all career paths down to the same sort of nihilistic views? Maybe so. But I’m not going to lie, I still think about it whenever I see a mountain, or a canyon or a cliff. I think about the story there that made it, and I think about the history, and I think about maybe taking another geology class.&lt;/p&gt;
 </description>
-        <pubDate>Wed, 03 Feb 2016 00:00:00 -0500</pubDate>
-        <link>https://sco.ttdavis.com/blog/what-you-want-to-be-when-youre-grown-up</link>
-        <guid isPermaLink="true">https://sco.ttdavis.com/blog/what-you-want-to-be-when-youre-grown-up</guid>
+        <pubDate>Wed, 03 Feb 2016 00:00:00 -0600</pubDate>
+        <link>http://localhost:4000/blog/what-you-want-to-be-when-youre-grown-up</link>
+        <guid isPermaLink="true">http://localhost:4000/blog/what-you-want-to-be-when-youre-grown-up</guid>
         
         
       </item>
@@ -433,9 +597,9 @@ I think the rest are easily understood. There is a &lt;code class=&quot;highligh
 &lt;p&gt;Feel the sun shining on your face? The nice cool breeze? The ease of deploying to your freely hosted site in seconds? Feels great to be alive doesn’t it?&lt;/p&gt;
 
 </description>
-        <pubDate>Tue, 26 Jan 2016 00:00:00 -0500</pubDate>
-        <link>https://sco.ttdavis.com/blog/converting-my-site-to-jekyll</link>
-        <guid isPermaLink="true">https://sco.ttdavis.com/blog/converting-my-site-to-jekyll</guid>
+        <pubDate>Tue, 26 Jan 2016 00:00:00 -0600</pubDate>
+        <link>http://localhost:4000/blog/converting-my-site-to-jekyll</link>
+        <guid isPermaLink="true">http://localhost:4000/blog/converting-my-site-to-jekyll</guid>
         
         
       </item>
@@ -492,105 +656,9 @@ I think the rest are easily understood. There is a &lt;code class=&quot;highligh
 &lt;p&gt;That’s it, hope you found this as useful as I did!&lt;/p&gt;
 
 </description>
-        <pubDate>Wed, 25 Nov 2015 00:00:00 -0500</pubDate>
-        <link>https://sco.ttdavis.com/blog/caching-model-associations-in-rails</link>
-        <guid isPermaLink="true">https://sco.ttdavis.com/blog/caching-model-associations-in-rails</guid>
-        
-        
-      </item>
-    
-      <item>
-        <title>Upgrading Bootstrap 2.x to 3</title>
-        <description>&lt;p&gt;&lt;img src=&quot;/images/bootstrap.jpg&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
-
-&lt;p&gt;When we started building &lt;a href=&quot;http://eastmeeteast.com/&quot;&gt;EastMeetEast&lt;/a&gt; last August, Bootstrap 3 was still a release candidate. It didn’t seem to make very much sense to implement it on our production site when it may have bugs or be updated and changed frequently.&lt;/p&gt;
-
-&lt;p&gt;After just a few weeks of work, the official release of 3.0 came out. At that point, we were more concerned with getting the product up and out than now backtracking to &lt;!--more--&gt; upgrade to 3. Well the time has come, now 9 months later when things are much more quiet, to tackle this sucker.&lt;/p&gt;
-
-&lt;p&gt;I’m writing this article as I come across common “gotchas” when migrating. For a detailed list of all the changes, you can &lt;a href=&quot;http://getbootstrap.com/components/#navbar&quot;&gt;view them here&lt;/a&gt;.&lt;/p&gt;
-
-&lt;h2 id=&quot;new-grid&quot;&gt;New Grid&lt;/h2&gt;
-
-&lt;p&gt;This is probably the most obvious, but there’s a new grid. It’s pretty simple but is based on “mobile first” design.&lt;/p&gt;
-
-&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-html&quot; data-lang=&quot;html&quot;&gt;&lt;span class=&quot;nt&quot;&gt;&amp;lt;div&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;class=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;span4 offset2&quot;&lt;/span&gt;&lt;span class=&quot;nt&quot;&gt;&amp;gt;&amp;lt;/div&amp;gt;&lt;/span&gt;
-
-//now becomes
-
-&lt;span class=&quot;nt&quot;&gt;&amp;lt;div&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;class=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;col-sm-4 col-md-offset-2&quot;&lt;/span&gt;&lt;span class=&quot;nt&quot;&gt;&amp;gt;&amp;lt;/div&amp;gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
-
-&lt;p&gt;The prefixes sm, md, lg, all refer to the screensizes that the container will be collapsed in. So you can have more than one grid class per element, a “col–4 col-lg-2” or something. There also is no more “row-fluid” class. There is only the “row” class and will always be fluid.&lt;/p&gt;
-
-&lt;h2 id=&quot;helper-classes&quot;&gt;Helper Classes&lt;/h2&gt;
-
-&lt;p&gt;A lot of these have also changed or added new ones. These include:&lt;/p&gt;
-
-&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-html&quot; data-lang=&quot;html&quot;&gt;&lt;span class=&quot;nt&quot;&gt;&amp;lt;label&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;class=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;sr-only&quot;&lt;/span&gt;&lt;span class=&quot;nt&quot;&gt;&amp;gt;&amp;lt;/label&amp;gt;&lt;/span&gt;  // screen reader only, will hide from user's view
-
-&lt;span class=&quot;nt&quot;&gt;&amp;lt;div&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;class=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;hidden-xs&quot;&lt;/span&gt;&lt;span class=&quot;nt&quot;&gt;&amp;gt;&amp;lt;/div&amp;gt;&lt;/span&gt; // will hide on mobile. Follows same prefix convention as grid classes
-
-&lt;span class=&quot;nt&quot;&gt;&amp;lt;div&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;class=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;alert danger-alert&quot;&lt;/span&gt;&lt;span class=&quot;nt&quot;&gt;&amp;gt;&amp;lt;/div&amp;gt;&lt;/span&gt; // error-alert is deprecated&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
-
-&lt;h2 id=&quot;navbar&quot;&gt;Navbar&lt;/h2&gt;
-
-&lt;p&gt;This has changed a lot and is probably better just to &lt;a href=&quot;http://getbootstrap.com/components/#navbar&quot;&gt;read the docs&lt;/a&gt;. The largest difference, though, is there is no more “navbar-inner”.&lt;/p&gt;
-
-&lt;h2 id=&quot;buttons&quot;&gt;Buttons&lt;/h2&gt;
-
-&lt;p&gt;The buttons have simplefied A LOT. They are now flat which makes them super easy to customize. With them, you can edit your buttons with “btn-danger, btn-info, btn-warning, etc” classes, update your Sass/Less variables like “$brandcolor-primary”, or created a custom class with a mixin:&lt;/p&gt;
-
-&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-sass&quot; data-lang=&quot;sass&quot;&gt;&lt;span class=&quot;nc&quot;&gt;.btn-brown&lt;/span&gt; &lt;span class=&quot;err&quot;&gt;{&lt;/span&gt;
-
-  &lt;span class=&quot;k&quot;&gt;@include&lt;/span&gt; &lt;span class=&quot;nd&quot;&gt;btn-variant&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;no&quot;&gt;white&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;no&quot;&gt;brown&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;no&quot;&gt;brown&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;err&quot;&gt;;&lt;/span&gt;
-
-&lt;span class=&quot;err&quot;&gt;}&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
-
-&lt;p&gt;Note: all references to “error” are now “danger”, hence the new class “btn-danger” (and also “alert-danger”)&lt;/p&gt;
-
-&lt;h2 id=&quot;responsive-images&quot;&gt;Responsive Images&lt;/h2&gt;
-
-&lt;p&gt;Responsive images are not responsive out of the box anymore. You’ll need to add a class of “img-responsive” to any image you want to behave that way. You may be able to get around it by just adding&lt;/p&gt;
-
-&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-sass&quot; data-lang=&quot;sass&quot;&gt;&lt;span class=&quot;na&quot;&gt;img&lt;/span&gt;&lt;span class=&quot;err&quot;&gt; { &lt;/span&gt;&lt;span class=&quot;nl&quot;&gt;max-width&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;m&quot;&gt;100%&lt;/span&gt; &lt;span class=&quot;err&quot;&gt;}&lt;/span&gt;
-
-&lt;span class=&quot;c1&quot;&gt;// or
-&lt;/span&gt;
-&lt;span class=&quot;nt&quot;&gt;img&lt;/span&gt; &lt;span class=&quot;err&quot;&gt;{&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;@&lt;/span&gt;&lt;span class=&quot;nt&quot;&gt;extend&lt;/span&gt; &lt;span class=&quot;nc&quot;&gt;.img-responsive&lt;/span&gt; &lt;span class=&quot;err&quot;&gt;}&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
-
-&lt;p&gt;but it may differ case to case, so use your discretion. For instance, in rails, you may have an image helper like “image_tag(256)” that spits out an image with width and height set to 256px. Using max-width alone on this will cause some problems, so it’s best to use the class name. Alternatively, you may have some images styled in such a way that “img-responsive” will break their layout by setting the height to “auto”. Just be aware and careful with these.&lt;/p&gt;
-
-&lt;h2 id=&quot;forms&quot;&gt;Forms&lt;/h2&gt;
-
-&lt;p&gt;If you use bootstraps form styles, they have changed a lot. “Control-group” is now “form-group”, “input-block-level” is now “form-control”. “Controls” and “controls-row” have been removed with no replacement. Have a look at the &lt;a href=&quot;http://getbootstrap.com/migration/&quot;&gt;details&lt;/a&gt; for more specific info. If you have any plugins, gems or other third party software that deals with forms, then you will have to check and see if they need to be updated as well. One such popular one is…&lt;/p&gt;
-
-&lt;h2 id=&quot;simple_form-with-rails&quot;&gt;Simple_form With Rails&lt;/h2&gt;
-
-&lt;p&gt;If you use Rails, and you use the very popular gem simple_form, then you are probably wondering why your forms looks like shit in bootstrap 3. Well, that’s because you need to update your gem. An official release is not out yet as of this posting, but there is a release candidate that you can use. For more info, &lt;a href=&quot;http://blog.plataformatec.com.br/2014/04/bootstrap-3-support-for-simple-form/&quot;&gt;check this out&lt;/a&gt;.&lt;/p&gt;
-
-&lt;p&gt;Those were all the major steps in upgrading our site to Bootstrap 3. It involved some other little adjustments here and there, but those were specific to our site and not as big as these. Good luck!&lt;/p&gt;
-
-</description>
-        <pubDate>Wed, 25 Jun 2014 00:00:00 -0400</pubDate>
-        <link>https://sco.ttdavis.com/blog/upgrading-bootstrap-2-to-3</link>
-        <guid isPermaLink="true">https://sco.ttdavis.com/blog/upgrading-bootstrap-2-to-3</guid>
-        
-        
-      </item>
-    
-      <item>
-        <title>Using PG (postgres) on Mavericks</title>
-        <description>&lt;p&gt;Heroku only uses Postres for databases. That’s fine, so you just need install it locally for developement. Well, you are probably pulling your hair out trying to install the pg gem on Mavericks. That’s because you can’t (as of yet anyway). The good news is there’s a quick and easy way.&lt;/p&gt;
-
-&lt;p&gt;Just install the &lt;a href=&quot;http://postgresapp.com/&quot;&gt;Postgres App&lt;/a&gt;, then install the gem in terminal, pointing it to the new config file.&lt;/p&gt;
-
-&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-ruby&quot; data-lang=&quot;ruby&quot;&gt;&lt;span class=&quot;n&quot;&gt;gem&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;install&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;pg&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;--&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;--&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;with&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;-&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;pg&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;-&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;config&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;sr&quot;&gt;/Applications/&lt;/span&gt;&lt;span class=&quot;no&quot;&gt;Postgres93&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;app&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;/&lt;/span&gt;&lt;span class=&quot;no&quot;&gt;Contents&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;/&lt;/span&gt;&lt;span class=&quot;no&quot;&gt;MacOS&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;/&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;bin&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;/&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;pg_config&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
-
-&lt;p&gt;Now, make &lt;!--more--&gt; sure the config is there first. If you are using another version of the app, you may have a different name there for “Postres93.app”. But that should do it. Run “bundle install” and click the app to get postres running. Your rails project should work fine now.&lt;/p&gt;
-
-</description>
-        <pubDate>Mon, 19 May 2014 00:00:00 -0400</pubDate>
-        <link>https://sco.ttdavis.com/blog/using-postgres-on-mavericks</link>
-        <guid isPermaLink="true">https://sco.ttdavis.com/blog/using-postgres-on-mavericks</guid>
+        <pubDate>Wed, 25 Nov 2015 00:00:00 -0600</pubDate>
+        <link>http://localhost:4000/blog/caching-model-associations-in-rails</link>
+        <guid isPermaLink="true">http://localhost:4000/blog/caching-model-associations-in-rails</guid>
         
         
       </item>
