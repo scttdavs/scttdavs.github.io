@@ -51,7 +51,6 @@ module GzipStreaming
         options[:stream] = true
       end
     end
-
   end
 
   def _render_template(options)
