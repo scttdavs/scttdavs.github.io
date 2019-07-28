@@ -9,7 +9,11 @@ The following directories and their contents are Copyright Scott Davis. You may 
 - _photos/
 - _drafts/
 - images/
-- images/
 - blog/
+- page/
+- _site/images/
+- _site/blog/
+- _site/page/
+- _site/photos/
 
 All other directories and files are MIT Licensed. Feel free to use the HTML and CSS as you please.
