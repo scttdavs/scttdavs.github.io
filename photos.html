@@ -10,7 +10,7 @@ pagination:
 ---
 
 <div class="photo-container" itemscope itemtype="https://schema.org/ImageGallery">
-  <section class='main photo-list'>
+  <section class='main photo-list show-aside'>
     <div class="photos-page group">
       {% for photo in paginator.posts %}
         <a href="{{ photo.url }}" class="continue">
