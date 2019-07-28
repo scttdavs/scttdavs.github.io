@@ -4,7 +4,10 @@
   margin-bottom: 45px;
   border-bottom: solid 1px lighten($offmiddle, 35%);
   padding-bottom: 35px;
-  display: flex;
+
+  &.has-photo {
+    display: flex;
+  }
 
   @media (max-width: 767px) {
     flex-direction: column;

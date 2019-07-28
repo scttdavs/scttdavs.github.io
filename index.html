@@ -4,15 +4,19 @@ title: Writing
 titleIgnore: true
 pagination:
   enabled: true
+  indexpage: '/index'
 ---
 
 <div class="blog-page">
   {% for post in paginator.posts %}
-    <div class='article-item full-article group' itemprop="blogPost" itemscope itemtype="http://schema.org/BlogPosting">
-      <div class="article-image">
-        <img src="/images/{{ post.photo }}.jpg" />
-      </div>
-      <div class="article-wrapper">
+    <div class='article-item full-article group {% if post.photo %}has-photo{% endif %}' itemprop="blogPost" itemscope itemtype="http://schema.org/BlogPosting">
+      {% if post.photo %}
+        <div class="article-image">
+          <img src="/images/{{ post.photo }}.jpg" />
+        </div>
+      
+        <div class="article-wrapper">
+      {% endif %}
         <h2 class="main-headline" itemprop="name headline">
           <a href="{{ post.url }}" itemprop="url">
             {{ post.title }}
@@ -27,7 +31,9 @@ pagination:
           {{ post.excerpt | replace: "h2", "h3" | remove: '<img>' }}
         </div>
         <a href="{{ post.url }}" class="continue" itemprop="url">continue reading</a>
-      </div>
+      {% if post.photo %}
+        </div>
+      {% endif %}
     </div>
   {% endfor %}
 </div>
