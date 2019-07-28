@@ -219,17 +219,17 @@ Feel the sun shining on your face? The nice cool breeze? The ease of deploying t
 
 <p>This may be the most technical part of the process, just getting the necessary tools installed. But first, you need to install Jekyll, so in terminal:</p>
 
-<figure class="highlight"><pre><code class="language-console" data-lang="console"><span class="err">gem install jekyll</span></code></pre></figure>
+<figure class="highlight"><pre><code class="language-console" data-lang="console"><span class="go">gem install jekyll</span></code></pre></figure>
 
 <p>And then create your project wherever you want it:</p>
 
-<figure class="highlight"><pre><code class="language-console" data-lang="console"><span class="err">jekyll new kickass-site</span></code></pre></figure>
+<figure class="highlight"><pre><code class="language-console" data-lang="console"><span class="go">jekyll new kickass-site</span></code></pre></figure>
 
 <p>and then change directories to your site and run your server. You don’t need to start your server <em>on</em> your server to have your site be viewable, but doing this locally is what generates all your files for you.</p>
 
-<figure class="highlight"><pre><code class="language-console" data-lang="console">cd kickass-site
+<figure class="highlight"><pre><code class="language-console" data-lang="console"><span class="go">cd kickass-site
 jekyll serve
-<span class="err">jekyll new my-awesome-site</span></code></pre></figure>
+jekyll new my-awesome-site</span></code></pre></figure>
 
 <p>You can now view your site at <code class="highlighter-rouge">http://localhost:4000</code> Open up your kickass site in your favorite editor and get to work!</p>
 
@@ -252,9 +252,9 @@ I think the rest are easily understood. There is a <code class="highlighter-roug
 
 <p>Also what is very important is <a href="http://jekyllrb.com/docs/frontmatter/">Front Matter</a>. Front Matter is the meta information denoted in YAML at the top of every page and post (or any other content you added). It includes basics such as title, which layout to use with it, and any other information you want passed along up the chain that is usefor for your site. Here’s a sample from my site:</p>
 
-<figure class="highlight"><pre><code class="language-yaml" data-lang="yaml"><span class="s">layout</span><span class="pi">:</span> <span class="s">post</span>
-<span class="s">title</span><span class="pi">:</span> <span class="s2">"</span><span class="s">Caching</span><span class="nv"> </span><span class="s">model</span><span class="nv"> </span><span class="s">associations</span><span class="nv"> </span><span class="s">in</span><span class="nv"> </span><span class="s">rails"</span>
-<span class="s">meta</span><span class="pi">:</span> <span class="s">post</span></code></pre></figure>
+<figure class="highlight"><pre><code class="language-yaml" data-lang="yaml"><span class="na">layout</span><span class="pi">:</span> <span class="s">post</span>
+<span class="na">title</span><span class="pi">:</span> <span class="s2">"</span><span class="s">Caching</span><span class="nv"> </span><span class="s">model</span><span class="nv"> </span><span class="s">associations</span><span class="nv"> </span><span class="s">in</span><span class="nv"> </span><span class="s">rails"</span>
+<span class="na">meta</span><span class="pi">:</span> <span class="s">post</span></code></pre></figure>
 
 <p>Any of these variables are available with the page variable, so <code class="highlighter-rouge">page.title</code> for instance in my example above, would return that value. Any variable associated with your site (and set in the _config.yml file) are available on the site variable, like: <code class="highlighter-rouge">site.url</code>. More on variables <a href="http://jekyllrb.com/docs/variables/">here</a>.</p>
 
@@ -302,7 +302,7 @@ I think the rest are easily understood. There is a <code class="highlighter-roug
 
     <footer>
   <div class='footer-inner'>
-    &copy; 2017 Scott Davis | Front End Developer, made with &hearts; in <strike>Brooklyn</strike> Washington Heights
+    &copy; 2019 Scott Davis | Front End Developer, made with &hearts; in <strike>Brooklyn</strike> Washington Heights
   </div>
 </footer>
 

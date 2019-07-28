@@ -215,9 +215,9 @@ body { padding: 0 40px 0 170px; }
 body.work { padding-left: 115px; padding-right: 0; }
 @media (max-width: 1024px) { body.work { padding-left: 0; padding-right: 0; } }
 
-p { text-rendering: optimizeLegibility; }
-p a { color: #00a2ad; }
-p a:hover { color: #EF4F50; }
+p, li { text-rendering: optimizeLegibility; }
+p a, li a { color: #00a2ad; }
+p a:hover, li a:hover { color: #EF4F50; }
 
 figure, .highlight { margin: 0; border-radius: 5px; }
 figure pre, .highlight pre { padding: 15px; }
@@ -324,7 +324,7 @@ span.date span, span.author span { color: #2f464d; }
 .photo-container::after { clear: both; content: ""; display: table; }
 
 .photo-item { width: 100%; height: 200px; background-size: cover; background-position: center; position: relative; padding: 15px; }
-.photo-item:after { transition: background-color 0.5s ease; cursor: pointer; background-color: transparent; content: ""; display: block; position: absolute; top: 0; left: 0; right: 0; bottom: 0; z-index: 1; }
+.photo-item:after { transition: background-color 0.5s ease; cursor: pointer; background-color: rgba(0, 0, 0, 0); content: ""; display: block; position: absolute; top: 0; left: 0; right: 0; bottom: 0; z-index: 1; }
 .photo-item:after:hover { cursor: pointer; }
 .photo-item:hover:after { background-color: rgba(0, 0, 0, 0.3); }
 .photo-item:hover h2, .photo-item:hover .excerpt { opacity: 1; }

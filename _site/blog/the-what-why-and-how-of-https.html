@@ -188,7 +188,7 @@ Now I just need to wait for Github to allow for https of github pages with a cus
 
 <p>Once you’ve decided on what you want and purchased it, you’ll need to request the certificate from the issuing company. To do this, you’ll need a certificate signing request (CSR) file. This can be created with many tools available around the internet, most of which cost money. Or you could do it on the command line with openSSL:</p>
 
-<figure class="highlight"><pre><code class="language-sh" data-lang="sh">openssl req -new -newkey rsa:2048 -nodes -keyout YOUR-DOMAIN.key -out YOUR-DOMAIN.csr</code></pre></figure>
+<figure class="highlight"><pre><code class="language-sh" data-lang="sh">openssl req <span class="nt">-new</span> <span class="nt">-newkey</span> rsa:2048 <span class="nt">-nodes</span> <span class="nt">-keyout</span> YOUR-DOMAIN.key <span class="nt">-out</span> YOUR-DOMAIN.csr</code></pre></figure>
 
 <p>This will create a token with 2048 bit encryption, and output your CSR and your private KEY file which you will need for later. When you enter this command, it will prompt you through a set of questions, the only one worth noting is the <code class="highlighter-rouge">name</code> field, which should be your domain name (if you are doing a domain verification certificate like me).</p>
 
@@ -258,7 +258,7 @@ Now I just need to wait for Github to allow for https of github pages with a cus
 
     <footer>
   <div class='footer-inner'>
-    &copy; 2017 Scott Davis | Front End Developer, made with &hearts; in <strike>Brooklyn</strike> Washington Heights
+    &copy; 2019 Scott Davis | Front End Developer, made with &hearts; in <strike>Brooklyn</strike> Washington Heights
   </div>
 </footer>
 

@@ -168,11 +168,11 @@ If all of that above was a piece of cake, maybe you’d be interested in some mo
 
 <p>There are several tools to help developers deploy changes to their site…that is if they manage their own server. With Rails, maybe the most popular gem is <a href="http://capistranorb.com/">Capistrano</a>. With it, all you do is type</p>
 
-<figure class="highlight"><pre><code class="language-console" data-lang="console"><span class="err">cap deploy</span></code></pre></figure>
+<figure class="highlight"><pre><code class="language-console" data-lang="console"><span class="go">cap deploy</span></code></pre></figure>
 
 <p>into the terminal and hit enter. It sends only the files that have been updated since your latest Git commit. It’s fantastic and very easy <!--more--> to use once you’ve set it up. If you use Heroku, they have their own CLI (Command Line Interface) with tools to do the exact same thing. Once installed and set up, all you need to type in terminal is</p>
 
-<figure class="highlight"><pre><code class="language-console" data-lang="console"><span class="err">git push heroku master</span></code></pre></figure>
+<figure class="highlight"><pre><code class="language-console" data-lang="console"><span class="go">git push heroku master</span></code></pre></figure>
 
 <p>If you are not using anything like this, you are most likely using…</p>
 
@@ -188,23 +188,23 @@ If all of that above was a piece of cake, maybe you’d be interested in some mo
 
 <p>Using this thing is dead simple, but requires us to use some things a lot of front-end developers may not use. It’s worth it, so we’ll just have to get over it. Time to fire up terminal! First thing is first, and the easiest way to get this done is install <a href="http://brew.sh/">Homebrew</a>. This should only need one line of code to do this and that’s</p>
 
-<figure class="highlight"><pre><code class="language-console" data-lang="console"><span class="err">ruby -e "$(curl -fsSL https://raw.github.com/Homebrew/homebrew/go/install)"</span></code></pre></figure>
+<figure class="highlight"><pre><code class="language-console" data-lang="console"><span class="gp">ruby -e "$</span><span class="o">(</span>curl <span class="nt">-fsSL</span> https://raw.github.com/Homebrew/homebrew/go/install<span class="o">)</span><span class="s2">"</span></code></pre></figure>
 
 <p>Copy and paste that in terminal and hit enter. You may have to install Xcode too. I know this is all a pain, but you only have to do it once and Homebrew is very powerful and useful tool to have anyway. I won’t go into much more detail about it, but there is plenty of documentation out there, it’s very popular.</p>
 
 <p>Once installed, run:</p>
 
-<figure class="highlight"><pre><code class="language-console" data-lang="console"><span class="err">brew update</span></code></pre></figure>
+<figure class="highlight"><pre><code class="language-console" data-lang="console"><span class="go">brew update</span></code></pre></figure>
 
 <p>then</p>
 
-<figure class="highlight"><pre><code class="language-console" data-lang="console"><span class="err">brew doctor</span></code></pre></figure>
+<figure class="highlight"><pre><code class="language-console" data-lang="console"><span class="go">brew doctor</span></code></pre></figure>
 
 <p>It will probably say you’re good to go. If so then all we need to do to install git-ftp is this:</p>
 
-<figure class="highlight"><pre><code class="language-console" data-lang="console"><span class="ni"># </span><span class="nc">brew</span><span class="kv"> install git
-</span><span class="ni"># </span><span class="nc">brew</span><span class="kv"> install curl --with-ssl --with-ssh
-</span><span class="ni"># </span><span class="nc">brew</span><span class="kv"> install git-ftp</span></code></pre></figure>
+<figure class="highlight"><pre><code class="language-console" data-lang="console"><span class="gp">#</span> brew install git
+<span class="gp">#</span> brew install curl <span class="nt">--with-ssl</span> <span class="nt">--with-ssh</span>
+<span class="gp">#</span> brew install git-ftp</code></pre></figure>
 
 <p>Note, if you already have git installed, ignore that first line. Git-ftp should now be installed! Give yourself a hearty pat on the back because you’re pretty much almost done.</p>
 
@@ -212,17 +212,17 @@ If all of that above was a piece of cake, maybe you’d be interested in some mo
 
 <p>Ok, let’s get to it. With terminal still open, type “cd” (this stands for change directory). We are going to naviage to your project folder. There are ways to do this in terminal but the easiest method to explain in this tutorial is just to open up finder, locate your project folder and drag and drop it into the terminal window. So your line should now read:</p>
 
-<figure class="highlight"><pre><code class="language-console" data-lang="console"><span class="err">cd /mycomputer/sites/myprojectfolderpath</span></code></pre></figure>
+<figure class="highlight"><pre><code class="language-console" data-lang="console"><span class="go">cd /mycomputer/sites/myprojectfolderpath</span></code></pre></figure>
 
 <p>Hit enter, and now type out this line, filled in with your own info of course:</p>
 
-<figure class="highlight"><pre><code class="language-console" data-lang="console"><span class="err">git ftp init -u &lt;user&gt; -p - ftp://host.example.com/public_html</span></code></pre></figure>
+<figure class="highlight"><pre><code class="language-console" data-lang="console"><span class="gp">git ftp init -u &lt;user&gt;</span> <span class="nt">-p</span> - ftp://host.example.com/public_html</code></pre></figure>
 
 <p>Remember not to just paste your ftp url. You need to include the subdirectories all the way down to your public folder. This may be “ftp://nameserver1234.com/domains/yourdomain/html” or something. After that hit enter, you will be prompted for your password. You won’t see any dots or characters when you type though, for security reasons. Just type it out normally and hit enter. That should do your initial commit, uploading your site to your server. Depending on the size, this could take a while (wordpress has TONS of files).</p>
 
 <p>For every other deployment after that you can use this line:</p>
 
-<figure class="highlight"><pre><code class="language-console" data-lang="console"><span class="err">git ftp push --user &lt;user&gt; --passwd &lt;password&gt; ftp://host.example.com/public_html</span></code></pre></figure>
+<figure class="highlight"><pre><code class="language-console" data-lang="console"><span class="gp">git ftp push --user &lt;user&gt;</span> <span class="nt">--passwd</span> &lt;password&gt; ftp://host.example.com/public_html</code></pre></figure>
 
 <p>It will only upload the files you changed. Easy peazy.</p>
 
@@ -258,7 +258,7 @@ If all of that above was a piece of cake, maybe you’d be interested in some mo
 
     <footer>
   <div class='footer-inner'>
-    &copy; 2017 Scott Davis | Front End Developer, made with &hearts; in <strike>Brooklyn</strike> Washington Heights
+    &copy; 2019 Scott Davis | Front End Developer, made with &hearts; in <strike>Brooklyn</strike> Washington Heights
   </div>
 </footer>
 

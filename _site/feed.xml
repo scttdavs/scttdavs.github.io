@@ -6,9 +6,182 @@
 </description>
     <link>http://localhost:4000/</link>
     <atom:link href="http://localhost:4000/feed.xml" rel="self" type="application/rss+xml"/>
-    <pubDate>Fri, 01 Sep 2017 09:56:58 -0400</pubDate>
-    <lastBuildDate>Fri, 01 Sep 2017 09:56:58 -0400</lastBuildDate>
-    <generator>Jekyll v3.4.3</generator>
+    <pubDate>Sat, 27 Jul 2019 23:00:24 -0400</pubDate>
+    <lastBuildDate>Sat, 27 Jul 2019 23:00:24 -0400</lastBuildDate>
+    <generator>Jekyll v3.8.5</generator>
+    
+      <item>
+        <title>Zero Downtime Deployments with Docker and DigitalOcean</title>
+        <description>&lt;p&gt;&lt;img src=&quot;/images/docker.jpg&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;Previously, &lt;a href=&quot;https://www.explorableplaces.com&quot;&gt;Explorable Places&lt;/a&gt; used Capistrano to deploy to one droplet in DigitalOcean. This setup had a number of downsides and limitations. Among them,&lt;!--more--&gt; we had:&lt;/p&gt;
+&lt;ul&gt;
+  &lt;li&gt;a single point of failure&lt;/li&gt;
+  &lt;li&gt;only &lt;em&gt;nearly&lt;/em&gt; zero downtime&lt;/li&gt;
+  &lt;li&gt;no easy way to scale horizontally&lt;/li&gt;
+  &lt;li&gt;difficulty in upgrades&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;When the app started out, it was easy and only necessary to have one box up that hosted everything: nginx, app, db and cache (memcached). Provisioning a new droplet would be a pain in the butt, and I had no way to distribute traffic to each box anyway. Platform upgrades (from Ubuntu 12 to 14) proved to be a royal pain in the behind, and required the site to be down for some time, in addition to the risk involved in the update itself.&lt;/p&gt;
+
+&lt;h2 id=&quot;docker&quot;&gt;Docker&lt;/h2&gt;
+
+&lt;p&gt;Dockerizing the app would solve a couple of our issues, and enable us to solve the others. There are multiple articles out there about how to convert your app, no matter the stack, to Docker, so I won’t go into such a large topic here. But for me, the basic steps were:&lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;Move DB out of our droplet, and into a managed host&lt;/li&gt;
+  &lt;li&gt;Dockerize our app with docker-compose, and utilize Dockerhub to manage our images&lt;/li&gt;
+  &lt;li&gt;Create a couple Docker droplets from the DigitalOcean marketplace, managed under a DigitalOcean load balancer&lt;/li&gt;
+  &lt;li&gt;Write a deploy script that will deploy to each environment&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h2 id=&quot;deploying&quot;&gt;Deploying&lt;/h2&gt;
+
+&lt;p&gt;Now that you presumably have your Dockerized app, along with all your separate &lt;code class=&quot;highlighter-rouge&quot;&gt;docker-compose&lt;/code&gt; files, environment variable files, and others that you do not want checked into source countrol, we need a way to get those files to our droplets, and start up our app.&lt;/p&gt;
+
+&lt;p&gt;Below, I’ve outlined our deploy script. See the bottom of this post for all the gory details, but what it does is:&lt;/p&gt;
+&lt;ol&gt;
+  &lt;li&gt;Use &lt;a href=&quot;https://github.com/digitalocean/droplet_kit&quot;&gt;DropletKit&lt;/a&gt; to get a list of our staging/production droplets&lt;/li&gt;
+  &lt;li&gt;
+    &lt;p&gt;Loop over each droplet to do the following:&lt;/p&gt;
+  &lt;/li&gt;
+  &lt;li&gt;Take the droplet out of traffic with the load balancer&lt;/li&gt;
+  &lt;li&gt;Copy all environment files, docker-compose files, etc. to the droplet.&lt;/li&gt;
+  &lt;li&gt;Run a start up script with the droplet that:
+    &lt;ul&gt;
+      &lt;li&gt;Take down all running containers and remove them, as well as volumes, and images.&lt;/li&gt;
+      &lt;li&gt;Pull in latest tagged image from DockerHub&lt;/li&gt;
+      &lt;li&gt;Bring up containers&lt;/li&gt;
+      &lt;li&gt;Put back into traffic with the load balancer if all was successful&lt;/li&gt;
+    &lt;/ul&gt;
+  &lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;p&gt;With this in place, you can simply deploy your app with:&lt;/p&gt;
+
+&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-shell&quot; data-lang=&quot;shell&quot;&gt;./deploy.rb staging
+&lt;span class=&quot;c&quot;&gt;# or&lt;/span&gt;
+./deploy.rb production&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
+
+&lt;h2 id=&quot;health-checks&quot;&gt;Health Checks&lt;/h2&gt;
+
+&lt;p&gt;The one key here is that we must be certain that our server is up and serving traffic before we add it back to the load balancer to receive traffic. By default, Docker Compose will consider the container to be started and healty as soon as it is up, even if it takes 10-15 seconds for your server within your container to start.&lt;/p&gt;
+
+&lt;p&gt;To make sure our app is ready to serve traffic, we can utilize health checks with Docker Compose. You can define this in your compose file like so:&lt;/p&gt;
+
+&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-yaml&quot; data-lang=&quot;yaml&quot;&gt;&lt;span class=&quot;na&quot;&gt;version&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;2.1&quot;&lt;/span&gt;
+&lt;span class=&quot;na&quot;&gt;services&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
+  &lt;span class=&quot;na&quot;&gt;app&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
+    &lt;span class=&quot;na&quot;&gt;healthcheck&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
+      &lt;span class=&quot;na&quot;&gt;test&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;curl --fail -s http://localhost:3000/healthcheck || exit 1&lt;/span&gt;
+      &lt;span class=&quot;na&quot;&gt;interval&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;5s&lt;/span&gt;
+      &lt;span class=&quot;na&quot;&gt;timeout&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;60s&lt;/span&gt;
+      &lt;span class=&quot;na&quot;&gt;retries&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;10&lt;/span&gt;
+  &lt;span class=&quot;na&quot;&gt;depends_on&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
+      &lt;span class=&quot;na&quot;&gt;app&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
+        &lt;span class=&quot;na&quot;&gt;condition&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;service_healthy&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
+
+&lt;p&gt;This health check will be run within your container, so you can reference localhost here. If you have other containers that depend on this one, you can define the conditions that will dictate when that container is brought up. Above, we have an nginx service that depends on our app. We tell it to wait until our app is healthy, which will depend on the health check.&lt;/p&gt;
+
+&lt;p&gt;Health checks will continue to run, so be sure to exlude it from any:&lt;/p&gt;
+&lt;ul&gt;
+  &lt;li&gt;SSL validation&lt;/li&gt;
+  &lt;li&gt;Performance monitoring (will severely skew your ‘typical’ and ‘problem’ response times)&lt;/li&gt;
+  &lt;li&gt;IP throttling (don’t want to throttle yourself)&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h2 id=&quot;scripts-gory-details&quot;&gt;Scripts (gory details)&lt;/h2&gt;
+
+&lt;h3 id=&quot;deploy-script&quot;&gt;Deploy script&lt;/h3&gt;
+
+&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-ruby&quot; data-lang=&quot;ruby&quot;&gt;&lt;span class=&quot;c1&quot;&gt;#!/usr/bin/env ruby&lt;/span&gt;
+
+&lt;span class=&quot;nb&quot;&gt;require&lt;/span&gt; &lt;span class=&quot;s1&quot;&gt;'rainbow'&lt;/span&gt;
+&lt;span class=&quot;nb&quot;&gt;require&lt;/span&gt; &lt;span class=&quot;s1&quot;&gt;'droplet_kit'&lt;/span&gt;
+&lt;span class=&quot;n&quot;&gt;client&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;no&quot;&gt;DropletKit&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;::&lt;/span&gt;&lt;span class=&quot;no&quot;&gt;Client&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;new&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;ss&quot;&gt;access_token: &lt;/span&gt;&lt;span class=&quot;no&quot;&gt;ENV&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;s1&quot;&gt;'DO_TOKEN'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;])&lt;/span&gt;
+
+&lt;span class=&quot;n&quot;&gt;load_balancer_id&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;client&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;load_balancers&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;all&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;first&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;id&lt;/span&gt;
+
+&lt;span class=&quot;n&quot;&gt;deploy_env&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;no&quot;&gt;ARGV&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]&lt;/span&gt;
+&lt;span class=&quot;k&quot;&gt;if&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;deploy_env&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;==&lt;/span&gt; &lt;span class=&quot;s1&quot;&gt;'production'&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;droplet_ids&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;client&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;load_balancers&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;find&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;ss&quot;&gt;id: &lt;/span&gt;&lt;span class=&quot;n&quot;&gt;load_id&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;).&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;droplet_ids&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;droplets&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;droplet_ids&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;map&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;|&lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;id&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;|&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;client&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;droplets&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;find&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;ss&quot;&gt;id: &lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;id&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+&lt;span class=&quot;k&quot;&gt;elsif&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;deploy_env&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;==&lt;/span&gt; &lt;span class=&quot;s1&quot;&gt;'staging'&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;droplets&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;client&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;droplets&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;find&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;ss&quot;&gt;id: &lt;/span&gt;&lt;span class=&quot;no&quot;&gt;ENV&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;s1&quot;&gt;'STAGING_DROPLET_ID'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;])]&lt;/span&gt;
+&lt;span class=&quot;k&quot;&gt;end&lt;/span&gt;
+
+&lt;span class=&quot;k&quot;&gt;if&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;!&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;droplets&lt;/span&gt;
+    &lt;span class=&quot;k&quot;&gt;raise&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;There are no droplets for deploy env: &lt;/span&gt;&lt;span class=&quot;si&quot;&gt;#{&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;deploy_env&lt;/span&gt;&lt;span class=&quot;si&quot;&gt;}&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;!&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+&lt;span class=&quot;k&quot;&gt;end&lt;/span&gt;
+
+&lt;span class=&quot;n&quot;&gt;droplet_hash&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{}&lt;/span&gt;
+
+&lt;span class=&quot;c1&quot;&gt;# set statuses&lt;/span&gt;
+&lt;span class=&quot;n&quot;&gt;droplets&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;each&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;do&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;|&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;droplet&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;|&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;droplet_hash&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;droplet&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;name&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;s1&quot;&gt;'not deployed'&lt;/span&gt;
+&lt;span class=&quot;k&quot;&gt;end&lt;/span&gt;
+
+&lt;span class=&quot;n&quot;&gt;droplets&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;each&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;do&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;|&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;droplet&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;|&lt;/span&gt;
+    &lt;span class=&quot;k&quot;&gt;if&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;deploy_env&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;==&lt;/span&gt; &lt;span class=&quot;s1&quot;&gt;'production'&lt;/span&gt;
+        &lt;span class=&quot;nb&quot;&gt;puts&lt;/span&gt; &lt;span class=&quot;no&quot;&gt;Rainbow&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;REMOVING &lt;/span&gt;&lt;span class=&quot;si&quot;&gt;#{&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;droplet&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;name&lt;/span&gt;&lt;span class=&quot;si&quot;&gt;}&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt; FROM THE LOAD BALANCER&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;).&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;green&lt;/span&gt;
+        &lt;span class=&quot;n&quot;&gt;client&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;load_balancers&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;remove_droplets&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;([&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;droplet&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;id&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;],&lt;/span&gt; &lt;span class=&quot;ss&quot;&gt;id: &lt;/span&gt;&lt;span class=&quot;n&quot;&gt;load_id&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+    &lt;span class=&quot;k&quot;&gt;end&lt;/span&gt;
+
+    &lt;span class=&quot;nb&quot;&gt;puts&lt;/span&gt; &lt;span class=&quot;no&quot;&gt;Rainbow&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;COPYING OVER NGINX CONFIG TO &lt;/span&gt;&lt;span class=&quot;si&quot;&gt;#{&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;droplet&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;name&lt;/span&gt;&lt;span class=&quot;si&quot;&gt;}&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;).&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;green&lt;/span&gt;
+
+    &lt;span class=&quot;c1&quot;&gt;# copy nginx&lt;/span&gt;
+    &lt;span class=&quot;c1&quot;&gt;# copy docker compose files and .env files&lt;/span&gt;
+    &lt;span class=&quot;nb&quot;&gt;system&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;scp ./docker/nginx/nginx.conf ./docker/nginx/nginx.&lt;/span&gt;&lt;span class=&quot;si&quot;&gt;#{&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;deploy_env&lt;/span&gt;&lt;span class=&quot;si&quot;&gt;}&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;.conf ./docker/nginx/ssl/&lt;/span&gt;&lt;span class=&quot;si&quot;&gt;#{&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;deploy_env&lt;/span&gt;&lt;span class=&quot;si&quot;&gt;}&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;.explorableplaces.crt ./docker/nginx/ssl/&lt;/span&gt;&lt;span class=&quot;si&quot;&gt;#{&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;deploy_env&lt;/span&gt;&lt;span class=&quot;si&quot;&gt;}&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;.explorableplaces.key docker-compose.yml docker-compose.&lt;/span&gt;&lt;span class=&quot;si&quot;&gt;#{&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;deploy_env&lt;/span&gt;&lt;span class=&quot;si&quot;&gt;}&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;.yml .env.common .env.&lt;/span&gt;&lt;span class=&quot;si&quot;&gt;#{&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;deploy_env&lt;/span&gt;&lt;span class=&quot;si&quot;&gt;}&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt; root@&lt;/span&gt;&lt;span class=&quot;si&quot;&gt;#{&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;droplet&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;public_ip&lt;/span&gt;&lt;span class=&quot;si&quot;&gt;}&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;:~/&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+
+    &lt;span class=&quot;nb&quot;&gt;puts&lt;/span&gt; &lt;span class=&quot;no&quot;&gt;Rainbow&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;DEPLOYING NEW CONTAINERS TO &lt;/span&gt;&lt;span class=&quot;si&quot;&gt;#{&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;droplet&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;name&lt;/span&gt;&lt;span class=&quot;si&quot;&gt;}&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;).&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;green&lt;/span&gt;
+
+    &lt;span class=&quot;nb&quot;&gt;puts&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;IP: &lt;/span&gt;&lt;span class=&quot;si&quot;&gt;#{&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;droplet&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;public_ip&lt;/span&gt;&lt;span class=&quot;si&quot;&gt;}&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;&lt;/span&gt;
+    &lt;span class=&quot;nb&quot;&gt;puts&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;deploy: &lt;/span&gt;&lt;span class=&quot;si&quot;&gt;#{&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;deploy_env&lt;/span&gt;&lt;span class=&quot;si&quot;&gt;}&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;deploySuccess&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;system&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;({&lt;/span&gt;
+        &lt;span class=&quot;s2&quot;&gt;&quot;DEPLOY_ENV&quot;&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&amp;gt;&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;deploy_env&lt;/span&gt;
+    &lt;span class=&quot;p&quot;&gt;},&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;(export -p; cat ./start-up.sh) | ssh root@&lt;/span&gt;&lt;span class=&quot;si&quot;&gt;#{&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;droplet&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;public_ip&lt;/span&gt;&lt;span class=&quot;si&quot;&gt;}&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;  'bash -s'&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+
+    &lt;span class=&quot;k&quot;&gt;if&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;deploySuccess&lt;/span&gt;
+        &lt;span class=&quot;nb&quot;&gt;puts&lt;/span&gt; &lt;span class=&quot;no&quot;&gt;Rainbow&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;SUCCESSFULLY DEPLOYED NEW CONTAINERS TO &lt;/span&gt;&lt;span class=&quot;si&quot;&gt;#{&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;droplet&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;name&lt;/span&gt;&lt;span class=&quot;si&quot;&gt;}&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;).&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;green&lt;/span&gt;
+        &lt;span class=&quot;n&quot;&gt;droplet_hash&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;droplet&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;name&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;s1&quot;&gt;'deployed'&lt;/span&gt;
+
+        &lt;span class=&quot;k&quot;&gt;if&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;deploy_env&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;==&lt;/span&gt; &lt;span class=&quot;s1&quot;&gt;'production'&lt;/span&gt;
+            &lt;span class=&quot;n&quot;&gt;client&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;load_balancers&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;add_droplets&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;([&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;droplet&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;id&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;],&lt;/span&gt; &lt;span class=&quot;ss&quot;&gt;id: &lt;/span&gt;&lt;span class=&quot;n&quot;&gt;load_id&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+        &lt;span class=&quot;k&quot;&gt;end&lt;/span&gt;
+    &lt;span class=&quot;k&quot;&gt;else&lt;/span&gt;
+        &lt;span class=&quot;n&quot;&gt;droplet_hash&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;droplet&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;name&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;s1&quot;&gt;'deploy failed'&lt;/span&gt;
+        &lt;span class=&quot;nb&quot;&gt;puts&lt;/span&gt; &lt;span class=&quot;no&quot;&gt;Rainbow&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;droplet_hash&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;).&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;red&lt;/span&gt;
+        &lt;span class=&quot;k&quot;&gt;raise&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;Did not execute deploy.sh script correctly&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+    &lt;span class=&quot;k&quot;&gt;end&lt;/span&gt;
+&lt;span class=&quot;k&quot;&gt;end&lt;/span&gt;
+
+&lt;span class=&quot;nb&quot;&gt;puts&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;FINISHED DEPLOY, STATUS:&quot;&lt;/span&gt;
+&lt;span class=&quot;n&quot;&gt;droplet_hash&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;each&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;do&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;|&lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;name&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;status&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;|&lt;/span&gt;
+  &lt;span class=&quot;nb&quot;&gt;puts&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;si&quot;&gt;#{&lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;name&lt;/span&gt;&lt;span class=&quot;si&quot;&gt;}&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;: &lt;/span&gt;&lt;span class=&quot;si&quot;&gt;#{&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;status&lt;/span&gt;&lt;span class=&quot;si&quot;&gt;}&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;&lt;/span&gt;
+&lt;span class=&quot;k&quot;&gt;end&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
+
+&lt;h3 id=&quot;start-up-script&quot;&gt;Start up script&lt;/h3&gt;
+
+&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-shell&quot; data-lang=&quot;shell&quot;&gt;&lt;span class=&quot;nb&quot;&gt;echo&lt;/span&gt; &lt;span class=&quot;nv&quot;&gt;$DOCKER_PASSWORD&lt;/span&gt; | docker login &lt;span class=&quot;nt&quot;&gt;-u&lt;/span&gt; &lt;span class=&quot;nv&quot;&gt;$DOCKER_USERNAME&lt;/span&gt; &lt;span class=&quot;nt&quot;&gt;--password-stdin&lt;/span&gt;
+docker-compose down &lt;span class=&quot;nt&quot;&gt;--remove-orphans&lt;/span&gt;
+docker system prune &lt;span class=&quot;nt&quot;&gt;-f&lt;/span&gt; &lt;span class=&quot;nt&quot;&gt;--all&lt;/span&gt; &lt;span class=&quot;nt&quot;&gt;--volumes&lt;/span&gt;
+
+&lt;span class=&quot;nb&quot;&gt;echo&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;$DEPLOY_ENV&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;&lt;/span&gt;
+&lt;span class=&quot;k&quot;&gt;if&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;[&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;$DEPLOY_ENV&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;==&lt;/span&gt; &lt;span class=&quot;s1&quot;&gt;'production'&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;]&lt;/span&gt;
+&lt;span class=&quot;k&quot;&gt;then
+    &lt;/span&gt;docker-compose &lt;span class=&quot;nt&quot;&gt;-f&lt;/span&gt; docker-compose.yml &lt;span class=&quot;nt&quot;&gt;-f&lt;/span&gt; docker-compose.production.yml pull &lt;span class=&quot;o&quot;&gt;&amp;amp;&amp;amp;&lt;/span&gt; docker-compose &lt;span class=&quot;nt&quot;&gt;-f&lt;/span&gt; docker-compose.yml &lt;span class=&quot;nt&quot;&gt;-f&lt;/span&gt; docker-compose.production.yml up &lt;span class=&quot;nt&quot;&gt;-d&lt;/span&gt; &lt;span class=&quot;nt&quot;&gt;--no-build&lt;/span&gt;
+&lt;span class=&quot;k&quot;&gt;elif&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;[&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;$DEPLOY_ENV&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;==&lt;/span&gt; &lt;span class=&quot;s1&quot;&gt;'staging'&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;]&lt;/span&gt;
+&lt;span class=&quot;k&quot;&gt;then
+    &lt;/span&gt;docker-compose &lt;span class=&quot;nt&quot;&gt;-f&lt;/span&gt; docker-compose.yml &lt;span class=&quot;nt&quot;&gt;-f&lt;/span&gt; docker-compose.staging.yml pull &lt;span class=&quot;o&quot;&gt;&amp;amp;&amp;amp;&lt;/span&gt; docker-compose &lt;span class=&quot;nt&quot;&gt;-f&lt;/span&gt; docker-compose.yml &lt;span class=&quot;nt&quot;&gt;-f&lt;/span&gt; docker-compose.staging.yml up &lt;span class=&quot;nt&quot;&gt;-d&lt;/span&gt; &lt;span class=&quot;nt&quot;&gt;--no-build&lt;/span&gt;
+&lt;span class=&quot;k&quot;&gt;fi&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
+
+</description>
+        <pubDate>Fri, 28 Jun 2019 00:00:00 -0400</pubDate>
+        <link>http://localhost:4000/blog/zero-downtime-deployments-with-docker-and-digitalocean</link>
+        <guid isPermaLink="true">http://localhost:4000/blog/zero-downtime-deployments-with-docker-and-digitalocean</guid>
+        
+        
+      </item>
     
       <item>
         <title>Progressive Rendering with Rails</title>
@@ -83,6 +256,97 @@
       </item>
     
       <item>
+        <title>On Being a Parent</title>
+        <description>&lt;p&gt;&lt;img src=&quot;/images/ssl-ghp.jpg&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;poop shooting to bassinet&lt;/li&gt;
+  &lt;li&gt;talking in baby conversation&lt;/li&gt;
+  &lt;li&gt;blue stained legs&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;“Scott! I need you!!”.&lt;/p&gt;
+
+&lt;p&gt;“Oh, Meg’s calling me, I got to go. I’ll talk to you later sis.”&lt;/p&gt;
+
+&lt;p&gt;I could tell from the sound in her voice what this was. I ran over to the bathroom, and the look on her face confirmed it.&lt;/p&gt;
+
+&lt;p&gt;“I think my water broke. I went to the bathroom and when I stood up I realized I was all wet. And I’m almost positive I was done, I don’t know what else it could be.”&lt;/p&gt;
+
+&lt;p&gt;I ran to the refrigerator and got the midwife’s card with their emergency number on it. We got the midwife on the phone and she congratulated us and gave us an expectation of what’s to come. It was good news, since it was 10:30 at night, Meg could take a bath to help with the ensuing contractions and try to get some sleep. Once the contractions wake her up and she couldn’t sleep through them, give her another call.&lt;/p&gt;
+
+&lt;p&gt;Sleeping through most of the early labor sounded good to both of us.&lt;/p&gt;
+
+&lt;p&gt;…&lt;/p&gt;
+
+&lt;p&gt;I picked Theo up and was changing his diaper. It was around 6 or so in the morning. He had slept pretty well, but once I had him on the table, I noticed his legs looked like they may be a little bruised. I grabbed diaper, one of the ones from our baby shower and changed him. This one said “You can do it Dad!”. I wish we had kept track of who wrote what message on them!&lt;/p&gt;
+
+&lt;p&gt;I walked into the living room with Meg, “Hey, his legs are looking more bruised. I don’t how this could have happened. Was it the car seat? We didn’t have it THAT tight.. Are babies just that sensitive?”.&lt;/p&gt;
+
+&lt;p&gt;Two days earlier we took him home from the hospital in taxi. We had trouble getting him in the car seat since he was so long and none of us had ever used a car seat. Once we had help from the nurse, he was in but it was definitely a tight fit.&lt;/p&gt;
+
+&lt;p&gt;We’re growing more concerned at this point. “Let’s make an appointment for the pediatrician today if we can”. We both agreed and made the appointment later in the afternoon.&lt;/p&gt;
+
+&lt;p&gt;Meg was holding Theo and despite the bruising he seemed fine and happy. She was talking to him and making faces. She looked down at his little bruised legs and then at his diaper, “You can do it Dad!”. And then back at the bruising, and back at the diaper. The writing was in blue sharpie..&lt;/p&gt;
+
+&lt;p&gt;She called me over and we tried rubbing of the ink from his skin. Off it came. Even brushing your skin lightly on the diaper was enough for the ink to rub off. Holy shit, he’s fine.. and for two days we thought we were the worst, accidentally abusive parents. We’d worried if we’re breaking him on day 2, how will he ever live!&lt;/p&gt;
+
+&lt;p&gt;We immediately threw the rest of the written diapers away.&lt;/p&gt;
+
+&lt;p&gt;…&lt;/p&gt;
+
+&lt;p&gt;I had the app open, Contraction Master. What a name.&lt;/p&gt;
+
+&lt;p&gt;“Ok, tell me when to start”.&lt;/p&gt;
+
+&lt;p&gt;“Now”&lt;/p&gt;
+
+&lt;p&gt;I started the timer and waited. Thirty seconds came and I expected her to tell me when to stop. It kept going and it got to a minute.&lt;/p&gt;
+
+&lt;p&gt;“Ok, it’s over now”.&lt;/p&gt;
+
+&lt;p&gt;A minute seemed a little long. I remember the classes we took, it should start off easy, like 30 seconds for an hour or more. Just a few minutes later, “Ok, another one’s coming!”.&lt;/p&gt;
+
+&lt;p&gt;About 40 minutes later I’d timed 5 or so contractions. Almost all of them were over a minute and some later ones were a minute to a minute and a half. I wondered if Meg was feeling them correctly beginning to end? Or was I timing them wrong? We’re getting a little worried at this point.&lt;/p&gt;
+
+&lt;p&gt;…&lt;/p&gt;
+
+&lt;p&gt;I peaked into the side of Theo’s diaper, “no poop” I said. Meg sat on the bed, reading an article.&lt;/p&gt;
+
+&lt;p&gt;“It’s pretty full though, I’ll still change it.” Due to all the stories I’d heard, getting peed on seemed inevitable. But still, I always stand to the side, never in the line of fire. If he was going to get me, he was going to have to go out of his way to do it.&lt;/p&gt;
+
+&lt;p&gt;I had his diaper off and lubed his bottom up with vaseline, I was getting his diaper ready it happened. A brownish yellow stream of poop shot straight out of his vaseline coated butt, at what must have been only 5 degree angle. It left the changing, pad, the edge of the changing table, and another foot and a half, and plunged straight into the mesh siding of the bassinet, splitting the poop stream into smaller poop streams.&lt;/p&gt;
+
+&lt;p&gt;My eyes were wide open and I just stared in shock. I must have said something because Meg noticed and came running over. What amazing team work we had, without saying much we literally leaped into action. Meg leaped a little bit into the puddle of poop on the floor, but it was ok, because we were on this!&lt;/p&gt;
+
+&lt;p&gt;I used 5, maybe 10 wipes to furiously clean up his butt, and also the changing pad. Thank God we got the kind that doesn’t need the cloth cover! It’s amazing how difficult it is to wipe up poop from the pad while keeping his kicking legs from getting all in it as well.&lt;/p&gt;
+
+&lt;p&gt;Meg worked on the floor, this required some heavy duty paper towels, and several wet wipes to finish the job. Then came the bassinet, the poor poor bassinet. After some soap and water, you could still see some yellow staining if you knew where to look. But what else could we do? Theo made his bed, and now he’ll have to lie in it.&lt;/p&gt;
+
+&lt;p&gt;…&lt;/p&gt;
+
+&lt;p&gt;We had called the midwife again, the other one had finished her shift and Jo had just started. She said to call back when Meg could not talk through a contraction any more. She was visibly in a lot of pain, and it was hard for me to imagine so much she couldn’t talk through. Her water broke about an hour and a half ago. We were supposed to be able to sleep through the night. We hadn’t even been able to finish our dinner after all of this started.&lt;/p&gt;
+
+&lt;p&gt;Her contractions were coming faster and faster. The bath did not help. She was now sitting on the toilet when a particularly bad one hit. She was sitting there because she was feeling nauseous and the tub was close by. She was bent over in pain and vomitted in the tub. I’ve never felt so helpless in my life. So much I also had a heaping of guilt. We called the midwife yet again. I’m sure she loved hearing back from us so soon. This time we had her on the phone again and when another contraction came. She was able to hear Meg through the whole thing. She could nothing but scream and cry out. Bent over her face was red and writhed in agony. It was then and only then, after all the long and close together contractions, after the vomit in the tub, and hearing Meg over the phone that.&lt;/p&gt;
+
+&lt;p&gt;“I think it would be good now to start getting ready to leave. There’s no rush, and I’ll meet you both at the hospital”.&lt;/p&gt;
+
+&lt;p&gt;…&lt;/p&gt;
+
+&lt;p&gt;…&lt;/p&gt;
+
+&lt;p&gt;No rush!? No rush?! I ran around like the proverbial chicken with its head cut off. Our hospital bag was packed but not all the way. I grabbed a sponge and scooped the puke out of the tub and into a bucket that I could flush down the toilet. We couldn’t leave that there for two day.&lt;/p&gt;
+
+&lt;p&gt;I ran around and got a garbage bag, towel, hospital bag and called a car. This was really happening.&lt;/p&gt;
+</description>
+        <pubDate>Fri, 28 Jul 2017 00:00:00 -0400</pubDate>
+        <link>http://localhost:4000/blog/on-being-a-parent</link>
+        <guid isPermaLink="true">http://localhost:4000/blog/on-being-a-parent</guid>
+        
+        
+      </item>
+    
+      <item>
         <title>HTTPS with Github Pages (and Custom Domains)</title>
         <description>&lt;p&gt;&lt;img src=&quot;/images/ssl-ghp.jpg&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
 
@@ -134,11 +398,11 @@
 
 &lt;div class=&quot;pre-wrap&quot;&gt;
 
-&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-javascript&quot; data-lang=&quot;javascript&quot;&gt;&lt;span class=&quot;kr&quot;&gt;const&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;ZNewReal&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;Math&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;pow&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;ZOldReal&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;2&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;-&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;Math&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;pow&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;ZOldImaginary&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;2&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;+&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;Cr&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-javascript&quot; data-lang=&quot;javascript&quot;&gt;&lt;span class=&quot;kd&quot;&gt;const&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;ZNewReal&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;Math&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;pow&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;ZOldReal&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;2&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;-&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;Math&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;pow&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;ZOldImaginary&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;2&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;+&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;Cr&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
 
-&lt;span class=&quot;kr&quot;&gt;const&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;ZNewImaginary&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;2&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;*&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;ZOldReal&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;*&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;ZOldImaginary&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;+&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;CImaginary&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+&lt;span class=&quot;kd&quot;&gt;const&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;ZNewImaginary&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;2&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;*&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;ZOldReal&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;*&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;ZOldImaginary&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;+&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;CImaginary&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
 
-&lt;span class=&quot;kr&quot;&gt;const&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;absoluteValue&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;Math&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;sqrt&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;Math&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;pow&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;ZNewReal&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;2&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;+&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;Math&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;pow&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;ZNewImaginary&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;2&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;));&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
+&lt;span class=&quot;kd&quot;&gt;const&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;absoluteValue&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;Math&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;sqrt&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;Math&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;pow&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;ZNewReal&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;2&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;+&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;Math&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;pow&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;ZNewImaginary&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;2&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;));&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
 
 &lt;/div&gt;
 
@@ -156,7 +420,7 @@
 
 &lt;div class=&quot;pre-wrap&quot;&gt;
 
-&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-javascript&quot; data-lang=&quot;javascript&quot;&gt;&lt;span class=&quot;kr&quot;&gt;const&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;newNumberOfIterations&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;actualNumberOfIterations&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;-&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;Math&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;log2&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;Math&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;log2&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;finalAbsoluteValueOfLastIterationResult&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;));&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
+&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-javascript&quot; data-lang=&quot;javascript&quot;&gt;&lt;span class=&quot;kd&quot;&gt;const&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;newNumberOfIterations&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;actualNumberOfIterations&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;-&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;Math&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;log2&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;Math&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;log2&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;finalAbsoluteValueOfLastIterationResult&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;));&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
 
 &lt;/div&gt;
 
@@ -254,7 +518,7 @@
 
 &lt;p&gt;Once you’ve decided on what you want and purchased it, you’ll need to request the certificate from the issuing company. To do this, you’ll need a certificate signing request (CSR) file. This can be created with many tools available around the internet, most of which cost money. Or you could do it on the command line with openSSL:&lt;/p&gt;
 
-&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-sh&quot; data-lang=&quot;sh&quot;&gt;openssl req -new -newkey rsa:2048 -nodes -keyout YOUR-DOMAIN.key -out YOUR-DOMAIN.csr&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
+&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-sh&quot; data-lang=&quot;sh&quot;&gt;openssl req &lt;span class=&quot;nt&quot;&gt;-new&lt;/span&gt; &lt;span class=&quot;nt&quot;&gt;-newkey&lt;/span&gt; rsa:2048 &lt;span class=&quot;nt&quot;&gt;-nodes&lt;/span&gt; &lt;span class=&quot;nt&quot;&gt;-keyout&lt;/span&gt; YOUR-DOMAIN.key &lt;span class=&quot;nt&quot;&gt;-out&lt;/span&gt; YOUR-DOMAIN.csr&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
 
 &lt;p&gt;This will create a token with 2048 bit encryption, and output your CSR and your private KEY file which you will need for later. When you enter this command, it will prompt you through a set of questions, the only one worth noting is the &lt;code class=&quot;highlighter-rouge&quot;&gt;name&lt;/code&gt; field, which should be your domain name (if you are doing a domain verification certificate like me).&lt;/p&gt;
 
@@ -371,7 +635,7 @@
 
 &lt;p&gt;It would make the most sense to return a &lt;code class=&quot;highlighter-rouge&quot;&gt;TypeError&lt;/code&gt; when a check fails, but this would be confusing if some type error unrelated to this library occurs. It would be tough to debug and distinguish which came from Typist and which didn’t. For that reason, Typist throws its own custom errors that inherit from &lt;code class=&quot;highlighter-rouge&quot;&gt;TypeError&lt;/code&gt;, including a helpful message:&lt;/p&gt;
 
-&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-console&quot; data-lang=&quot;console&quot;&gt;&lt;span class=&quot;err&quot;&gt;TypeError: TypistError: Expected 1,2,3 to be of type String&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
+&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-console&quot; data-lang=&quot;console&quot;&gt;&lt;span class=&quot;go&quot;&gt;TypeError: TypistError: Expected 1,2,3 to be of type String&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
 
 &lt;h2 id=&quot;support&quot;&gt;Support&lt;/h2&gt;
 
@@ -447,17 +711,17 @@
 
 &lt;p&gt;This may be the most technical part of the process, just getting the necessary tools installed. But first, you need to install Jekyll, so in terminal:&lt;/p&gt;
 
-&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-console&quot; data-lang=&quot;console&quot;&gt;&lt;span class=&quot;err&quot;&gt;gem install jekyll&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
+&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-console&quot; data-lang=&quot;console&quot;&gt;&lt;span class=&quot;go&quot;&gt;gem install jekyll&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
 
 &lt;p&gt;And then create your project wherever you want it:&lt;/p&gt;
 
-&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-console&quot; data-lang=&quot;console&quot;&gt;&lt;span class=&quot;err&quot;&gt;jekyll new kickass-site&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
+&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-console&quot; data-lang=&quot;console&quot;&gt;&lt;span class=&quot;go&quot;&gt;jekyll new kickass-site&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
 
 &lt;p&gt;and then change directories to your site and run your server. You don’t need to start your server &lt;em&gt;on&lt;/em&gt; your server to have your site be viewable, but doing this locally is what generates all your files for you.&lt;/p&gt;
 
-&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-console&quot; data-lang=&quot;console&quot;&gt;cd kickass-site
+&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-console&quot; data-lang=&quot;console&quot;&gt;&lt;span class=&quot;go&quot;&gt;cd kickass-site
 jekyll serve
-&lt;span class=&quot;err&quot;&gt;jekyll new my-awesome-site&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
+jekyll new my-awesome-site&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
 
 &lt;p&gt;You can now view your site at &lt;code class=&quot;highlighter-rouge&quot;&gt;http://localhost:4000&lt;/code&gt; Open up your kickass site in your favorite editor and get to work!&lt;/p&gt;
 
@@ -480,9 +744,9 @@ I think the rest are easily understood. There is a &lt;code class=&quot;highligh
 
 &lt;p&gt;Also what is very important is &lt;a href=&quot;http://jekyllrb.com/docs/frontmatter/&quot;&gt;Front Matter&lt;/a&gt;. Front Matter is the meta information denoted in YAML at the top of every page and post (or any other content you added). It includes basics such as title, which layout to use with it, and any other information you want passed along up the chain that is usefor for your site. Here’s a sample from my site:&lt;/p&gt;
 
-&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-yaml&quot; data-lang=&quot;yaml&quot;&gt;&lt;span class=&quot;s&quot;&gt;layout&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;post&lt;/span&gt;
-&lt;span class=&quot;s&quot;&gt;title&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;Caching&lt;/span&gt;&lt;span class=&quot;nv&quot;&gt; &lt;/span&gt;&lt;span class=&quot;s&quot;&gt;model&lt;/span&gt;&lt;span class=&quot;nv&quot;&gt; &lt;/span&gt;&lt;span class=&quot;s&quot;&gt;associations&lt;/span&gt;&lt;span class=&quot;nv&quot;&gt; &lt;/span&gt;&lt;span class=&quot;s&quot;&gt;in&lt;/span&gt;&lt;span class=&quot;nv&quot;&gt; &lt;/span&gt;&lt;span class=&quot;s&quot;&gt;rails&quot;&lt;/span&gt;
-&lt;span class=&quot;s&quot;&gt;meta&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;post&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
+&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-yaml&quot; data-lang=&quot;yaml&quot;&gt;&lt;span class=&quot;na&quot;&gt;layout&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;post&lt;/span&gt;
+&lt;span class=&quot;na&quot;&gt;title&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;Caching&lt;/span&gt;&lt;span class=&quot;nv&quot;&gt; &lt;/span&gt;&lt;span class=&quot;s&quot;&gt;model&lt;/span&gt;&lt;span class=&quot;nv&quot;&gt; &lt;/span&gt;&lt;span class=&quot;s&quot;&gt;associations&lt;/span&gt;&lt;span class=&quot;nv&quot;&gt; &lt;/span&gt;&lt;span class=&quot;s&quot;&gt;in&lt;/span&gt;&lt;span class=&quot;nv&quot;&gt; &lt;/span&gt;&lt;span class=&quot;s&quot;&gt;rails&quot;&lt;/span&gt;
+&lt;span class=&quot;na&quot;&gt;meta&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;post&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
 
 &lt;p&gt;Any of these variables are available with the page variable, so &lt;code class=&quot;highlighter-rouge&quot;&gt;page.title&lt;/code&gt; for instance in my example above, would return that value. Any variable associated with your site (and set in the _config.yml file) are available on the site variable, like: &lt;code class=&quot;highlighter-rouge&quot;&gt;site.url&lt;/code&gt;. More on variables &lt;a href=&quot;http://jekyllrb.com/docs/variables/&quot;&gt;here&lt;/a&gt;.&lt;/p&gt;
 
@@ -508,143 +772,6 @@ I think the rest are easily understood. There is a &lt;code class=&quot;highligh
         <pubDate>Tue, 26 Jan 2016 00:00:00 -0500</pubDate>
         <link>http://localhost:4000/blog/converting-my-site-to-jekyll</link>
         <guid isPermaLink="true">http://localhost:4000/blog/converting-my-site-to-jekyll</guid>
-        
-        
-      </item>
-    
-      <item>
-        <title>Caching model associations in rails</title>
-        <description>&lt;p&gt;I’ve been working on a project recently called &lt;a href=&quot;http://www.explorableplaces.com&quot;&gt;www.explorableplaces.com&lt;/a&gt;, and I added memcached caching with &lt;a href=&quot;https://github.com/mperham/dalli&quot;&gt;Dalli&lt;/a&gt;. So I’m basically trying to cache anything and everything that can help our performance.&lt;/p&gt;
-
-&lt;p&gt;Normally, you will see guides and articles show you caching with an example like this:&lt;/p&gt;
-
-&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-ruby&quot; data-lang=&quot;ruby&quot;&gt;&lt;span class=&quot;k&quot;&gt;def&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;cached_images&lt;/span&gt;
-  &lt;span class=&quot;no&quot;&gt;Rails&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;cache&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;fetch&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;([&lt;/span&gt;&lt;span class=&quot;s1&quot;&gt;'Articles'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;id&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;s1&quot;&gt;'images'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;updated_at&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;to_i&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;])&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;do&lt;/span&gt;
-    &lt;span class=&quot;n&quot;&gt;images&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;to_a&lt;/span&gt;
-  &lt;span class=&quot;k&quot;&gt;end&lt;/span&gt;
-&lt;span class=&quot;k&quot;&gt;end&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
-
-&lt;p&gt;And while this now works, if I eager load an association, it will not &lt;!--more--&gt; call my “images_cached” method but the default one instead, so no gain there.&lt;/p&gt;
-
-&lt;p&gt;When I was thinking about this more and more, a lightbulb went off in my head. Instead, you can do something like this:&lt;/p&gt;
-
-&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-ruby&quot; data-lang=&quot;ruby&quot;&gt;&lt;span class=&quot;k&quot;&gt;class&lt;/span&gt; &lt;span class=&quot;nc&quot;&gt;Article&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;&amp;lt;&lt;/span&gt; &lt;span class=&quot;no&quot;&gt;ActiveRecord&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;::&lt;/span&gt;&lt;span class=&quot;no&quot;&gt;Base&lt;/span&gt;
-  &lt;span class=&quot;ss&quot;&gt;has_many: :images&lt;/span&gt;
-  &lt;span class=&quot;ss&quot;&gt;has_many: :cached_images&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;ss&quot;&gt;class_name: &lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;Image&quot;&lt;/span&gt;
-
-  &lt;span class=&quot;k&quot;&gt;def&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;cached_images&lt;/span&gt;
-    &lt;span class=&quot;no&quot;&gt;Rails&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;cache&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;fetch&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;([&lt;/span&gt;&lt;span class=&quot;s1&quot;&gt;'Articles'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;id&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;s1&quot;&gt;'images'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;updated_at&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;to_i&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;])&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;do&lt;/span&gt;
-      &lt;span class=&quot;k&quot;&gt;super&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;to_a&lt;/span&gt;
-    &lt;span class=&quot;k&quot;&gt;end&lt;/span&gt;
-  &lt;span class=&quot;k&quot;&gt;end&lt;/span&gt;
-&lt;span class=&quot;k&quot;&gt;end&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
-
-&lt;h2 id=&quot;so-whats-going-on-here&quot;&gt;So What’s Going On Here?&lt;/h2&gt;
-
-&lt;p&gt;This adds a new association that basically just returns all an article’s images. So why did I create a new one? Well we still need our controllers to work with creating new images like “@article.images.new”. Also, the advantage here is now I can eager load images: “Article.all.includes(:cached_images)” which will return all cached images with each article.&lt;/p&gt;
-
-&lt;p&gt;When it’s run, rails tries to fetch it from the cache using a key created from the array of values passed into it. If it finds something, it returns it. And if not, it runs the code in the block and returns that (which is then cached for future use). In that block, super just calls the original “images” method to make the call to the db and get those images.&lt;/p&gt;
-
-&lt;h2 id=&quot;updated_at-what-are-these-keys&quot;&gt;Updated_at? What Are These Keys?&lt;/h2&gt;
-
-&lt;p&gt;Why do I have “updated_at” in there? Basically, once the model is updated, this would mean the key would be updated, and essentially expire the old cached value, fetching a new one. This is a safer feature so your data doesn’t get stale. For our example, if the article has an id of 5, then our key would look something like “Articles/5/images/1448145415”.&lt;/p&gt;
-
-&lt;p&gt;You may have wondered, what if I update an image? Then the cache will not be expired but I will still get old data? We can easily fix that in our images model:&lt;/p&gt;
-
-&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-ruby&quot; data-lang=&quot;ruby&quot;&gt;&lt;span class=&quot;k&quot;&gt;class&lt;/span&gt; &lt;span class=&quot;nc&quot;&gt;Image&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;&amp;lt;&lt;/span&gt; &lt;span class=&quot;no&quot;&gt;ActiveRecord&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;::&lt;/span&gt;&lt;span class=&quot;no&quot;&gt;Base&lt;/span&gt;
-  &lt;span class=&quot;ss&quot;&gt;belongs_to: :article&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;ss&quot;&gt;touch: &lt;/span&gt;&lt;span class=&quot;kp&quot;&gt;true&lt;/span&gt;
-&lt;span class=&quot;k&quot;&gt;end&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
-
-&lt;p&gt;With “touch: true”, whenever the image is created, updated or destroyed, it will touch the article it belongs to, updating its “updated_at” time. Sweet!&lt;/p&gt;
-
-&lt;h2 id=&quot;and-to_a&quot;&gt;And To_a?&lt;/h2&gt;
-
-&lt;p&gt;And you may also be wondering why “.to_a”. Well, without that, it will actually just cache the ActiveRecord association and not the values. That’s bad, and would just throw an error on us if we try to retrieve it. Calling “to_a” on it forces that association to actually make the call and get our data, which is returned as an array so we can cache it.&lt;/p&gt;
-
-&lt;p&gt;That’s it, hope you found this as useful as I did!&lt;/p&gt;
-
-</description>
-        <pubDate>Wed, 25 Nov 2015 00:00:00 -0500</pubDate>
-        <link>http://localhost:4000/blog/caching-model-associations-in-rails</link>
-        <guid isPermaLink="true">http://localhost:4000/blog/caching-model-associations-in-rails</guid>
-        
-        
-      </item>
-    
-      <item>
-        <title>Upgrading Bootstrap 2.x to 3</title>
-        <description>&lt;p&gt;&lt;img src=&quot;/images/bootstrap.jpg&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
-
-&lt;p&gt;When we started building &lt;a href=&quot;http://eastmeeteast.com/&quot;&gt;EastMeetEast&lt;/a&gt; last August, Bootstrap 3 was still a release candidate. It didn’t seem to make very much sense to implement it on our production site when it may have bugs or be updated and changed frequently.&lt;/p&gt;
-
-&lt;p&gt;After just a few weeks of work, the official release of 3.0 came out. At that point, we were more concerned with getting the product up and out than now backtracking to &lt;!--more--&gt; upgrade to 3. Well the time has come, now 9 months later when things are much more quiet, to tackle this sucker.&lt;/p&gt;
-
-&lt;p&gt;I’m writing this article as I come across common “gotchas” when migrating. For a detailed list of all the changes, you can &lt;a href=&quot;http://getbootstrap.com/components/#navbar&quot;&gt;view them here&lt;/a&gt;.&lt;/p&gt;
-
-&lt;h2 id=&quot;new-grid&quot;&gt;New Grid&lt;/h2&gt;
-
-&lt;p&gt;This is probably the most obvious, but there’s a new grid. It’s pretty simple but is based on “mobile first” design.&lt;/p&gt;
-
-&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-html&quot; data-lang=&quot;html&quot;&gt;&lt;span class=&quot;nt&quot;&gt;&amp;lt;div&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;class=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;span4 offset2&quot;&lt;/span&gt;&lt;span class=&quot;nt&quot;&gt;&amp;gt;&amp;lt;/div&amp;gt;&lt;/span&gt;
-
-//now becomes
-
-&lt;span class=&quot;nt&quot;&gt;&amp;lt;div&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;class=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;col-sm-4 col-md-offset-2&quot;&lt;/span&gt;&lt;span class=&quot;nt&quot;&gt;&amp;gt;&amp;lt;/div&amp;gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
-
-&lt;p&gt;The prefixes sm, md, lg, all refer to the screensizes that the container will be collapsed in. So you can have more than one grid class per element, a “col–4 col-lg-2” or something. There also is no more “row-fluid” class. There is only the “row” class and will always be fluid.&lt;/p&gt;
-
-&lt;h2 id=&quot;helper-classes&quot;&gt;Helper Classes&lt;/h2&gt;
-
-&lt;p&gt;A lot of these have also changed or added new ones. These include:&lt;/p&gt;
-
-&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-html&quot; data-lang=&quot;html&quot;&gt;&lt;span class=&quot;nt&quot;&gt;&amp;lt;label&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;class=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;sr-only&quot;&lt;/span&gt;&lt;span class=&quot;nt&quot;&gt;&amp;gt;&amp;lt;/label&amp;gt;&lt;/span&gt;  // screen reader only, will hide from user's view
-
-&lt;span class=&quot;nt&quot;&gt;&amp;lt;div&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;class=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;hidden-xs&quot;&lt;/span&gt;&lt;span class=&quot;nt&quot;&gt;&amp;gt;&amp;lt;/div&amp;gt;&lt;/span&gt; // will hide on mobile. Follows same prefix convention as grid classes
-
-&lt;span class=&quot;nt&quot;&gt;&amp;lt;div&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;class=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;alert danger-alert&quot;&lt;/span&gt;&lt;span class=&quot;nt&quot;&gt;&amp;gt;&amp;lt;/div&amp;gt;&lt;/span&gt; // error-alert is deprecated&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
-
-&lt;h2 id=&quot;navbar&quot;&gt;Navbar&lt;/h2&gt;
-
-&lt;p&gt;This has changed a lot and is probably better just to &lt;a href=&quot;http://getbootstrap.com/components/#navbar&quot;&gt;read the docs&lt;/a&gt;. The largest difference, though, is there is no more “navbar-inner”.&lt;/p&gt;
-
-&lt;h2 id=&quot;buttons&quot;&gt;Buttons&lt;/h2&gt;
-
-&lt;p&gt;The buttons have simplefied A LOT. They are now flat which makes them super easy to customize. With them, you can edit your buttons with “btn-danger, btn-info, btn-warning, etc” classes, update your Sass/Less variables like “$brandcolor-primary”, or created a custom class with a mixin:&lt;/p&gt;
-
-&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-sass&quot; data-lang=&quot;sass&quot;&gt;&lt;span class=&quot;nc&quot;&gt;.btn-brown&lt;/span&gt; &lt;span class=&quot;err&quot;&gt;{&lt;/span&gt;
-
-  &lt;span class=&quot;k&quot;&gt;@include&lt;/span&gt; &lt;span class=&quot;nd&quot;&gt;btn-variant&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;no&quot;&gt;white&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;no&quot;&gt;brown&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;no&quot;&gt;brown&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;err&quot;&gt;;&lt;/span&gt;
-
-&lt;span class=&quot;err&quot;&gt;}&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
-
-&lt;p&gt;Note: all references to “error” are now “danger”, hence the new class “btn-danger” (and also “alert-danger”)&lt;/p&gt;
-
-&lt;h2 id=&quot;responsive-images&quot;&gt;Responsive Images&lt;/h2&gt;
-
-&lt;p&gt;Responsive images are not responsive out of the box anymore. You’ll need to add a class of “img-responsive” to any image you want to behave that way. You may be able to get around it by just adding&lt;/p&gt;
-
-&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-sass&quot; data-lang=&quot;sass&quot;&gt;&lt;span class=&quot;na&quot;&gt;img&lt;/span&gt;&lt;span class=&quot;err&quot;&gt; { &lt;/span&gt;&lt;span class=&quot;nl&quot;&gt;max-width&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;m&quot;&gt;100%&lt;/span&gt; &lt;span class=&quot;err&quot;&gt;}&lt;/span&gt;
-
-&lt;span class=&quot;c1&quot;&gt;// or
-&lt;/span&gt;
-&lt;span class=&quot;nt&quot;&gt;img&lt;/span&gt; &lt;span class=&quot;err&quot;&gt;{&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;@&lt;/span&gt;&lt;span class=&quot;nt&quot;&gt;extend&lt;/span&gt; &lt;span class=&quot;nc&quot;&gt;.img-responsive&lt;/span&gt; &lt;span class=&quot;err&quot;&gt;}&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
-
-&lt;p&gt;but it may differ case to case, so use your discretion. For instance, in rails, you may have an image helper like “image_tag(256)” that spits out an image with width and height set to 256px. Using max-width alone on this will cause some problems, so it’s best to use the class name. Alternatively, you may have some images styled in such a way that “img-responsive” will break their layout by setting the height to “auto”. Just be aware and careful with these.&lt;/p&gt;
-
-&lt;h2 id=&quot;forms&quot;&gt;Forms&lt;/h2&gt;
-
-&lt;p&gt;If you use bootstraps form styles, they have changed a lot. “Control-group” is now “form-group”, “input-block-level” is now “form-control”. “Controls” and “controls-row” have been removed with no replacement. Have a look at the &lt;a href=&quot;http://getbootstrap.com/migration/&quot;&gt;details&lt;/a&gt; for more specific info. If you have any plugins, gems or other third party software that deals with forms, then you will have to check and see if they need to be updated as well. One such popular one is…&lt;/p&gt;
-
-&lt;h2 id=&quot;simple_form-with-rails&quot;&gt;Simple_form With Rails&lt;/h2&gt;
-
-&lt;p&gt;If you use Rails, and you use the very popular gem simple_form, then you are probably wondering why your forms looks like shit in bootstrap 3. Well, that’s because you need to update your gem. An official release is not out yet as of this posting, but there is a release candidate that you can use. For more info, &lt;a href=&quot;http://blog.plataformatec.com.br/2014/04/bootstrap-3-support-for-simple-form/&quot;&gt;check this out&lt;/a&gt;.&lt;/p&gt;
-
-&lt;p&gt;Those were all the major steps in upgrading our site to Bootstrap 3. It involved some other little adjustments here and there, but those were specific to our site and not as big as these. Good luck!&lt;/p&gt;
-
-</description>
-        <pubDate>Wed, 25 Jun 2014 00:00:00 -0400</pubDate>
-        <link>http://localhost:4000/blog/upgrading-bootstrap-2-to-3</link>
-        <guid isPermaLink="true">http://localhost:4000/blog/upgrading-bootstrap-2-to-3</guid>
         
         
       </item>
