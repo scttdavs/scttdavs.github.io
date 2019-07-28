@@ -31,14 +31,13 @@ Now that you presumably have your Dockerized app, along with all your separate `
 Below, I've outlined our deploy script. See the bottom of this post for all the gory details, but what it does is:
 1. Use [DropletKit][droplet_kit] to get a list of our staging/production droplets
 1. Loop over each droplet to do the following:
-
-1. Take the droplet out of traffic with the load balancer
-1. Copy all environment files, docker-compose files, etc. to the droplet.
-1. Run a start up script with the droplet that:
-    * Take down all running containers and remove them, as well as volumes, and images.
-    * Pull in latest tagged image from DockerHub
-    * Bring up containers
-    * Put back into traffic with the load balancer if all was successful
+    1. Take the droplet out of traffic with the load balancer
+    1. Copy all environment files, docker-compose files, etc. to the droplet.
+    1. Run a start up script with the droplet that:
+        1. Take down all running containers and remove them, as well as volumes, and images.
+        1. Pull in latest tagged image from DockerHub
+        1. Bring up containers
+        1. Put back into traffic with the load balancer if all was successful
 
 With this in place, you can simply deploy your app with:
 
