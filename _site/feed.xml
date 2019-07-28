@@ -6,8 +6,8 @@
 </description>
     <link>https://sco.ttdavis.com/</link>
     <atom:link href="https://sco.ttdavis.com/feed.xml" rel="self" type="application/rss+xml"/>
-    <pubDate>Sat, 27 Jul 2019 23:29:55 -0400</pubDate>
-    <lastBuildDate>Sat, 27 Jul 2019 23:29:55 -0400</lastBuildDate>
+    <pubDate>Sun, 28 Jul 2019 13:39:16 -0400</pubDate>
+    <lastBuildDate>Sun, 28 Jul 2019 13:39:16 -0400</lastBuildDate>
     <generator>Jekyll v3.8.5</generator>
     
       <item>
@@ -17,12 +17,12 @@
 &lt;p&gt;Previously, &lt;a href=&quot;https://www.explorableplaces.com&quot;&gt;Explorable Places&lt;/a&gt; used Capistrano to deploy to one droplet in DigitalOcean. This setup had a number of downsides and limitations. Among them,&lt;!--more--&gt; we had:&lt;/p&gt;
 &lt;ul&gt;
   &lt;li&gt;a single point of failure&lt;/li&gt;
-  &lt;li&gt;only &lt;em&gt;nearly&lt;/em&gt; zero downtime&lt;/li&gt;
+  &lt;li&gt;only &lt;em&gt;nearly&lt;/em&gt; zero downtime for deployments&lt;/li&gt;
   &lt;li&gt;no easy way to scale horizontally&lt;/li&gt;
   &lt;li&gt;difficulty in upgrades&lt;/li&gt;
 &lt;/ul&gt;
 
-&lt;p&gt;When the app started out, it was easy and only necessary to have one box up that hosted everything: nginx, app, db and cache (memcached). Provisioning a new droplet would be a pain in the butt, and I had no way to distribute traffic to each box anyway. Platform upgrades (from Ubuntu 12 to 14) proved to be a royal pain in the behind, and required the site to be down for some time, in addition to the risk involved in the update itself.&lt;/p&gt;
+&lt;p&gt;When the app started out, it was easy and only necessary to have one box up that hosted everything: nginx, app, db and cache (memcached). Provisioning a new droplet would be a pain in the butt, and I had no way to distribute traffic to each box anyway. Platform upgrades (Ubuntu) proved to be a royal pain in the behind, and required the site to be down for some time, in addition to the risk involved in the update itself.&lt;/p&gt;
 
 &lt;h2 id=&quot;docker&quot;&gt;Docker&lt;/h2&gt;
 
@@ -44,16 +44,16 @@
   &lt;li&gt;Use &lt;a href=&quot;https://github.com/digitalocean/droplet_kit&quot;&gt;DropletKit&lt;/a&gt; to get a list of our staging/production droplets&lt;/li&gt;
   &lt;li&gt;Loop over each droplet to do the following:
     &lt;ol&gt;
-      &lt;li&gt;Take the droplet out of traffic with the load balancer&lt;/li&gt;
+      &lt;li&gt;Take the droplet out of traffic by removing it from the load balancer&lt;/li&gt;
       &lt;li&gt;Copy all environment files, docker-compose files, etc. to the droplet.&lt;/li&gt;
-      &lt;li&gt;Run a start up script with the droplet that:
+      &lt;li&gt;Run a start up script within the droplet that:
         &lt;ol&gt;
-          &lt;li&gt;Take down all running containers and remove them, as well as volumes, and images.&lt;/li&gt;
-          &lt;li&gt;Pull in latest tagged image from DockerHub&lt;/li&gt;
-          &lt;li&gt;Bring up containers&lt;/li&gt;
-          &lt;li&gt;Put back into traffic with the load balancer if all was successful&lt;/li&gt;
+          &lt;li&gt;Takes down all running containers and removes them, as well as volumes, and images.&lt;/li&gt;
+          &lt;li&gt;Pulls in latest tagged image from DockerHub&lt;/li&gt;
+          &lt;li&gt;Brings up containers&lt;/li&gt;
         &lt;/ol&gt;
       &lt;/li&gt;
+      &lt;li&gt;Put the droplet back into traffic by adding back to the load balancer (if everything was successful)&lt;/li&gt;
     &lt;/ol&gt;
   &lt;/li&gt;
 &lt;/ol&gt;
@@ -83,7 +83,7 @@
       &lt;span class=&quot;na&quot;&gt;app&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
         &lt;span class=&quot;na&quot;&gt;condition&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;service_healthy&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
 
-&lt;p&gt;This health check will be run within your container, so you can reference localhost here. If you have other containers that depend on this one, you can define the conditions that will dictate when that container is brought up. Above, we have an nginx service that depends on our app. We tell it to wait until our app is healthy, which will depend on the health check.&lt;/p&gt;
+&lt;p&gt;This health check will be run within your container, so you can reference localhost here. If you have other containers that depend on this one, you can define the conditions that will dictate when that container is brought up. Above, we have an nginx service that depends on our app. We tell it to wait until our app is healthy, which will be based on the health check we defined.&lt;/p&gt;
 
 &lt;p&gt;Health checks will continue to run, so be sure to exlude it from any:&lt;/p&gt;
 &lt;ul&gt;

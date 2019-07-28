@@ -26,12 +26,12 @@ Previously, Explorable Places used Capistrano to deploy to one droplet in Digita
 Previously, Explorable Places used Capistrano to deploy to one droplet in DigitalOcean. This setup had a number of downsides and limitations. Among them, we had:
 
   a single point of failure
-  only nearly zero downtime
+  only nearly zero downtime for deployments
   no easy way to scale horizontally
   difficulty in upgrades
 
 
-When the app started out, it was easy and only necessary to have one box up that hosted everything: nginx, app, db and cache (memcached). Provisioning a new droplet would be a pain in the butt, and I had no way to distribute traffic to each box anyway. Platform upgrades (from Ubuntu 12 to 14) proved to be a royal pain in the behind, and required the site to be down for some time, in addition to the risk involved in the update itself.
+When the app started out, it was easy and only necessary to have one box up that hosted everything: nginx, app, db and cache (memcached). Provisioning a new droplet would be a pain in the butt, and I had no way to distribute traffic to each box anyway. Platform upgrades (Ubuntu) proved to be a royal pain in the behind, and required the site to be down for some time, in addition to the risk involved in the update itself.
 
 Docker
 
@@ -53,16 +53,16 @@ Below, I’ve outlined our deploy script. See the bottom of this post for all th
   Use DropletKit to get a list of our staging/production droplets
   Loop over each droplet to do the following:
     
-      Take the droplet out of traffic with the load balancer
+      Take the droplet out of traffic by removing it from the load balancer
       Copy all environment files, docker-compose files, etc. to the droplet.
-      Run a start up script with the droplet that:
+      Run a start up script within the droplet that:
         
-          Take down all running containers and remove them, as well as volumes, and images.
-          Pull in latest tagged image from DockerHub
-          Bring up containers
-          Put back into traffic with the load balancer if all was successful
+          Takes down all running containers and removes them, as well as volumes, and images.
+          Pulls in latest tagged image from DockerHub
+          Brings up containers
         
       
+      Put the droplet back into traffic by adding back to the load balancer (if everything was successful)
     
   
 
@@ -92,7 +92,7 @@ services:
       app:
         condition: service_healthy
 
-This health check will be run within your container, so you can reference localhost here. If you have other containers that depend on this one, you can define the conditions that will dictate when that container is brought up. Above, we have an nginx service that depends on our app. We tell it to wait until our app is healthy, which will depend on the health check.
+This health check will be run within your container, so you can reference localhost here. If you have other containers that depend on this one, you can define the conditions that will dictate when that container is brought up. Above, we have an nginx service that depends on our app. We tell it to wait until our app is healthy, which will be based on the health check we defined.
 
 Health checks will continue to run, so be sure to exlude it from any:
 
@@ -240,7 +240,7 @@ fi
     <div class='gradient-bar'></div>
 
     <div class='group' itemscope itemtype="http://schema.org/Blog">
-      <section class='main article-list'>
+      <section class='main article-list show-aside'>
         <article class='article-item group' itemscope itemtype="http://schema.org/BlogPosting">
   <h1 itemprop="name headline">Zero Downtime Deployments with Docker and DigitalOcean</h1>
   <span class="author" itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -262,12 +262,12 @@ fi
 <p>Previously, <a href="https://www.explorableplaces.com">Explorable Places</a> used Capistrano to deploy to one droplet in DigitalOcean. This setup had a number of downsides and limitations. Among them,<!--more--> we had:</p>
 <ul>
   <li>a single point of failure</li>
-  <li>only <em>nearly</em> zero downtime</li>
+  <li>only <em>nearly</em> zero downtime for deployments</li>
   <li>no easy way to scale horizontally</li>
   <li>difficulty in upgrades</li>
 </ul>
 
-<p>When the app started out, it was easy and only necessary to have one box up that hosted everything: nginx, app, db and cache (memcached). Provisioning a new droplet would be a pain in the butt, and I had no way to distribute traffic to each box anyway. Platform upgrades (from Ubuntu 12 to 14) proved to be a royal pain in the behind, and required the site to be down for some time, in addition to the risk involved in the update itself.</p>
+<p>When the app started out, it was easy and only necessary to have one box up that hosted everything: nginx, app, db and cache (memcached). Provisioning a new droplet would be a pain in the butt, and I had no way to distribute traffic to each box anyway. Platform upgrades (Ubuntu) proved to be a royal pain in the behind, and required the site to be down for some time, in addition to the risk involved in the update itself.</p>
 
 <h2 id="docker">Docker</h2>
 
@@ -289,16 +289,16 @@ fi
   <li>Use <a href="https://github.com/digitalocean/droplet_kit">DropletKit</a> to get a list of our staging/production droplets</li>
   <li>Loop over each droplet to do the following:
     <ol>
-      <li>Take the droplet out of traffic with the load balancer</li>
+      <li>Take the droplet out of traffic by removing it from the load balancer</li>
       <li>Copy all environment files, docker-compose files, etc. to the droplet.</li>
-      <li>Run a start up script with the droplet that:
+      <li>Run a start up script within the droplet that:
         <ol>
-          <li>Take down all running containers and remove them, as well as volumes, and images.</li>
-          <li>Pull in latest tagged image from DockerHub</li>
-          <li>Bring up containers</li>
-          <li>Put back into traffic with the load balancer if all was successful</li>
+          <li>Takes down all running containers and removes them, as well as volumes, and images.</li>
+          <li>Pulls in latest tagged image from DockerHub</li>
+          <li>Brings up containers</li>
         </ol>
       </li>
+      <li>Put the droplet back into traffic by adding back to the load balancer (if everything was successful)</li>
     </ol>
   </li>
 </ol>
@@ -328,7 +328,7 @@ fi
       <span class="na">app</span><span class="pi">:</span>
         <span class="na">condition</span><span class="pi">:</span> <span class="s">service_healthy</span></code></pre></figure>
 
-<p>This health check will be run within your container, so you can reference localhost here. If you have other containers that depend on this one, you can define the conditions that will dictate when that container is brought up. Above, we have an nginx service that depends on our app. We tell it to wait until our app is healthy, which will depend on the health check.</p>
+<p>This health check will be run within your container, so you can reference localhost here. If you have other containers that depend on this one, you can define the conditions that will dictate when that container is brought up. Above, we have an nginx service that depends on our app. We tell it to wait until our app is healthy, which will be based on the health check we defined.</p>
 
 <p>Health checks will continue to run, so be sure to exlude it from any:</p>
 <ul>
@@ -428,7 +428,8 @@ docker system prune <span class="nt">-f</span> <span class="nt">--all</span> <sp
 
       </section>
 
-      <aside itemprop="creator" itemscope itemtype="http://schema.org/Person">
+      
+        <aside itemprop="creator" itemscope itemtype="http://schema.org/Person">
   <div class='avatar-wrap'>
     <div class='avatar'>
       <meta itemprop="image" content="/images/me.jpg" />
@@ -444,6 +445,7 @@ docker system prune <span class="nt">-f</span> <span class="nt">--all</span> <sp
   
 </aside>
 
+      
     </div>
 
     <footer>
