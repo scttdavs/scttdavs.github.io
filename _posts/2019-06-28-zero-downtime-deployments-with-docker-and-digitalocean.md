@@ -9,11 +9,11 @@ meta: post
 
 Previously, [Explorable Places][ep] used Capistrano to deploy to one droplet in DigitalOcean. This setup had a number of downsides and limitations. Among them,<!--more--> we had:
 - a single point of failure
-- only _nearly_ zero downtime
+- only _nearly_ zero downtime for deployments
 - no easy way to scale horizontally
 - difficulty in upgrades
 
-When the app started out, it was easy and only necessary to have one box up that hosted everything: nginx, app, db and cache (memcached). Provisioning a new droplet would be a pain in the butt, and I had no way to distribute traffic to each box anyway. Platform upgrades (from Ubuntu 12 to 14) proved to be a royal pain in the behind, and required the site to be down for some time, in addition to the risk involved in the update itself.
+When the app started out, it was easy and only necessary to have one box up that hosted everything: nginx, app, db and cache (memcached). Provisioning a new droplet would be a pain in the butt, and I had no way to distribute traffic to each box anyway. Platform upgrades (Ubuntu) proved to be a royal pain in the behind, and required the site to be down for some time, in addition to the risk involved in the update itself.
 
 ## Docker
 
@@ -31,13 +31,13 @@ Now that you presumably have your Dockerized app, along with all your separate `
 Below, I've outlined our deploy script. See the bottom of this post for all the gory details, but what it does is:
 1. Use [DropletKit][droplet_kit] to get a list of our staging/production droplets
 1. Loop over each droplet to do the following:
-    1. Take the droplet out of traffic with the load balancer
+    1. Take the droplet out of traffic by removing it from the load balancer
     1. Copy all environment files, docker-compose files, etc. to the droplet.
-    1. Run a start up script with the droplet that:
-        1. Take down all running containers and remove them, as well as volumes, and images.
-        1. Pull in latest tagged image from DockerHub
-        1. Bring up containers
-        1. Put back into traffic with the load balancer if all was successful
+    1. Run a start up script within the droplet that:
+        1. Takes down all running containers and removes them, as well as volumes, and images.
+        1. Pulls in latest tagged image from DockerHub
+        1. Brings up containers
+    1. Put the droplet back into traffic by adding back to the load balancer (if everything was successful)
 
 With this in place, you can simply deploy your app with:
 
@@ -68,7 +68,7 @@ services:
         condition: service_healthy
 {% endhighlight %}
 
-This health check will be run within your container, so you can reference localhost here. If you have other containers that depend on this one, you can define the conditions that will dictate when that container is brought up. Above, we have an nginx service that depends on our app. We tell it to wait until our app is healthy, which will depend on the health check.
+This health check will be run within your container, so you can reference localhost here. If you have other containers that depend on this one, you can define the conditions that will dictate when that container is brought up. Above, we have an nginx service that depends on our app. We tell it to wait until our app is healthy, which will be based on the health check we defined.
 
 Health checks will continue to run, so be sure to exlude it from any:
 - SSL validation

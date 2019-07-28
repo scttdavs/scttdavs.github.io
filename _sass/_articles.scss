@@ -75,16 +75,14 @@
 .post-content {
   ol {
     list-style-type: none;
+    counter-reset: listCounter;
     li {
-      counter-increment: count-me;
+      counter-increment: listCounter;
 
       &:before {
-        content: counter(count-me) ". ";
-        display: block;
-        position: relative;
-        max-height: 0px;
-        left: -1.3em;
-        top: -0.05em;
+        content: counters(listCounter, ".");
+        display: inline-block;
+        margin-right: 10px;
         color: #000000;
       }
     }
