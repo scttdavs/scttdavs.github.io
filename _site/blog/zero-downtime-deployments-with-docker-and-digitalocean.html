@@ -51,17 +51,18 @@ Now that you presumably have your Dockerized app, along with all your separate d
 Below, I’ve outlined our deploy script. See the bottom of this post for all the gory details, but what it does is:
 
   Use DropletKit to get a list of our staging/production droplets
-  
-    Loop over each droplet to do the following:
-  
-  Take the droplet out of traffic with the load balancer
-  Copy all environment files, docker-compose files, etc. to the droplet.
-  Run a start up script with the droplet that:
+  Loop over each droplet to do the following:
     
-      Take down all running containers and remove them, as well as volumes, and images.
-      Pull in latest tagged image from DockerHub
-      Bring up containers
-      Put back into traffic with the load balancer if all was successful
+      Take the droplet out of traffic with the load balancer
+      Copy all environment files, docker-compose files, etc. to the droplet.
+      Run a start up script with the droplet that:
+        
+          Take down all running containers and remove them, as well as volumes, and images.
+          Pull in latest tagged image from DockerHub
+          Bring up containers
+          Put back into traffic with the load balancer if all was successful
+        
+      
     
   
 
@@ -285,18 +286,19 @@ fi
 <p>Below, I’ve outlined our deploy script. See the bottom of this post for all the gory details, but what it does is:</p>
 <ol>
   <li>Use <a href="https://github.com/digitalocean/droplet_kit">DropletKit</a> to get a list of our staging/production droplets</li>
-  <li>
-    <p>Loop over each droplet to do the following:</p>
-  </li>
-  <li>Take the droplet out of traffic with the load balancer</li>
-  <li>Copy all environment files, docker-compose files, etc. to the droplet.</li>
-  <li>Run a start up script with the droplet that:
-    <ul>
-      <li>Take down all running containers and remove them, as well as volumes, and images.</li>
-      <li>Pull in latest tagged image from DockerHub</li>
-      <li>Bring up containers</li>
-      <li>Put back into traffic with the load balancer if all was successful</li>
-    </ul>
+  <li>Loop over each droplet to do the following:
+    <ol>
+      <li>Take the droplet out of traffic with the load balancer</li>
+      <li>Copy all environment files, docker-compose files, etc. to the droplet.</li>
+      <li>Run a start up script with the droplet that:
+        <ol>
+          <li>Take down all running containers and remove them, as well as volumes, and images.</li>
+          <li>Pull in latest tagged image from DockerHub</li>
+          <li>Bring up containers</li>
+          <li>Put back into traffic with the load balancer if all was successful</li>
+        </ol>
+      </li>
+    </ol>
   </li>
 </ol>
 
