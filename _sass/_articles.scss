@@ -4,6 +4,12 @@
   margin-bottom: 45px;
   border-bottom: solid 1px lighten($offmiddle, 35%);
   padding-bottom: 35px;
+  display: flex;
+
+  @media (max-width: 767px) {
+    flex-direction: column;
+  }
+
   &:last-child {
     border-bottom: none;
   }
@@ -11,6 +17,27 @@
     color: darken($offmiddle, 10%);
     font: normal 20px/30px "Vollkorn", Georgia;
   }
+
+  .article-image {
+    flex-basis: 30%;
+    padding-top: 28px;
+
+    @media (max-width: 767px) {
+      flex-basis: 100%;
+      padding-top: 0;
+    }
+  }
+  
+  .article-wrapper {
+    flex-basis: 70%;
+    padding-left: 25px;
+
+    @media (max-width: 767px) {
+      flex-basis: 100%;
+      padding-left: 0;
+    }
+  }
+
   .excerpt {
     h3 {
       font: 400 22px "Lato", sans-serif;
@@ -119,6 +146,6 @@ span.date, span.author {
   }
 }
 
-.blog-page img {
+.excerpt img {
   display: none;
 }

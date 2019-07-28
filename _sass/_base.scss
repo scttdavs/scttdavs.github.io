@@ -109,16 +109,23 @@ h5 {
 
 .main {
   padding: 40px 20px;
-  width: 65%;
-  float: left;
+
+  &.about {
+    width: 65%;
+    float: left;
+  }
+
   @media (max-width: 1024px) {
     padding-left: 0;
   }
   @media (max-width: 767px) {
-    width: 100%;
-    float: none;
     padding-bottom: 0;
     padding-right: 0;
+
+    &.about {
+      width: 100%;
+      float: none;
+    }
   }
   &.project-main {
     padding: 0;

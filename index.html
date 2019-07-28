@@ -9,21 +9,25 @@ pagination:
 <div class="blog-page">
   {% for post in paginator.posts %}
     <div class='article-item full-article group' itemprop="blogPost" itemscope itemtype="http://schema.org/BlogPosting">
-      <h2 class="main-headline" itemprop="name headline">
-        <a href="{{ post.url }}" itemprop="url">
-          {{ post.title }}
-        </a>
-      </h2>
-      <span class="date">
-        <time datetime="{{ post.date | date_to_xmlschema }}" itemprop="datePublished">
-          {{ post.date | date: "%b %-d, %Y" }}
-        </time>
-      </span>
-      <div class='excerpt' itemprop="articleBody">
-        {{ post.excerpt | replace: "h2", "h3" | remove: '<img>' }}
+      <div class="article-image">
+        <img src="/images/{{ post.photo }}.jpg" />
       </div>
-      <a href="{{ post.url }}" class="continue" itemprop="url">continue reading</a>
-
+      <div class="article-wrapper">
+        <h2 class="main-headline" itemprop="name headline">
+          <a href="{{ post.url }}" itemprop="url">
+            {{ post.title }}
+          </a>
+        </h2>
+        <span class="date">
+          <time datetime="{{ post.date | date_to_xmlschema }}" itemprop="datePublished">
+            {{ post.date | date: "%b %-d, %Y" }}
+          </time>
+        </span>
+        <div class='excerpt' itemprop="articleBody">
+          {{ post.excerpt | replace: "h2", "h3" | remove: '<img>' }}
+        </div>
+        <a href="{{ post.url }}" class="continue" itemprop="url">continue reading</a>
+      </div>
     </div>
   {% endfor %}
 </div>
