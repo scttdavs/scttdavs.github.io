@@ -12,7 +12,9 @@ pagination:
     <div class='article-item full-article group {% if post.photo %}has-photo{% endif %}' itemprop="blogPost" itemscope itemtype="http://schema.org/BlogPosting">
       {% if post.photo %}
         <div class="article-image">
-          <img src="/images/{{ post.photo }}.jpg" />
+            <a href="{{ post.url }}" itemprop="url">
+              <img alt="" src="/images/{{ post.photo }}.jpg" />
+            </a>
         </div>
       
         <div class="article-wrapper">
