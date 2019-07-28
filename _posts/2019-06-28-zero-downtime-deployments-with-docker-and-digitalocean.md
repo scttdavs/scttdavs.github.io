@@ -62,7 +62,8 @@ services:
       interval: 5s
       timeout: 60s
       retries: 10
-  depends_on:
+  nginx:
+    depends_on:
       app:
         condition: service_healthy
 {% endhighlight %}
