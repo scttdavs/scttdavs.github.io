@@ -110,7 +110,7 @@ h5 {
 .main {
   padding: 40px 20px;
 
-  &.about {
+  &.show-aside {
     width: 65%;
     float: left;
   }
@@ -122,7 +122,7 @@ h5 {
     padding-bottom: 0;
     padding-right: 0;
 
-    &.about {
+    &.show-aside {
       width: 100%;
       float: none;
     }

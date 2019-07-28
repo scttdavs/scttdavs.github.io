@@ -10,9 +10,13 @@
     {% include gradient-bar.html %}
 
     <div class='group' itemscope itemtype="http://schema.org/Blog">
-      <section class='main article-list'>
+      <section class='main article-list {% if page.meta == "post" %}show-aside{% endif %}'>
         {{ content }}
       </section>
+
+      {% if page.meta == "post" %}
+        {% include author_aside.html %}
+      {% endif %}
     </div>
 
     {% include footer.html %}
