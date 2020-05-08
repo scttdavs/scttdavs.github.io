@@ -75,10 +75,18 @@ WebAssembly aims to be another intermediate representation, fitting in right bef
 
 ### The end of Javascript?
 
-Not at all, as Javascript is still the language of the web. But WebAssembly can be much faster. Nowadays, Javascript is fast mostly because of the JWT (just in time) compiler. This is a special kind of compiler that compiles and optimizes code into machine code on the fly. Due to the dynamic nature of Javascript, it cannot do this ahead of time, it has to do it at run time. But with WebAssembly, since it is compiled much closer to assembly, you cannot retain that dynamism. Types must be known ahead of time, which means the optimization that the JWT does can be done ahead of time, and is more reliable.
+Not at all, as Javascript is still the language of the web. But WebAssembly can be much faster. Nowadays, Javascript is fast mostly because of the JWT (just in time) compiler. This is a special kind of compiler that compiles and optimizes code into machine code on the fly. Due to the dynamic nature of Javascript, it cannot do this ahead of time, it has to do it at run time. But with WebAssembly, since it is compiled much closer to assembly, you cannot retain that dynamism. Types must be known ahead of time, which means the optimization that the JWT does can be done ahead of time, and is more reliable. This is not to say that all apps should be in WebAssembly, but if there is a particular CPU heavy piece of code, it could benefit from being run in WebAssembly.
 
 ### So I need to learn Rust now?
 
 Nope, there is good news for us Javascript devs out there. A new language called AssemblyScript has been created and is a subset of TypeScript, with all the special types it needs to compile correctly to WebAssembly.
 
 There are some special caveats, such as you can only return numbers. If you return complex type, such as an array, or even a string, the number returned will point to the location in the shared memory buffer where you can retrieve the data. There are some nice loaders though, where this work is done for you, and you can return strings and typed arrays, but nothing else. This is one way in which it ensures that WebAssembly will guarantee quickness.
+
+Here is a sample of AssemblyScript that just adds to 32 bit signed integers:
+
+{% highlight typescript %}
+export function add(a: i32, b: i32): i32 {
+    return a + b;
+}
+{% endhighlight %}
