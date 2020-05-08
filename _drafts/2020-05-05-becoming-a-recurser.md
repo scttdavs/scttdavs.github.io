@@ -69,3 +69,16 @@ main =
 
 ## WebAssembly
 
+All code eventually runs as machine code. Before it gets to there, it is compiled to assembly, which is a symbolic representation of machine code. Since machine code is specific to the hardware it is run on, so is assembly. So, code must be compiled to something else first, called an intermediate representation. This is more portable now, as it can be run on any computer, and that computer would be responsible for compiling it into its own assembly.
+
+WebAssembly aims to be another intermediate representation, fitting in right before assembly. It is run in the browser, and the implications are vast. Consider the JVM, which is what Java, Scala, Clojure, and others compile down to. This is considered an intermediate representation. If a compiler exists to compile code written for the JVM into WebAssembly, then any programs written in those languges can now be run in the browser!!
+
+### The end of Javascript?
+
+Not at all, as Javascript is still the language of the web. But WebAssembly can be much faster. Nowadays, Javascript is fast mostly because of the JWT (just in time) compiler. This is a special kind of compiler that compiles and optimizes code into machine code on the fly. Due to the dynamic nature of Javascript, it cannot do this ahead of time, it has to do it at run time. But with WebAssembly, since it is compiled much closer to assembly, you cannot retain that dynamism. Types must be known ahead of time, which means the optimization that the JWT does can be done ahead of time, and is more reliable.
+
+### So I need to learn Rust now?
+
+Nope, there is good news for us Javascript devs out there. A new language called AssemblyScript has been created and is a subset of TypeScript, with all the special types it needs to compile correctly to WebAssembly.
+
+There are some special caveats, such as you can only return numbers. If you return complex type, such as an array, or even a string, the number returned will point to the location in the shared memory buffer where you can retrieve the data. There are some nice loaders though, where this work is done for you, and you can return strings and typed arrays, but nothing else. This is one way in which it ensures that WebAssembly will guarantee quickness.
