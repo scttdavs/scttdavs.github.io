@@ -86,6 +86,18 @@ export function add(a: i32, b: i32): i32 {
 }
 {% endhighlight %}
 
+## Collaborative text editor
+
+A few years ago at eBay, we typically used [Collabedit][collabedit] for our coding interviews. It wasn't that good, and often we lost connection and had to refresh the page. A coworker and I joked that we should learn how to build one and do it for a Hack Week project one summer. I agreed that it was a good idea, but we never got around to it. However, I decided to dig into it now and see if it could be done!
+
+I found a wonderful [case study][casestudy] that another group made when they tried to solve this same problem. The tool then built is available to try out at [conclave.tech][conclave].
+
+I started building it and successfully got peers to connect to each other over WebRTC via a shared url. Next was the sharing of actual data typed by clients. Central to this feature is avoiding conflicts as everyone types over the same characters. One clever way to solve this is with a new kind of datatype I had not heard of, called a [CRDT or confict-free replicated data type][crdt]. Specifically, I would be dealing with a sequential CRDT.
+
+It works by treating the characters as nodes, and edits to those nodes then become children themselves. Each node keeps track of which user made it. I'm oversimplifying here, but by treating the data this way, it can manage all the edits from various users and ensure that everyone ends up with the same result on their respective computers! This was perhaps the project I had the most fun on, and which I had more time to delve in and get it working like the conclave team did. There is always next time!
+
+As the Recurse Center often says, "never graduate!".
+
 [d3]: https://d3js.org/
 [rfancyaxis]: https://www.cl.cam.ac.uk/~sjm217/projects/graphics/
 [fancyaxis]: https://www.npmjs.com/package/fancy-axis
@@ -94,3 +106,7 @@ export function add(a: i32, b: i32): i32 {
 [assemblyscript]: https://docs.assemblyscript.org/
 [typescript]: https://www.typescriptlang.org/
 [jit]: https://en.wikipedia.org/wiki/Just-in-time_compilation
+[collabedit]: http://collabedit.com/
+[casestudy]: https://conclave-team.github.io/conclave-site/
+[conclave]: http://conclave.tech/
+[crdt]: https://en.wikipedia.org/wiki/Conflict-free_replicated_data_type
