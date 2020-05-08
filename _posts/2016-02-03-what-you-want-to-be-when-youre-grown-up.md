@@ -1,7 +1,7 @@
 ---
 layout: post
 title: "What you want to be when you're grown up"
-photo: philmont
+photo: philmont.jpg
 meta: post
 ---
 

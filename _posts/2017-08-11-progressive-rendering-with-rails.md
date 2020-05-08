@@ -1,7 +1,7 @@
 ---
 layout: post
 title: "Progressive Rendering with Rails"
-photo: prog
+photo: prog.jpg
 meta: post
 ---
 

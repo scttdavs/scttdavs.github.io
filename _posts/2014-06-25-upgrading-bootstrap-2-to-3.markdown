@@ -1,7 +1,7 @@
 ---
 layout: post
 title: "Upgrading Bootstrap 2.x to 3"
-photo: bootstrap
+photo: bootstrap.jpg
 meta: post
 ---
 

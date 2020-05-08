@@ -1,7 +1,7 @@
 ---
 layout: post
 title: "HTTPS with Github Pages (and Custom Domains)"
-photo: ssl-ghp
+photo: ssl-ghp.jpg
 meta: post
 ---
 

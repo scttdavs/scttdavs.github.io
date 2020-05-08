@@ -1,7 +1,7 @@
 ---
 layout: post
 title: "Type checking in JS, an experiment"
-photo: type-check
+photo: type-check.jpg
 meta: post
 ---
 

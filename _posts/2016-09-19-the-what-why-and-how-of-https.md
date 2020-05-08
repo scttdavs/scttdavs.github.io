@@ -1,7 +1,7 @@
 ---
 layout: post
 title: "The What, Why, and How of HTTPS"
-photo: ssl
+photo: ssl.jpg
 meta: post
 ---
 

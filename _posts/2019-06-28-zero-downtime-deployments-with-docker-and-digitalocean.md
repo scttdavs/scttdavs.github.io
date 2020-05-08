@@ -1,7 +1,7 @@
 ---
 layout: post
 title: "Zero Downtime Deployments with Docker and DigitalOcean"
-photo: docker
+photo: docker.jpg
 meta: post
 ---
 

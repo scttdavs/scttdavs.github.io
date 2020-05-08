@@ -1,7 +1,7 @@
 ---
 layout: post
 title: "Converting My Site to Jekyll"
-photo: jekyll
+photo: jekyll.jpg
 meta: post
 ---
 

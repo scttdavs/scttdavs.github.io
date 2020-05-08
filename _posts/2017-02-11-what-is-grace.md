@@ -1,7 +1,7 @@
 ---
 layout: post
 title: "What is grace?"
-photo: dict
+photo: dict.jpg
 meta: post
 ---
 

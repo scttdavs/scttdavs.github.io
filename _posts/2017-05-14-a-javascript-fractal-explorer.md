@@ -1,7 +1,7 @@
 ---
 layout: post
 title: "A Javascript Fractal Explorer"
-photo: mandelbrot2
+photo: mandelbrot2.jpg
 meta: post
 ---
 

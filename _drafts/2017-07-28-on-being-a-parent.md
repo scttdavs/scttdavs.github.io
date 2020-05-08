@@ -1,7 +1,7 @@
 ---
 layout: post
 title: "On Being a Parent"
-photo: ssl-ghp
+photo: ssl-ghp.jpg
 meta: post
 ---
 

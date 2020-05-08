@@ -1,11 +1,11 @@
 ---
 layout: post
 title: "Becoming a Recurser"
-photo: ssl-ghp
+photo: recurse.png
 meta: post
 ---
 
-![](/images/ssl-ghp.jpg)
+![](/images/recurse.png)
 
 I recently had the priveledge to attend the Recurse Center, which if you have not heard of, you should definitely check out. It was a really interesting time to attend, given the current global pandemic we all are finding ourselves in now. The entire experience was moved online,<!--more--> and done remotely. 
 
@@ -66,3 +66,6 @@ greet = "World"
 main =
   text (String.join " " ["Hello", greet])
 {% endhighlight %}
+
+## WebAssembly
+
