@@ -7,7 +7,7 @@ meta: post
 
 ![](/images/recurse.png)
 
-I recently had the priveledge to attend the Recurse Center, which if you have not heard of, you should definitely check out. It was a really interesting time to attend, given the current global pandemic we all are finding ourselves in now. The entire experience was moved online,<!--more--> and done remotely. 
+I recently had the priveledge to attend the [Recurse Center][recurse], which if you have not heard of, you should definitely check out. It was a really interesting time to attend, given the current global pandemic we all are finding ourselves in now. The entire experience was moved online,<!--more--> and done remotely. 
 
 While a lot of the social aspect was lost (but credit is due to the RC team, a lot was retained as well), I was still able to grow and learn about a number of things I had no idea I would tackle. I wanted to cover everything here, as a record of what I learned, and maybe as a starting place for when I can jump back in!
 
@@ -98,6 +98,7 @@ It works by treating the characters as nodes, and edits to those nodes then beco
 
 As the Recurse Center often says, "never graduate!".
 
+[recurse]: https://www.recurse.com/
 [d3]: https://d3js.org/
 [rfancyaxis]: https://www.cl.cam.ac.uk/~sjm217/projects/graphics/
 [fancyaxis]: https://www.npmjs.com/package/fancy-axis
