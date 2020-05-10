@@ -13,9 +13,9 @@ While a lot of the social aspect was lost (but credit is due to the RC team, a l
 
 ## D3
 
-I had been wanting to learn about [D3][d3] for a long time, and finally I had the opportunity. Infographics, in particular, have been an interest of mind since my graphic design days. In particular, [Edward Tufte][tufte] was someone whose work I always admired. I figured I could build something in D3 in the style of Tufte. After a bit of research, I found [a library][rfancyaxis] written in R that basically accomplished what I was looking for. I used that library as a visual guide to basically build the same thing in javascript.
+I had been wanting to learn about [D3][d3] for a long time, and finally I had the opportunity. Infographics, in particular, have been an interest of mine since my graphic design days. In particular, [Edward Tufte][tufte] was someone whose work I always admired. I figured that for a project, I could build something in D3 in the style of Tufte. After a bit of research, I found [a library][rfancyaxis] written in R that basically accomplished what I was looking for. I used that library as a visual guide to basically build the same thing, but in javascript.
 
-With that in mind, I was able to publish [fancy-axis][fancyaxis], with its first feature, a rug plot. It implements the same interface as D3 for axes, so that it follows the same pattern and can be used interchangeably. It also adds a couple more methods, since the axes will need to access the chart data now, but it follow the same patterns as the rest of the library, so that should be familiar too. Here is an example:
+With that in mind, I was able to publish [fancy-axis][fancyaxis], with its first feature, a rug plot. It implements the same interface as D3 for axes, so that it follows the same API and can be used interchangeably. But now that the axes will need to access the chart data directly, it also adds a couple more methods as well an options object for styling, but it follow the same patterns as the rest of the library's api so that it should still be familiar. Here is an example:
 
 {% highlight javascript %}
 import { rugPlot } from "fancy-axis";
@@ -41,16 +41,16 @@ svg.append("g")
     .call(bottomAxis);
 {% endhighlight %}
 
-and what that could look like:
+and here is what that could look like in a sample chart I built, with the options listed above:
 <img src="https://github.com/scttdavs/fancy-axis/raw/master/rug-plot-example.png" alt="drawing" style="max-width:400px; display: block;"/>
 
 ## Elm
 
-I had wanted to dive into another language, to further broaden my horizons on what are the styles and stardards of another successful and popular language. I at first wanted to try some dialect of Lisp, probably Clojure, but I start also looking at Elm, which is heavily influenced by Haskell.
+I had wanted to dive into another language to further broaden my horizons on what are the styles and stardards are of another successful and popular language. I at first wanted to try some dialect of Lisp, probably Clojure, but I start also looking at Elm which is heavily influenced by Haskell.
 
 It is a pure functional language, which I was interest in, and it compiled to Javascript. One thing I didn't know, is that it can also be used to build an entire web application front end, including the UI. In that sense, it can be an entire replacement for libraries such as React, Vue, etc.
 
-I completed the official beginner's tutorial, and built some small components, such as an simple counter. I enjoyed the type system more, but overall I did have trouble getting used to the syntax. I don't think I would pick it up on my own, but I do think I would enjoy working on an existing project that used Elm! Here is a small snippet for clarity:
+I completed the official beginner's tutorial, and built some small components, such as a simple counter. I enjoyed the type system more, but overall I did have trouble getting used to the syntax. I don't think I would pick it up on my own, but I do think I would enjoy working on an existing project that used Elm! Here is a small snippet of a ["Hello, world" app][helloworld] for clarity:
 
 {% highlight elm %}
 import Html exposing (text)
@@ -76,7 +76,7 @@ Not at all, as Javascript is still the language of the web. But WebAssembly can 
 
 Nope, there is good news for us Javascript devs out there. A new language called [AssemblyScript][assemblyscript] has been created and is a subset of [TypeScript][typescript], with all the special types it needs to compile correctly to WebAssembly.
 
-There are some special caveats (with WebAssembly as a whole), such as you can only return numbers. If you return complex type, such as an array, or even a string, the number returned will point to the location in the shared memory buffer where you can retrieve the data. There are some nice loaders though, where this work is done for you, and you can return strings and typed arrays, but nothing else. This is one way in which it ensures that WebAssembly will guarantee quickness by limiting it to those types only.
+There are some special caveats (with WebAssembly as a whole), such as you can only return numbers. If you return complex type, such as an array, function, class instance, or even a string, the number returned will point to the location in the shared memory buffer where you can retrieve the data. There are some nice loaders though, where this work is done for you, and you can return strings and typed arrays, but not currently any other comlplex type.
 
 Here is a sample of AssemblyScript that just adds two 32 bit signed integers:
 
@@ -90,11 +90,11 @@ export function add(a: i32, b: i32): i32 {
 
 A few years ago at eBay, we typically used [Collabedit][collabedit] for our coding interviews. It wasn't that good, and often we lost connection and had to refresh the page. A coworker and I joked that we should learn how to build one and do it for a Hack Week project one summer. I agreed that it was a good idea, but we never got around to it. However, I decided to dig into it now and see if it could be done!
 
-I found a wonderful [case study][casestudy] that another group made when they tried to solve this same problem. The tool then built is available to try out at [conclave.tech][conclave].
+I found a wonderful [case study][casestudy] that another group made when they tried to solve this same problem. The tool they built is available to try out at [conclave.tech][conclave].
 
-I started building it and successfully got peers to connect to each other over WebRTC via a shared url. Next was the sharing of actual data typed by clients. Central to this feature is avoiding conflicts as everyone types over the same characters. One clever way to solve this is with a new kind of datatype I had not heard of, called a [CRDT or confict-free replicated data type][crdt]. Specifically, I would be dealing with a sequential CRDT.
+I started building my own and successfully got peers to connect to each other over WebRTC via a shared url. Next was the sharing of actual data typed by clients. Central to this feature is avoiding conflicts as everyone types over the same characters. One clever way to solve this is with a new kind of datatype I had not heard of, called a [CRDT or confict-free replicated data type][crdt]. Specifically, I would be dealing with a sequential CRDT.
 
-It works by treating the characters as nodes, and edits to those nodes then become children themselves. Each node keeps track of which user made it. I'm oversimplifying here, but by treating the data this way, it can manage all the edits from various users and ensure that everyone ends up with the same result on their respective computers! This was perhaps the project I had the most fun on, and which I had more time to delve in and get it working like the conclave team did. There is always next time!
+It works by treating the characters as nodes, and edits to those nodes then become children themselves. Each node keeps track of which user made it. I'm oversimplifying here, but by treating the data this way, it can manage all the edits from various users and ensure that everyone ends up with the same result on their respective computers! This was perhaps the project I had the most fun on, and wish I had more time to delve in and get it working like the conclave team did. There is always next time!
 
 As the Recurse Center often says, "never graduate!".
 
@@ -110,3 +110,4 @@ As the Recurse Center often says, "never graduate!".
 [casestudy]: https://conclave-team.github.io/conclave-site/
 [conclave]: http://conclave.tech/
 [crdt]: https://en.wikipedia.org/wiki/Conflict-free_replicated_data_type
+[helloworld]: https://en.wikipedia.org/wiki/%22Hello,_World!%22_program
