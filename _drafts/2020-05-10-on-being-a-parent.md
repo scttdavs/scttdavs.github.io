@@ -1,27 +1,28 @@
 ---
 layout: post
 title: "On Being a Parent"
-photo: ssl-ghp.jpg
+photo: becoming-parent.png
 meta: post
 ---
 
-![](/images/ssl-ghp.jpg)
+![](/images/becoming-parent.png)
 
-- poop shooting to bassinet
-- talking in baby conversation
-- blue stained legs
-
-"Scott! I need you!!".
+"Scott! I need you!!"
 
 "Oh, Meg's calling me, I got to go. I'll talk to you later sis."
 
-I could tell from the sound in her voice what this was. I ran over to the bathroom, and the look on her face confirmed it.
+I could tell from the sound in her voice what this was<!--more-->. I ran over to the bathroom, and the look on her face confirmed it.
 
 "I think my water broke. I went to the bathroom and when I stood up I realized I was all wet. And I'm almost positive I was done, I don't know what else it could be."
 
 I ran to the refrigerator and got the midwife's card with their emergency number on it. We got the midwife on the phone and she congratulated us and gave us an expectation of what's to come. It was good news, since it was 10:30 at night, Meg could take a bath to help with the ensuing contractions and try to get some sleep. Once the contractions wake her up and she couldn't sleep through them, give her another call.
 
 Sleeping through most of the early labor sounded good to both of us.
+
+
+- poop shooting to bassinet
+- talking in baby conversation
+- blue stained legs
 
 ...
 
