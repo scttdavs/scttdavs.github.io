@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
-    <title>Scott Davis | Front End Developer</title>
-    <description>Front End Developer / Person
+    <title>Scott Davis | Software Engineer</title>
+    <description>Software Engineer / Person
 </description>
     <link>http://localhost:4000/</link>
     <atom:link href="http://localhost:4000/feed.xml" rel="self" type="application/rss+xml"/>
-    <pubDate>Sun, 10 May 2020 19:55:27 -0400</pubDate>
-    <lastBuildDate>Sun, 10 May 2020 19:55:27 -0400</lastBuildDate>
+    <pubDate>Sun, 10 May 2020 21:51:31 -0400</pubDate>
+    <lastBuildDate>Sun, 10 May 2020 21:51:31 -0400</lastBuildDate>
     <generator>Jekyll v3.8.5</generator>
     
       <item>
