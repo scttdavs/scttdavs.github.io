@@ -41,6 +41,20 @@
     }
   }
 
+  .time-jump {
+    border-color: $offblue;
+    width: 50%;
+    margin: 48px auto;
+    border-style: solid;
+  }
+
+  .footnote {
+    color: $offmiddle;
+    font-size: 14px;
+    line-height: 1.5;
+    display: block;
+  }
+
   .excerpt {
     h3 {
       font: 400 22px "Lato", sans-serif;
