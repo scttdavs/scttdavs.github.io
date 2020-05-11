@@ -290,6 +290,8 @@ nav ul li a:hover { color: #EF4F50; }
 @media (max-width: 767px) { .article-item .article-image, .work-item .article-image { flex-basis: 100%; padding-top: 0; } }
 .article-item .article-wrapper, .work-item .article-wrapper { flex-basis: 70%; padding-left: 25px; }
 @media (max-width: 767px) { .article-item .article-wrapper, .work-item .article-wrapper { flex-basis: 100%; padding-left: 0; } }
+.article-item .time-jump, .work-item .time-jump { border-color: #00D2E0; width: 50%; margin: 48px auto; border-style: solid; }
+.article-item .footnote, .work-item .footnote { color: #779098; font-size: 14px; line-height: 1.5; display: block; }
 .article-item .excerpt h3, .work-item .excerpt h3 { font: 400 22px "Lato", sans-serif; color: #2f464d; margin-top: 30px; text-transform: capitalize; }
 .article-item .excerpt p:last-of-type:after, .work-item .excerpt p:last-of-type:after { content: "\2026"; }
 .article-item a.continue, .work-item a.continue { font: bold 12px "Lato", sans-serif; text-transform: uppercase; float: right; }
