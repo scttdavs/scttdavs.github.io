@@ -11,7 +11,7 @@ meta: post
 
 "Oh, Meg's calling me, I got to go. I'll talk to you later sis."
 
-I could tell from the sound in her voice happened<!--more-->. I ran over to the bathroom, and the look on her face just confirmed it.
+I could tell from the sound in her voice what had happened<!--more-->. I ran over to the bathroom, and the look on her face just confirmed it.
 
 "I think my water broke. I went to the bathroom and when I stood, up I realized I was all wet. And I'm almost positive I was done, I don't know what else it could be."
 
