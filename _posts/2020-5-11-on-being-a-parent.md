@@ -93,4 +93,4 @@ As she made copies, I looked over. Three other couples, waiting patiently and qu
 
 <hr class="time-jump" />
 
-<em class="footnote">This was orginally written in 2017, but I never quite finished it. It is published now, after we have just welcomed our second child, a baby girl, this past December. Reflecting back on these stories, I've realized I must have changed Theo thousands of times by now, but I really had no idea what I was doing then. I like that phrase, "changed", and think it's apt for parenting. We change them, and they change us</em>
+<em class="footnote">This was orginally written in 2017, but I never quite finished it. It is published now, after we have just welcomed our second child, a baby girl, this past December. Reflecting back on these stories, I've realized I must have changed Theo thousands of times by now, but I really had no idea what I was doing then. I like that phrase, "changed", and think it's apt for parenting. We change them, and they change us.</em>
