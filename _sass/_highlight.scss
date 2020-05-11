@@ -17,7 +17,8 @@ $green:    #3AE25C; //  operators, other keywords
   white-space: pre-wrap;
 }
 
-code.highlighter-rouge {
+code.highlighter-rouge,
+code.language-plaintext.highlighter-rouge {
     color: $offmiddle-dark;
     background-color: $lightgray;
     padding-left: 5px;
