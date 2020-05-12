@@ -13,7 +13,7 @@ meta: post
 
 I could tell from the sound in her voice what had happened<!--more-->. I ran over to the bathroom, and the look on her face just confirmed it.
 
-"I think my water broke. I went to the bathroom and when I stood, up I realized I was all wet. And I'm almost positive I was done, I don't know what else it could be."
+"I think my water broke. I don't know what else it could be."
 
 I ran to the refrigerator and got the midwives' card with their emergency number on it. We got the midwife on the phone and she congratulated us and gave us some expectation of what's to come. She said it was good news, since it was 10:30 at night. Meg could take a bath to help with the ensuing contractions and try to get some sleep. Once the contractions wake her up and she can't sleep through them, she said to give her another call.
 
