@@ -4,11 +4,94 @@
     <title>Scott Davis | Software Engineer</title>
     <description>Software Engineer / Person
 </description>
-    <link>https://sco.ttdavis.com/</link>
-    <atom:link href="https://sco.ttdavis.com/feed.xml" rel="self" type="application/rss+xml"/>
-    <pubDate>Tue, 12 May 2020 17:14:22 -0400</pubDate>
-    <lastBuildDate>Tue, 12 May 2020 17:14:22 -0400</lastBuildDate>
+    <link>http://localhost:4000/</link>
+    <atom:link href="http://localhost:4000/feed.xml" rel="self" type="application/rss+xml"/>
+    <pubDate>Mon, 25 May 2020 21:16:38 -0400</pubDate>
+    <lastBuildDate>Mon, 25 May 2020 21:16:38 -0400</lastBuildDate>
     <generator>Jekyll v3.8.5</generator>
+    
+      <item>
+        <title>Applying Domain Driven Design Principles</title>
+        <description>&lt;p&gt;Domain Driven Design is a methodology I’ve heard about more and more over the last year, from technical book clubs to interviews. It focuses on how you design your application, including the language and naming used within it. Namely, everything should match the business domain it is serving. The book that first introduced this concept is quite long, and goes into very specific detail on how to implement this method, including it’s own specific patterns, such as entities, values, repositories, etc. Explorable Places’ domain logic started off simple years ago, but over time, the complexity grew. Our models got fat, our controllers got fat, we had business logic in a few views, it was bad and it needed to be wrangled. While I don’t think we needed to refactor the entire app to implement the very specific Domain Driven Design methodology, I think there are definitely some key learnings we can take away and apply. Specifically, we should encapsulate our business logic separately into small testable units of ‘action’, and we should name everything according to what and how the user is doing an action.&lt;/p&gt;
+
+&lt;h2 id=&quot;existing-tooling&quot;&gt;Existing Tooling&lt;/h2&gt;
+
+&lt;p&gt;There are plenty of tools that can help achieve this. Previously at eBay, we used Trooba in Node to create streamable pipelines with handlers. In Ruby, there is the popular Interactor, as well as Wisper (which is an event pub/sub based solution), and Pathway.&lt;/p&gt;
+
+&lt;h3 id=&quot;pubsub&quot;&gt;Pub/Sub&lt;/h3&gt;
+
+&lt;p&gt;Wisper was particularly interesting because DDD focuses also on events, and the app reacting to an event, which could represent a user’s action. I like this approach, but a couple things stuck out as potential issues.&lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;
+    &lt;p&gt;Asynchronous events: It would be nice to have these events be asynchronous, but let’s say one event completes, and triggers another event asynchronously. That second event could fail, and depending on our business logic, may need to rollback the changes of the first handler. This would be very hard to achieve, which would leave us to use the default syncronous handling.&lt;/p&gt;
+  &lt;/li&gt;
+  &lt;li&gt;
+    &lt;p&gt;Tangled mess of handlers: If we are not careful, these events and handlers could expand quickly to become a tangled mess. This also makes it difficult to conceptualize just what happens when a single event is triggered, which could lead to unintended consequences when adding or editing new events.&lt;/p&gt;
+  &lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h3 id=&quot;interactors&quot;&gt;Interactors&lt;/h3&gt;
+
+&lt;p&gt;An “interactor” is basically a reimplementation of the Command Design Pattern, but specifically intended to encapsulate and manage business logic. Each interactor handles one small piece of logic, such as “send email” or “save record”. Independently, these are small, reusable, and easily testable. But rarely do we need to do something so small when a user performs some action in our app. That’s where the real power of this gem shines through. We can group multiple interactors together with an “organizer”. Each interactor has a shared context and can fail the while chain if need be. At the end, a result is returned where you can store the success or failure of the action.&lt;/p&gt;
+
+&lt;p&gt;I like this solution because we get the same benefit of something like a pub/sub solution, but we can see at a glance all that happens with a specific action and the order that they will happen in. Below I’ll go over a small example that we had that I think illustrates the usefullness of it.&lt;/p&gt;
+
+&lt;h2 id=&quot;example-confirm-a-booking&quot;&gt;Example: Confirm a booking&lt;/h2&gt;
+
+&lt;p&gt;Previously, we relied on a mix of methods defined directly on the model and ActiveRecord callbacks. Beyond that, some of them were delayed jobs, but that’s how it would “work”. Using interactors, we can define a user’s action of confirming a booking as such below. It is highly readable, and we can see the steps that are taken at each stage. If there is a failure, we can catch it and roll back any database changes. Of course, we only fail in such cases where we would want to roll back.&lt;/p&gt;
+
+&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-ruby&quot; data-lang=&quot;ruby&quot;&gt;&lt;span class=&quot;k&quot;&gt;class&lt;/span&gt; &lt;span class=&quot;nc&quot;&gt;ConfirmBooking&lt;/span&gt;
+  &lt;span class=&quot;kp&quot;&gt;include&lt;/span&gt; &lt;span class=&quot;no&quot;&gt;Interactor&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;::&lt;/span&gt;&lt;span class=&quot;no&quot;&gt;Organizer&lt;/span&gt;
+
+  &lt;span class=&quot;n&quot;&gt;organize&lt;/span&gt; &lt;span class=&quot;no&quot;&gt;UpdateBookingStatus&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;no&quot;&gt;CaptureCardAuthorization&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;no&quot;&gt;SendMessages&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;no&quot;&gt;SyncCalendars&lt;/span&gt;
+
+  &lt;span class=&quot;n&quot;&gt;around&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;do&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;|&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;organizer&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;|&lt;/span&gt;
+    &lt;span class=&quot;no&quot;&gt;ActiveRecord&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;::&lt;/span&gt;&lt;span class=&quot;no&quot;&gt;Base&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;transaction&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;do&lt;/span&gt;
+      &lt;span class=&quot;k&quot;&gt;begin&lt;/span&gt;
+        &lt;span class=&quot;n&quot;&gt;organizer&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;call&lt;/span&gt;
+      &lt;span class=&quot;k&quot;&gt;rescue&lt;/span&gt; &lt;span class=&quot;no&quot;&gt;Interactor&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;::&lt;/span&gt;&lt;span class=&quot;no&quot;&gt;Failure&lt;/span&gt;
+        &lt;span class=&quot;k&quot;&gt;raise&lt;/span&gt; &lt;span class=&quot;no&quot;&gt;ActiveRecord&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;::&lt;/span&gt;&lt;span class=&quot;no&quot;&gt;Rollback&lt;/span&gt;
+      &lt;span class=&quot;k&quot;&gt;end&lt;/span&gt;
+    &lt;span class=&quot;k&quot;&gt;end&lt;/span&gt;
+  &lt;span class=&quot;k&quot;&gt;end&lt;/span&gt;
+
+  &lt;span class=&quot;k&quot;&gt;def&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;call&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;context&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;status_event&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;ss&quot;&gt;:confirm&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;context&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;message_times&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;ss&quot;&gt;:confirmation_complete&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]&lt;/span&gt;
+    &lt;span class=&quot;k&quot;&gt;super&lt;/span&gt;
+  &lt;span class=&quot;k&quot;&gt;end&lt;/span&gt;
+&lt;span class=&quot;k&quot;&gt;end&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
+
+&lt;p&gt;I want to point out the language used also. Each interactor defined uses the natural language we use when talking about the product. We update the booking status to confirmed. We capture the credit card authorization, send messages to users, and sync calendars with updated events. We can clearly see what happens whenever we confirm any booking.&lt;/p&gt;
+
+&lt;p&gt;And in our controller, we now have a very succinct action method:&lt;/p&gt;
+
+&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-ruby&quot; data-lang=&quot;ruby&quot;&gt;&lt;span class=&quot;k&quot;&gt;def&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;confirm&lt;/span&gt;
+  &lt;span class=&quot;n&quot;&gt;booking&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;no&quot;&gt;Booking&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;find&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;booking_params&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;ss&quot;&gt;:id&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;])&lt;/span&gt;
+
+  &lt;span class=&quot;n&quot;&gt;result&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;no&quot;&gt;ConfirmBooking&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;call&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;({&lt;/span&gt; &lt;span class=&quot;ss&quot;&gt;booking: &lt;/span&gt;&lt;span class=&quot;n&quot;&gt;booking&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;})&lt;/span&gt;
+  &lt;span class=&quot;vi&quot;&gt;@booking&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;result&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;booking&lt;/span&gt;
+
+  &lt;span class=&quot;n&quot;&gt;respond_to&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;do&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;|&lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;format&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;|&lt;/span&gt;
+    &lt;span class=&quot;k&quot;&gt;if&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;result&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;success?&lt;/span&gt;
+      &lt;span class=&quot;nb&quot;&gt;format&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;html&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;redirect_back&lt;/span&gt; &lt;span class=&quot;ss&quot;&gt;fallback_location: &lt;/span&gt;&lt;span class=&quot;n&quot;&gt;root_path&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;ss&quot;&gt;notice: &lt;/span&gt;&lt;span class=&quot;s1&quot;&gt;'Booking was successfully confirmed.'&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+      &lt;span class=&quot;nb&quot;&gt;format&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;json&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;render&lt;/span&gt; &lt;span class=&quot;ss&quot;&gt;status: &lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;200&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;ss&quot;&gt;json: &lt;/span&gt;&lt;span class=&quot;vi&quot;&gt;@booking&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+    &lt;span class=&quot;k&quot;&gt;else&lt;/span&gt;
+      &lt;span class=&quot;nb&quot;&gt;format&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;html&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;redirect_back&lt;/span&gt; &lt;span class=&quot;ss&quot;&gt;fallback_location: &lt;/span&gt;&lt;span class=&quot;n&quot;&gt;root_path&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;ss&quot;&gt;alert: &lt;/span&gt;&lt;span class=&quot;s1&quot;&gt;'There was an error confirming your booking.'&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+      &lt;span class=&quot;nb&quot;&gt;format&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;json&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;render&lt;/span&gt; &lt;span class=&quot;ss&quot;&gt;status: &lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;500&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;ss&quot;&gt;json: &lt;/span&gt;&lt;span class=&quot;vi&quot;&gt;@booking&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;errors&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+    &lt;span class=&quot;k&quot;&gt;end&lt;/span&gt;
+  &lt;span class=&quot;k&quot;&gt;end&lt;/span&gt;
+&lt;span class=&quot;k&quot;&gt;end&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
+
+&lt;p&gt;In our other organizers for creating a booking, canceling, declining or rescheduling, we reuse nearly all the same interactors. While we haven’t followed the DDD methodology to a tee, we’ve encapsulated our domain logic and made it the main focus of our app, and designed around it, making managing our complex business logic easier and clearer.&lt;/p&gt;
+</description>
+        <pubDate>Mon, 25 May 2020 21:16:37 -0400</pubDate>
+        <link>http://localhost:4000/blog/applying-domain-driven-design-principles</link>
+        <guid isPermaLink="true">http://localhost:4000/blog/applying-domain-driven-design-principles</guid>
+        
+        
+      </item>
     
       <item>
         <title>On Being a Parent</title>
@@ -103,8 +186,8 @@
 &lt;p&gt;&lt;em class=&quot;footnote&quot;&gt;This was orginally written in 2017, but I never quite finished it. It is published now, after we have just welcomed our second child, a baby girl, this past December. Reflecting back on these stories, I’ve realized I must have changed Theo thousands of times by now, but I really had no idea what I was doing then. I like that phrase, “changed”, and think it’s apt for parenting. We change them, and they change us.&lt;/em&gt;&lt;/p&gt;
 </description>
         <pubDate>Mon, 11 May 2020 00:00:00 -0400</pubDate>
-        <link>https://sco.ttdavis.com/blog/on-being-a-parent</link>
-        <guid isPermaLink="true">https://sco.ttdavis.com/blog/on-being-a-parent</guid>
+        <link>http://localhost:4000/blog/on-being-a-parent</link>
+        <guid isPermaLink="true">http://localhost:4000/blog/on-being-a-parent</guid>
         
         
       </item>
@@ -200,8 +283,8 @@
 
 </description>
         <pubDate>Sun, 10 May 2020 00:00:00 -0400</pubDate>
-        <link>https://sco.ttdavis.com/blog/becoming-a-recurser</link>
-        <guid isPermaLink="true">https://sco.ttdavis.com/blog/becoming-a-recurser</guid>
+        <link>http://localhost:4000/blog/becoming-a-recurser</link>
+        <guid isPermaLink="true">http://localhost:4000/blog/becoming-a-recurser</guid>
         
         
       </item>
@@ -375,8 +458,8 @@ docker system prune &lt;span class=&quot;nt&quot;&gt;-f&lt;/span&gt; &lt;span cl
 
 </description>
         <pubDate>Fri, 28 Jun 2019 00:00:00 -0400</pubDate>
-        <link>https://sco.ttdavis.com/blog/zero-downtime-deployments-with-docker-and-digitalocean</link>
-        <guid isPermaLink="true">https://sco.ttdavis.com/blog/zero-downtime-deployments-with-docker-and-digitalocean</guid>
+        <link>http://localhost:4000/blog/zero-downtime-deployments-with-docker-and-digitalocean</link>
+        <guid isPermaLink="true">http://localhost:4000/blog/zero-downtime-deployments-with-docker-and-digitalocean</guid>
         
         
       </item>
@@ -447,8 +530,8 @@ docker system prune &lt;span class=&quot;nt&quot;&gt;-f&lt;/span&gt; &lt;span cl
 
 </description>
         <pubDate>Fri, 11 Aug 2017 00:00:00 -0400</pubDate>
-        <link>https://sco.ttdavis.com/blog/progressive-rendering-with-rails</link>
-        <guid isPermaLink="true">https://sco.ttdavis.com/blog/progressive-rendering-with-rails</guid>
+        <link>http://localhost:4000/blog/progressive-rendering-with-rails</link>
+        <guid isPermaLink="true">http://localhost:4000/blog/progressive-rendering-with-rails</guid>
         
         
       </item>
@@ -479,8 +562,8 @@ docker system prune &lt;span class=&quot;nt&quot;&gt;-f&lt;/span&gt; &lt;span cl
 &lt;p&gt;And that’s it! It will most likely take a few hours to update, which sucks because your site will be down in the mean time. But at least it’s simple and it’s free! Now with Cloudflare, Jekyll, and Github Pages, you get free hosting and free SSL certs. 🍻&lt;/p&gt;
 </description>
         <pubDate>Sat, 27 May 2017 00:00:00 -0400</pubDate>
-        <link>https://sco.ttdavis.com/blog/https-with-github-pages-with-custom-domains</link>
-        <guid isPermaLink="true">https://sco.ttdavis.com/blog/https-with-github-pages-with-custom-domains</guid>
+        <link>http://localhost:4000/blog/https-with-github-pages-with-custom-domains</link>
+        <guid isPermaLink="true">http://localhost:4000/blog/https-with-github-pages-with-custom-domains</guid>
         
         
       </item>
@@ -546,8 +629,8 @@ docker system prune &lt;span class=&quot;nt&quot;&gt;-f&lt;/span&gt; &lt;span cl
 
 </description>
         <pubDate>Sun, 14 May 2017 00:00:00 -0400</pubDate>
-        <link>https://sco.ttdavis.com/blog/a-javascript-fractal-explorer</link>
-        <guid isPermaLink="true">https://sco.ttdavis.com/blog/a-javascript-fractal-explorer</guid>
+        <link>http://localhost:4000/blog/a-javascript-fractal-explorer</link>
+        <guid isPermaLink="true">http://localhost:4000/blog/a-javascript-fractal-explorer</guid>
         
         
       </item>
@@ -591,8 +674,8 @@ docker system prune &lt;span class=&quot;nt&quot;&gt;-f&lt;/span&gt; &lt;span cl
 &lt;p&gt;It was only fitting that his last boat was named Grace, after all. He knew before I did. We read this quote at Sam’s funeral, and it still holds true today as it did then.&lt;/p&gt;
 </description>
         <pubDate>Sat, 11 Feb 2017 00:00:00 -0500</pubDate>
-        <link>https://sco.ttdavis.com/blog/what-is-grace</link>
-        <guid isPermaLink="true">https://sco.ttdavis.com/blog/what-is-grace</guid>
+        <link>http://localhost:4000/blog/what-is-grace</link>
+        <guid isPermaLink="true">http://localhost:4000/blog/what-is-grace</guid>
         
         
       </item>
@@ -671,8 +754,8 @@ docker system prune &lt;span class=&quot;nt&quot;&gt;-f&lt;/span&gt; &lt;span cl
 
 </description>
         <pubDate>Mon, 19 Sep 2016 00:00:00 -0400</pubDate>
-        <link>https://sco.ttdavis.com/blog/the-what-why-and-how-of-https</link>
-        <guid isPermaLink="true">https://sco.ttdavis.com/blog/the-what-why-and-how-of-https</guid>
+        <link>http://localhost:4000/blog/the-what-why-and-how-of-https</link>
+        <guid isPermaLink="true">http://localhost:4000/blog/the-what-why-and-how-of-https</guid>
         
         
       </item>
@@ -750,35 +833,8 @@ docker system prune &lt;span class=&quot;nt&quot;&gt;-f&lt;/span&gt; &lt;span cl
 
 </description>
         <pubDate>Mon, 11 Apr 2016 00:00:00 -0400</pubDate>
-        <link>https://sco.ttdavis.com/blog/type-checking-js</link>
-        <guid isPermaLink="true">https://sco.ttdavis.com/blog/type-checking-js</guid>
-        
-        
-      </item>
-    
-      <item>
-        <title>What you want to be when you're grown up</title>
-        <description>&lt;h2 id=&quot;childhood-aspirations&quot;&gt;Childhood Aspirations&lt;/h2&gt;
-
-&lt;p&gt;Have you ever wanted to do something other than what you do now, that is, now that you’re grown up? I did, a few times actually. When I was much younger, helping animals sounded like a great and noble cause. I mean, I loved our dog, and I loved animals, so it was a match it seems. I even earned the Veterinary Medicine merit badge, so you knew I meant business. But it was during &lt;!--more--&gt; those merit badge requirements I met with an actual Vet and followed him for an afternoon. One teenage employee cleaned cages all day, not exactly the part time job I would look forward to in pursuing my new career. And the Vet himself, he showed me how to neuter a cat. You might think this noble professional would take great care in this procedure. He would carefully make an incision, a couple snips here and there, and then sew him right up, good as new…errr well maybe not &lt;em&gt;as new&lt;/em&gt;.&lt;/p&gt;
-
-&lt;p&gt;Reality it seems, is not as we always picture it. He wrapped his fingers around both cat testes and ripped them out in one motion, tossed them in the trash can on top of some paper and then sewed him up. The cat laying on his back, looking up dazedly around the room, didn’t even seem bothered by the whole ordeal. I looked down horrified at the little pill shaped balls sitting there in the trash next to some discarded mail and wrappers. It was then I realized this is not for me. I would not be helping animals 95% of the time. Instead I would spend most of my day and my career, my life, violently removing animals reproductive organs.&lt;/p&gt;
-
-&lt;p&gt;&lt;img src=&quot;/images/philmont.jpg&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
-
-&lt;h2 id=&quot;adulthood-ish-aspirations&quot;&gt;Adulthood-ish Aspirations&lt;/h2&gt;
-
-&lt;p&gt;I hadn’t worried much about what I was going to major in in college. I settled on graphic design because I like computers and I like computer graphics. Keeping things simple, I stuck with it. My sophomore year though, I had to take a science class and geology fit perfectly into my schedule. The professor was one of the more sleep inducing ones I’ve had, an expert powerpointer if I ever saw one. But despite his poor delivery, and even poorer jokes, I showed up to every class and peeled my eyes open to stay awake because I loved it. Maybe it was the void it filled with actually understanding how the Earth works. Or maybe it was the stories such knowledge inherently told about our planet. It felt a little like learning about what your great grandfather was like and what he did. You felt a fond connection to the past and to this thing you never knew or knew anything about before.&lt;/p&gt;
-
-&lt;p&gt;I’ve had this feeling before too. Also back in my time in Boy Scouts, many of the dads in our troop were geologists. This really was a unique privilege when you are hiking around the mountains as much as you do in scouts. We would come upon some cliffs or other rock formations and one of the dads would tell us not only what kind of rocks they were and how they formed, but he could extrapolate the history of the very ground we stood on for the past several million years. It was magic really. It made your imagination run wild to picture what it was like where you stood 20 million years ago, and even feel special that you can appreciate it, where some other hiker might walk by the same spot never knowing any better of the wonder and history that laid under his feet.&lt;/p&gt;
-
-&lt;p&gt;Yeah, I thought it would be just fine to be a geologist, to be outside all day, away from the office, the desk, the routine and everydayness of a regular job. But reality it seems, is rarely so aligned with our expectations. Those dads in our troop, every single one worked for an oil company. They used their magic to predict, with a certain accuracy, the chances of there being oil beneath a given area. What imagination did this instill, what wonder or joy? None.&lt;/p&gt;
-
-&lt;p&gt;It was a strange coincidence that the two careers I had hoped for equated to either ripping out an animals testicles or pinpointing where to rip out the Earth’s sealed up carbon only to release it back again. Could you boil down all career paths down to the same sort of nihilistic views? Maybe so. But I’m not going to lie, I still think about it whenever I see a mountain, or a canyon or a cliff. I think about the story there that made it, and I think about the history, and I think about maybe taking another geology class.&lt;/p&gt;
-</description>
-        <pubDate>Wed, 03 Feb 2016 00:00:00 -0500</pubDate>
-        <link>https://sco.ttdavis.com/blog/what-you-want-to-be-when-youre-grown-up</link>
-        <guid isPermaLink="true">https://sco.ttdavis.com/blog/what-you-want-to-be-when-youre-grown-up</guid>
+        <link>http://localhost:4000/blog/type-checking-js</link>
+        <guid isPermaLink="true">http://localhost:4000/blog/type-checking-js</guid>
         
         
       </item>
