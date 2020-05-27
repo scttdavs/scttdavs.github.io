@@ -73,84 +73,13 @@
           </a>
         </h2>
         <span class="date">
-          <time datetime="2020-05-25T21:16:37-04:00" itemprop="datePublished">
-            May 25, 2020
+          <time datetime="2020-05-26T21:56:56-04:00" itemprop="datePublished">
+            May 26, 2020
           </time>
         </span>
         <div class='excerpt' itemprop="articleBody">
-          <p>Domain Driven Design is a methodology I’ve heard about more and more over the last year, from technical book clubs to interviews. It focuses on how you design your application, including the language and naming used within it. Namely, everything should match the business domain it is serving. The book that first introduced this concept is quite long, and goes into very specific detail on how to implement this method, including it’s own specific patterns, such as entities, values, repositories, etc. Explorable Places’ domain logic started off simple years ago, but over time, the complexity grew. Our models got fat, our controllers got fat, we had business logic in a few views, it was bad and it needed to be wrangled. While I don’t think we needed to refactor the entire app to implement the very specific Domain Driven Design methodology, I think there are definitely some key learnings we can take away and apply. Specifically, we should encapsulate our business logic separately into small testable units of ‘action’, and we should name everything according to what and how the user is doing an action.</p>
+          <p><a href="https://en.wikipedia.org/wiki/Domain-driven_design">Domain Driven Design</a> (DDD) is a methodology I’ve heard about more and more over the last year, from technical book clubs to interviews. It focuses on how you design your application, including the language and naming used within it. Namely, everything should match the business domain it is serving, a so-called <a href="https://en.wikipedia.org/wiki/Domain-driven_design#concepts">“ubiquitous language”</a>.</p>
 
-<h3 id="existing-tooling">Existing Tooling</h3>
-
-<p>There are plenty of tools that can help achieve this. Previously at eBay, we used Trooba in Node to create streamable pipelines with handlers. In Ruby, there is the popular Interactor, as well as Wisper (which is an event pub/sub based solution), and Pathway.</p>
-
-<h3 id="pubsub">Pub/Sub</h3>
-
-<p>Wisper was particularly interesting because DDD focuses also on events, and the app reacting to an event, which could represent a user’s action. I like this approach, but a couple things stuck out as potential issues.</p>
-
-<ul>
-  <li>
-    <p>Asynchronous events: It would be nice to have these events be asynchronous, but let’s say one event completes, and triggers another event asynchronously. That second event could fail, and depending on our business logic, may need to rollback the changes of the first handler. This would be very hard to achieve, which would leave us to use the default syncronous handling.</p>
-  </li>
-  <li>
-    <p>Tangled mess of handlers: If we are not careful, these events and handlers could expand quickly to become a tangled mess. This also makes it difficult to conceptualize just what happens when a single event is triggered, which could lead to unintended consequences when adding or editing new events.</p>
-  </li>
-</ul>
-
-<h3 id="interactors">Interactors</h3>
-
-<p>An “interactor” is basically a reimplementation of the Command Design Pattern, but specifically intended to encapsulate and manage business logic. Each interactor handles one small piece of logic, such as “send email” or “save record”. Independently, these are small, reusable, and easily testable. But rarely do we need to do something so small when a user performs some action in our app. That’s where the real power of this gem shines through. We can group multiple interactors together with an “organizer”. Each interactor has a shared context and can fail the while chain if need be. At the end, a result is returned where you can store the success or failure of the action.</p>
-
-<p>I like this solution because we get the same benefit of something like a pub/sub solution, but we can see at a glance all that happens with a specific action and the order that they will happen in. Below I’ll go over a small example that we had that I think illustrates the usefullness of it.</p>
-
-<h3 id="example-confirm-a-booking">Example: Confirm a booking</h3>
-
-<p>Previously, we relied on a mix of methods defined directly on the model and ActiveRecord callbacks. Beyond that, some of them were delayed jobs, but that’s how it would “work”. Using interactors, we can define a user’s action of confirming a booking as such below. It is highly readable, and we can see the steps that are taken at each stage. If there is a failure, we can catch it and roll back any database changes. Of course, we only fail in such cases where we would want to roll back.</p>
-
-<figure class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="k">class</span> <span class="nc">ConfirmBooking</span>
-  <span class="kp">include</span> <span class="no">Interactor</span><span class="o">::</span><span class="no">Organizer</span>
-
-  <span class="n">organize</span> <span class="no">UpdateBookingStatus</span><span class="p">,</span> <span class="no">CaptureCardAuthorization</span><span class="p">,</span> <span class="no">SendMessages</span><span class="p">,</span> <span class="no">SyncCalendars</span>
-
-  <span class="n">around</span> <span class="k">do</span> <span class="o">|</span><span class="n">organizer</span><span class="o">|</span>
-    <span class="no">ActiveRecord</span><span class="o">::</span><span class="no">Base</span><span class="p">.</span><span class="nf">transaction</span> <span class="k">do</span>
-      <span class="k">begin</span>
-        <span class="n">organizer</span><span class="p">.</span><span class="nf">call</span>
-      <span class="k">rescue</span> <span class="no">Interactor</span><span class="o">::</span><span class="no">Failure</span>
-        <span class="k">raise</span> <span class="no">ActiveRecord</span><span class="o">::</span><span class="no">Rollback</span>
-      <span class="k">end</span>
-    <span class="k">end</span>
-  <span class="k">end</span>
-
-  <span class="k">def</span> <span class="nf">call</span>
-    <span class="n">context</span><span class="p">.</span><span class="nf">status_event</span> <span class="o">=</span> <span class="ss">:confirm</span>
-    <span class="n">context</span><span class="p">.</span><span class="nf">message_times</span> <span class="o">=</span> <span class="p">[</span><span class="ss">:confirmation_complete</span><span class="p">]</span>
-    <span class="k">super</span>
-  <span class="k">end</span>
-<span class="k">end</span></code></pre></figure>
-
-<p>I want to point out the language used also. Each interactor defined uses the natural language we use when talking about the product. We update the booking status to confirmed. We capture the credit card authorization, send messages to users, and sync calendars with updated events. We can clearly see what happens whenever we confirm any booking.</p>
-
-<p>And in our controller, we now have a very succinct action method:</p>
-
-<figure class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="k">def</span> <span class="nf">confirm</span>
-  <span class="n">booking</span> <span class="o">=</span> <span class="no">Booking</span><span class="p">.</span><span class="nf">find</span><span class="p">(</span><span class="n">booking_params</span><span class="p">[</span><span class="ss">:id</span><span class="p">])</span>
-
-  <span class="n">result</span> <span class="o">=</span> <span class="no">ConfirmBooking</span><span class="p">.</span><span class="nf">call</span><span class="p">({</span> <span class="ss">booking: </span><span class="n">booking</span> <span class="p">})</span>
-  <span class="vi">@booking</span> <span class="o">=</span> <span class="n">result</span><span class="p">.</span><span class="nf">booking</span>
-
-  <span class="n">respond_to</span> <span class="k">do</span> <span class="o">|</span><span class="nb">format</span><span class="o">|</span>
-    <span class="k">if</span> <span class="n">result</span><span class="p">.</span><span class="nf">success?</span>
-      <span class="nb">format</span><span class="p">.</span><span class="nf">html</span> <span class="p">{</span> <span class="n">redirect_back</span> <span class="ss">fallback_location: </span><span class="n">root_path</span><span class="p">,</span> <span class="ss">notice: </span><span class="s1">'Booking was successfully confirmed.'</span> <span class="p">}</span>
-      <span class="nb">format</span><span class="p">.</span><span class="nf">json</span> <span class="p">{</span> <span class="n">render</span> <span class="ss">status: </span><span class="mi">200</span><span class="p">,</span> <span class="ss">json: </span><span class="vi">@booking</span> <span class="p">}</span>
-    <span class="k">else</span>
-      <span class="nb">format</span><span class="p">.</span><span class="nf">html</span> <span class="p">{</span> <span class="n">redirect_back</span> <span class="ss">fallback_location: </span><span class="n">root_path</span><span class="p">,</span> <span class="ss">alert: </span><span class="s1">'There was an error confirming your booking.'</span> <span class="p">}</span>
-      <span class="nb">format</span><span class="p">.</span><span class="nf">json</span> <span class="p">{</span> <span class="n">render</span> <span class="ss">status: </span><span class="mi">500</span><span class="p">,</span> <span class="ss">json: </span><span class="vi">@booking</span><span class="p">.</span><span class="nf">errors</span> <span class="p">}</span>
-    <span class="k">end</span>
-  <span class="k">end</span>
-<span class="k">end</span></code></pre></figure>
-
-<p>In our other organizers for creating a booking, canceling, declining or rescheduling, we reuse nearly all the same interactors. While we haven’t followed the DDD methodology to a tee, we’ve encapsulated our domain logic and made it the main focus of our app, and designed around it, making managing our complex business logic easier and clearer.</p>
 
         </div>
         <a href="/blog/applying-domain-driven-design-principles" class="continue" itemprop="url">continue reading</a>
