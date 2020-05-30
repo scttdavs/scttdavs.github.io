@@ -8,18 +8,22 @@
   
     <meta name="twitter:card" content="summary" />
     <meta name="twitter:site" content="@scttdavs" />
-    <meta name="twitter:image" content="http://localhost:4000/images/.jpg">
+    <meta name="twitter:image" content="http://localhost:4000/images/kandinsky.jpg.jpg">
     <meta name="twitter:title" content="Applying Domain Driven Design Principles" />
-    <meta name="twitter:description" content="Domain Driven Design (DDD) is a methodology I’ve heard about more and more over the last year, from technical book clubs to interviews. It focuses on how you design your application, including the language and naming used within it. Namely, everything should match the business domain it is serving, a so-called “ubiquitous language”.
+    <meta name="twitter:description" content="
+
+Domain Driven Design (DDD) is a methodology I’ve heard about more and more over the last year, from technical book clubs to interviews. It focuses on how you design your application, including the language and naming used within it. Namely, everything should match the business domain it is serving, a so-called “ubiquitous language”.
 
 " />
 
     <meta property="og:title" content="Applying Domain Driven Design Principles">
     <meta property="og:url" content="http://localhost:4000/blog/applying-domain-driven-design-principles">
-    <meta property="og:image" content="http://localhost:4000/images/.jpg">
+    <meta property="og:image" content="http://localhost:4000/images/kandinsky.jpg.jpg">
     <meta property="og:image:type" content="image/jpeg" />
     <meta property="og:site_name" content="Scott Davis">
-    <meta property="og:description" content="Domain Driven Design (DDD) is a methodology I’ve heard about more and more over the last year, from technical book clubs to interviews. It focuses on how you design your application, including the language and naming used within it. Namely, everything should match the business domain it is serving, a so-called “ubiquitous language”.
+    <meta property="og:description" content="
+
+Domain Driven Design (DDD) is a methodology I’ve heard about more and more over the last year, from technical book clubs to interviews. It focuses on how you design your application, including the language and naming used within it. Namely, everything should match the business domain it is serving, a so-called “ubiquitous language”.
 
 The book that first introduced this concept is quite long, and goes into very specific detail on the concepts and how to implement this method, including it’s own specific patterns, such as entities, values, repositories, etc. Explorable Places’ domain logic started off simple years ago, but over time, the complexity grew. Models got fat, controllers got fat, and we had business logic in a few views. It was bad and it needed to be wrangled. However, most of the app remained simple CRUD actions.
 
@@ -44,15 +48,15 @@ Wisper was particularly interesting because DDD does focus on domain events, and
 
 Interactors
 
-An “interactor” is basically a reimplementation of the Command Design Pattern, but specifically intended to encapsulate and manage business logic. Each interactor handles one small piece of logic, such as “send email” or “save record”. These are small, reusable, and easily testable, but rarely do we need to do something so small when a user performs some action in our app. That’s where the real power of this gem shines through. We can group multiple interactors together with an “organizer”. Each interactor has a shared context and can fail the while chain if need be. At the end, a result is returned where you can store the success or failure of the action. Conceptually, a single interactor or organizer could represent a domain event in this case.
+An “interactor” is basically a reimplementation of the Command Design Pattern, but specifically intended to encapsulate and manage business logic. Each interactor handles one small piece of logic, such as “send email” or “save record”. These are small, reusable, and easily testable, but rarely do we need to do something so small when a user performs some action in our app. That’s where the real power of this gem shines through. We can group multiple interactors together with an “organizer”. Each interactor has a shared context and can fail the whole chain if need be. At the end, a result is returned where you can store the success or failure of the action. Conceptually, a single interactor or organizer could represent a domain event in this case.
 
-I like this solution because we get the same benefit of something like a pub/sub solution, but we can see with a glance at the code all that happens with a specific action and the order that they will happen in. Below I’ll go over a small example that we had that I think illustrates this well.
+I like this solution because we get the same benefit of something like a pub/sub solution, but we can see with just a glance at the code all that happens with a specific action and the order that they will happen in. Below I’ll go over a small example that we had that I think illustrates this well.
 
 Example: Confirm a booking
 
-Previously, we relied on a mix of methods defined directly on the model along with ActiveRecord callbacks. Beyond that, some of the logic was also executed via delayed jobs, but that’s essentially how it would “work”. This resulted in a massive pile of spaghetti code that was difficult to maintain and reason about.
+At Explorable Places, we have bookings for learning experiences. Once a booking is made, the learning institution must confirm or decline it. Previously, we relied on a mix of methods defined directly on the booking model along with ActiveRecord callbacks. Beyond that, some of the logic was also executed via delayed jobs, but that’s essentially how it would “work”. This resulted in a massive pile of spaghetti code that was difficult to maintain and reason about.
 
-Using interactors, we could encapsulate all the logic a user’s action of confirming a booking to a single file. It is highly readable, and we can see the steps that are taken at each stage. If there is a failure, we can catch it and roll back any database changes. Of course, we only fail in such cases where we would want to roll back.
+Using interactors, we could encapsulate all the logic of a user’s action of confirming a booking to a single file. It is highly readable, and we can see the steps that are taken at each stage. If there is a failure, we can catch it and roll back any database changes. Of course, we only fail in such cases where we would want to roll back.
 
 class ConfirmBooking
   include Interactor::Organizer
@@ -82,11 +86,11 @@ class SendMessages
   include Interactor
 
   def call
-    booking = context.booking ||= Booking.find(context.booking_id)
+    booking = context.booking
     message_times = context.message_times
 
     booking.messages.for_times(message_times).each do |message|
-			UserMailer.send_message(booking.id, message.id).deliver_later
+      UserMailer.send_message(booking.id, message.id).deliver_later
     end
   end
 end
@@ -179,13 +183,15 @@ In our other organizers for creating a booking, canceling, declining or reschedu
     ,
   </span>
   <span class="date">
-    <time datetime="2020-05-26T21:56:56-04:00" itemprop="datePublished">
-      May 26, 2020
+    <time datetime="2020-05-30T12:47:06-04:00" itemprop="datePublished">
+      May 30, 2020
     </time>
   </span>
 
   <div class="post-content" itemprop="articleBody">
-    <p><a href="https://en.wikipedia.org/wiki/Domain-driven_design">Domain Driven Design</a> (DDD) is a methodology I’ve heard about more and more over the last year, from technical book clubs to interviews. It focuses on how you design your application, including the language and naming used within it. Namely, everything should match the business domain it is serving, a so-called <a href="https://en.wikipedia.org/wiki/Domain-driven_design#concepts">“ubiquitous language”</a>.<!--more--></p>
+    <p><img src="/images/kandinsky.jpg" alt="" /></p>
+
+<p><a href="https://en.wikipedia.org/wiki/Domain-driven_design">Domain Driven Design</a> (DDD) is a methodology I’ve heard about more and more over the last year, from technical book clubs to interviews. It focuses on how you design your application, including the language and naming used within it. Namely, everything should match the business domain it is serving, a so-called <a href="https://en.wikipedia.org/wiki/Domain-driven_design#concepts">“ubiquitous language”</a>.<!--more--></p>
 
 <p>The <a href="https://www.amazon.com/Domain-Driven-Design-Tackling-Complexity-Software-ebook/dp/B00794TAUG/ref=sr_1_3?crid=1CTX2TZEYWY3E&amp;dchild=1&amp;keywords=domain+driven+design&amp;qid=1590456005&amp;s=books&amp;sprefix=domain+dri%2Caps%2C152&amp;sr=1-3">book</a> that first introduced this concept is quite long, and goes into very specific detail on the concepts and how to implement this method, including it’s own specific patterns, such as entities, values, repositories, etc. <a href="https://www.explorableplaces.com">Explorable Places’</a> domain logic started off simple years ago, but over time, the complexity grew. Models got fat, controllers got fat, and we had business logic in a few views. It was bad and it needed to be wrangled. However, most of the app remained simple CRUD actions.</p>
 
@@ -210,15 +216,15 @@ In our other organizers for creating a booking, canceling, declining or reschedu
 
 <h3 id="interactors">Interactors</h3>
 
-<p>An “interactor” is basically a reimplementation of the Command Design Pattern, but specifically intended to encapsulate and manage business logic. Each interactor handles one small piece of logic, such as “send email” or “save record”. These are small, reusable, and easily testable, but rarely do we need to do something so small when a user performs some action in our app. That’s where the real power of this gem shines through. We can group multiple interactors together with an “organizer”. Each interactor has a shared context and can fail the while chain if need be. At the end, a result is returned where you can store the success or failure of the action. Conceptually, a single interactor or organizer could represent a domain event in this case.</p>
+<p>An “interactor” is basically a reimplementation of the Command Design Pattern, but specifically intended to encapsulate and manage business logic. Each interactor handles one small piece of logic, such as “send email” or “save record”. These are small, reusable, and easily testable, but rarely do we need to do something so small when a user performs some action in our app. That’s where the real power of this gem shines through. We can group multiple interactors together with an “organizer”. Each interactor has a shared context and can fail the whole chain if need be. At the end, a result is returned where you can store the success or failure of the action. Conceptually, a single interactor or organizer could represent a domain event in this case.</p>
 
-<p>I like this solution because we get the same benefit of something like a pub/sub solution, but we can see with a glance at the code all that happens with a specific action and the order that they will happen in. Below I’ll go over a small example that we had that I think illustrates this well.</p>
+<p>I like this solution because we get the same benefit of something like a pub/sub solution, but we can see with just a glance at the code all that happens with a specific action and the order that they will happen in. Below I’ll go over a small example that we had that I think illustrates this well.</p>
 
 <h2 id="example-confirm-a-booking">Example: Confirm a booking</h2>
 
-<p>Previously, we relied on a mix of methods defined directly on the model along with ActiveRecord callbacks. Beyond that, some of the logic was also executed via delayed jobs, but that’s essentially how it would “work”. This resulted in a massive pile of spaghetti code that was difficult to maintain and reason about.</p>
+<p>At Explorable Places, we have bookings for learning experiences. Once a booking is made, the learning institution must confirm or decline it. Previously, we relied on a mix of methods defined directly on the booking model along with ActiveRecord callbacks. Beyond that, some of the logic was also executed via delayed jobs, but that’s essentially how it would “work”. This resulted in a massive pile of spaghetti code that was difficult to maintain and reason about.</p>
 
-<p>Using interactors, we could encapsulate all the logic a user’s action of confirming a booking to a single file. It is highly readable, and we can see the steps that are taken at each stage. If there is a failure, we can catch it and roll back any database changes. Of course, we only fail in such cases where we would want to roll back.</p>
+<p>Using interactors, we could encapsulate all the logic of a user’s action of confirming a booking to a single file. It is highly readable, and we can see the steps that are taken at each stage. If there is a failure, we can catch it and roll back any database changes. Of course, we only fail in such cases where we would want to roll back.</p>
 
 <figure class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="k">class</span> <span class="nc">ConfirmBooking</span>
   <span class="kp">include</span> <span class="no">Interactor</span><span class="o">::</span><span class="no">Organizer</span>
@@ -248,11 +254,11 @@ In our other organizers for creating a booking, canceling, declining or reschedu
   <span class="kp">include</span> <span class="no">Interactor</span>
 
   <span class="k">def</span> <span class="nf">call</span>
-    <span class="n">booking</span> <span class="o">=</span> <span class="n">context</span><span class="p">.</span><span class="nf">booking</span> <span class="o">||=</span> <span class="no">Booking</span><span class="p">.</span><span class="nf">find</span><span class="p">(</span><span class="n">context</span><span class="p">.</span><span class="nf">booking_id</span><span class="p">)</span>
+    <span class="n">booking</span> <span class="o">=</span> <span class="n">context</span><span class="p">.</span><span class="nf">booking</span>
     <span class="n">message_times</span> <span class="o">=</span> <span class="n">context</span><span class="p">.</span><span class="nf">message_times</span>
 
     <span class="n">booking</span><span class="p">.</span><span class="nf">messages</span><span class="p">.</span><span class="nf">for_times</span><span class="p">(</span><span class="n">message_times</span><span class="p">).</span><span class="nf">each</span> <span class="k">do</span> <span class="o">|</span><span class="n">message</span><span class="o">|</span>
-			<span class="no">UserMailer</span><span class="p">.</span><span class="nf">send_message</span><span class="p">(</span><span class="n">booking</span><span class="p">.</span><span class="nf">id</span><span class="p">,</span> <span class="n">message</span><span class="p">.</span><span class="nf">id</span><span class="p">).</span><span class="nf">deliver_later</span>
+      <span class="no">UserMailer</span><span class="p">.</span><span class="nf">send_message</span><span class="p">(</span><span class="n">booking</span><span class="p">.</span><span class="nf">id</span><span class="p">,</span> <span class="n">message</span><span class="p">.</span><span class="nf">id</span><span class="p">).</span><span class="nf">deliver_later</span>
     <span class="k">end</span>
   <span class="k">end</span>
 <span class="k">end</span></code></pre></figure>
