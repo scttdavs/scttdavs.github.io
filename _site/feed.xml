@@ -4,10 +4,10 @@
     <title>Scott Davis | Software Engineer</title>
     <description>Software Engineer / Person
 </description>
-    <link>http://localhost:4000/</link>
-    <atom:link href="http://localhost:4000/feed.xml" rel="self" type="application/rss+xml"/>
-    <pubDate>Sat, 30 May 2020 12:47:06 -0400</pubDate>
-    <lastBuildDate>Sat, 30 May 2020 12:47:06 -0400</lastBuildDate>
+    <link>https://sco.ttdavis.com/</link>
+    <atom:link href="https://sco.ttdavis.com/feed.xml" rel="self" type="application/rss+xml"/>
+    <pubDate>Sat, 30 May 2020 12:51:27 -0400</pubDate>
+    <lastBuildDate>Sat, 30 May 2020 12:51:27 -0400</lastBuildDate>
     <generator>Jekyll v3.8.5</generator>
     
       <item>
@@ -110,9 +110,9 @@
 &lt;p&gt;In our other organizers for creating a booking, canceling, declining or rescheduling, we reuse nearly all the same interactors. While we haven’t followed the DDD methodology to a tee, we’ve successfully encapsulated our domain logic, used the common language that our domain experts and users would use, and made it the primary focus of our app. By designing everything around that, we made managing our complex business logic easier, clearer, and more reliable.&lt;/p&gt;
 
 </description>
-        <pubDate>Sat, 30 May 2020 12:47:06 -0400</pubDate>
-        <link>http://localhost:4000/blog/applying-domain-driven-design-principles</link>
-        <guid isPermaLink="true">http://localhost:4000/blog/applying-domain-driven-design-principles</guid>
+        <pubDate>Sat, 30 May 2020 00:00:00 -0400</pubDate>
+        <link>https://sco.ttdavis.com/blog/applying-domain-driven-design-principles</link>
+        <guid isPermaLink="true">https://sco.ttdavis.com/blog/applying-domain-driven-design-principles</guid>
         
         
       </item>
@@ -210,8 +210,8 @@
 &lt;p&gt;&lt;em class=&quot;footnote&quot;&gt;This was orginally written in 2017, but I never quite finished it. It is published now, after we have just welcomed our second child, a baby girl, this past December. Reflecting back on these stories, I’ve realized I must have changed Theo thousands of times by now, but I really had no idea what I was doing then. I like that phrase, “changed”, and think it’s apt for parenting. We change them, and they change us.&lt;/em&gt;&lt;/p&gt;
 </description>
         <pubDate>Mon, 11 May 2020 00:00:00 -0400</pubDate>
-        <link>http://localhost:4000/blog/on-being-a-parent</link>
-        <guid isPermaLink="true">http://localhost:4000/blog/on-being-a-parent</guid>
+        <link>https://sco.ttdavis.com/blog/on-being-a-parent</link>
+        <guid isPermaLink="true">https://sco.ttdavis.com/blog/on-being-a-parent</guid>
         
         
       </item>
@@ -307,8 +307,8 @@
 
 </description>
         <pubDate>Sun, 10 May 2020 00:00:00 -0400</pubDate>
-        <link>http://localhost:4000/blog/becoming-a-recurser</link>
-        <guid isPermaLink="true">http://localhost:4000/blog/becoming-a-recurser</guid>
+        <link>https://sco.ttdavis.com/blog/becoming-a-recurser</link>
+        <guid isPermaLink="true">https://sco.ttdavis.com/blog/becoming-a-recurser</guid>
         
         
       </item>
@@ -482,8 +482,8 @@ docker system prune &lt;span class=&quot;nt&quot;&gt;-f&lt;/span&gt; &lt;span cl
 
 </description>
         <pubDate>Fri, 28 Jun 2019 00:00:00 -0400</pubDate>
-        <link>http://localhost:4000/blog/zero-downtime-deployments-with-docker-and-digitalocean</link>
-        <guid isPermaLink="true">http://localhost:4000/blog/zero-downtime-deployments-with-docker-and-digitalocean</guid>
+        <link>https://sco.ttdavis.com/blog/zero-downtime-deployments-with-docker-and-digitalocean</link>
+        <guid isPermaLink="true">https://sco.ttdavis.com/blog/zero-downtime-deployments-with-docker-and-digitalocean</guid>
         
         
       </item>
@@ -554,8 +554,8 @@ docker system prune &lt;span class=&quot;nt&quot;&gt;-f&lt;/span&gt; &lt;span cl
 
 </description>
         <pubDate>Fri, 11 Aug 2017 00:00:00 -0400</pubDate>
-        <link>http://localhost:4000/blog/progressive-rendering-with-rails</link>
-        <guid isPermaLink="true">http://localhost:4000/blog/progressive-rendering-with-rails</guid>
+        <link>https://sco.ttdavis.com/blog/progressive-rendering-with-rails</link>
+        <guid isPermaLink="true">https://sco.ttdavis.com/blog/progressive-rendering-with-rails</guid>
         
         
       </item>
@@ -586,8 +586,8 @@ docker system prune &lt;span class=&quot;nt&quot;&gt;-f&lt;/span&gt; &lt;span cl
 &lt;p&gt;And that’s it! It will most likely take a few hours to update, which sucks because your site will be down in the mean time. But at least it’s simple and it’s free! Now with Cloudflare, Jekyll, and Github Pages, you get free hosting and free SSL certs. 🍻&lt;/p&gt;
 </description>
         <pubDate>Sat, 27 May 2017 00:00:00 -0400</pubDate>
-        <link>http://localhost:4000/blog/https-with-github-pages-with-custom-domains</link>
-        <guid isPermaLink="true">http://localhost:4000/blog/https-with-github-pages-with-custom-domains</guid>
+        <link>https://sco.ttdavis.com/blog/https-with-github-pages-with-custom-domains</link>
+        <guid isPermaLink="true">https://sco.ttdavis.com/blog/https-with-github-pages-with-custom-domains</guid>
         
         
       </item>
@@ -653,8 +653,8 @@ docker system prune &lt;span class=&quot;nt&quot;&gt;-f&lt;/span&gt; &lt;span cl
 
 </description>
         <pubDate>Sun, 14 May 2017 00:00:00 -0400</pubDate>
-        <link>http://localhost:4000/blog/a-javascript-fractal-explorer</link>
-        <guid isPermaLink="true">http://localhost:4000/blog/a-javascript-fractal-explorer</guid>
+        <link>https://sco.ttdavis.com/blog/a-javascript-fractal-explorer</link>
+        <guid isPermaLink="true">https://sco.ttdavis.com/blog/a-javascript-fractal-explorer</guid>
         
         
       </item>
@@ -698,8 +698,8 @@ docker system prune &lt;span class=&quot;nt&quot;&gt;-f&lt;/span&gt; &lt;span cl
 &lt;p&gt;It was only fitting that his last boat was named Grace, after all. He knew before I did. We read this quote at Sam’s funeral, and it still holds true today as it did then.&lt;/p&gt;
 </description>
         <pubDate>Sat, 11 Feb 2017 00:00:00 -0500</pubDate>
-        <link>http://localhost:4000/blog/what-is-grace</link>
-        <guid isPermaLink="true">http://localhost:4000/blog/what-is-grace</guid>
+        <link>https://sco.ttdavis.com/blog/what-is-grace</link>
+        <guid isPermaLink="true">https://sco.ttdavis.com/blog/what-is-grace</guid>
         
         
       </item>
@@ -778,8 +778,8 @@ docker system prune &lt;span class=&quot;nt&quot;&gt;-f&lt;/span&gt; &lt;span cl
 
 </description>
         <pubDate>Mon, 19 Sep 2016 00:00:00 -0400</pubDate>
-        <link>http://localhost:4000/blog/the-what-why-and-how-of-https</link>
-        <guid isPermaLink="true">http://localhost:4000/blog/the-what-why-and-how-of-https</guid>
+        <link>https://sco.ttdavis.com/blog/the-what-why-and-how-of-https</link>
+        <guid isPermaLink="true">https://sco.ttdavis.com/blog/the-what-why-and-how-of-https</guid>
         
         
       </item>
@@ -857,8 +857,8 @@ docker system prune &lt;span class=&quot;nt&quot;&gt;-f&lt;/span&gt; &lt;span cl
 
 </description>
         <pubDate>Mon, 11 Apr 2016 00:00:00 -0400</pubDate>
-        <link>http://localhost:4000/blog/type-checking-js</link>
-        <guid isPermaLink="true">http://localhost:4000/blog/type-checking-js</guid>
+        <link>https://sco.ttdavis.com/blog/type-checking-js</link>
+        <guid isPermaLink="true">https://sco.ttdavis.com/blog/type-checking-js</guid>
         
         
       </item>
