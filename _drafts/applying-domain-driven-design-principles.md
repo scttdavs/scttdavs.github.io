@@ -2,7 +2,10 @@
 layout: post
 title: "Applying Domain Driven Design Principles"
 meta: post
+photo: kandinsky.jpg
 ---
+
+![](/images/kandinsky.jpg)
 
 [Domain Driven Design][ddd] (DDD) is a methodology I've heard about more and more over the last year, from technical book clubs to interviews. It focuses on how you design your application, including the language and naming used within it. Namely, everything should match the business domain it is serving, a so-called ["ubiquitous language"][ubiq].<!--more-->
 
@@ -24,15 +27,15 @@ Wisper was particularly interesting because DDD does focus on domain events, and
 
 ### Interactors
 
-An "interactor" is basically a reimplementation of the Command Design Pattern, but specifically intended to encapsulate and manage business logic. Each interactor handles one small piece of logic, such as "send email" or "save record". These are small, reusable, and easily testable, but rarely do we need to do something so small when a user performs some action in our app. That's where the real power of this gem shines through. We can group multiple interactors together with an "organizer". Each interactor has a shared context and can fail the while chain if need be. At the end, a result is returned where you can store the success or failure of the action. Conceptually, a single interactor or organizer could represent a domain event in this case.
+An "interactor" is basically a reimplementation of the Command Design Pattern, but specifically intended to encapsulate and manage business logic. Each interactor handles one small piece of logic, such as "send email" or "save record". These are small, reusable, and easily testable, but rarely do we need to do something so small when a user performs some action in our app. That's where the real power of this gem shines through. We can group multiple interactors together with an "organizer". Each interactor has a shared context and can fail the whole chain if need be. At the end, a result is returned where you can store the success or failure of the action. Conceptually, a single interactor or organizer could represent a domain event in this case.
 
-I like this solution because we get the same benefit of something like a pub/sub solution, but we can see with a glance at the code all that happens with a specific action and the order that they will happen in. Below I'll go over a small example that we had that I think illustrates this well.
+I like this solution because we get the same benefit of something like a pub/sub solution, but we can see with just a glance at the code all that happens with a specific action and the order that they will happen in. Below I'll go over a small example that we had that I think illustrates this well.
 
 ## Example: Confirm a booking
 
-Previously, we relied on a mix of methods defined directly on the model along with ActiveRecord callbacks. Beyond that, some of the logic was also executed via delayed jobs, but that's essentially how it would "work". This resulted in a massive pile of spaghetti code that was difficult to maintain and reason about.
+At Explorable Places, we have bookings for learning experiences. Once a booking is made, the learning institution must confirm or decline it. Previously, we relied on a mix of methods defined directly on the booking model along with ActiveRecord callbacks. Beyond that, some of the logic was also executed via delayed jobs, but that's essentially how it would "work". This resulted in a massive pile of spaghetti code that was difficult to maintain and reason about.
 
-Using interactors, we could encapsulate all the logic a user's action of confirming a booking to a single file. It is highly readable, and we can see the steps that are taken at each stage. If there is a failure, we can catch it and roll back any database changes. Of course, we only fail in such cases where we would want to roll back.
+Using interactors, we could encapsulate all the logic of a user's action of confirming a booking to a single file. It is highly readable, and we can see the steps that are taken at each stage. If there is a failure, we can catch it and roll back any database changes. Of course, we only fail in such cases where we would want to roll back.
 
 {% highlight ruby %}
 class ConfirmBooking
@@ -65,11 +68,11 @@ class SendMessages
   include Interactor
 
   def call
-    booking = context.booking ||= Booking.find(context.booking_id)
+    booking = context.booking
     message_times = context.message_times
 
     booking.messages.for_times(message_times).each do |message|
-			UserMailer.send_message(booking.id, message.id).deliver_later
+      UserMailer.send_message(booking.id, message.id).deliver_later
     end
   end
 end

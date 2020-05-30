@@ -6,13 +6,15 @@
 </description>
     <link>http://localhost:4000/</link>
     <atom:link href="http://localhost:4000/feed.xml" rel="self" type="application/rss+xml"/>
-    <pubDate>Tue, 26 May 2020 21:56:56 -0400</pubDate>
-    <lastBuildDate>Tue, 26 May 2020 21:56:56 -0400</lastBuildDate>
+    <pubDate>Sat, 30 May 2020 12:47:06 -0400</pubDate>
+    <lastBuildDate>Sat, 30 May 2020 12:47:06 -0400</lastBuildDate>
     <generator>Jekyll v3.8.5</generator>
     
       <item>
         <title>Applying Domain Driven Design Principles</title>
-        <description>&lt;p&gt;&lt;a href=&quot;https://en.wikipedia.org/wiki/Domain-driven_design&quot;&gt;Domain Driven Design&lt;/a&gt; (DDD) is a methodology I’ve heard about more and more over the last year, from technical book clubs to interviews. It focuses on how you design your application, including the language and naming used within it. Namely, everything should match the business domain it is serving, a so-called &lt;a href=&quot;https://en.wikipedia.org/wiki/Domain-driven_design#concepts&quot;&gt;“ubiquitous language”&lt;/a&gt;.&lt;!--more--&gt;&lt;/p&gt;
+        <description>&lt;p&gt;&lt;img src=&quot;/images/kandinsky.jpg&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;a href=&quot;https://en.wikipedia.org/wiki/Domain-driven_design&quot;&gt;Domain Driven Design&lt;/a&gt; (DDD) is a methodology I’ve heard about more and more over the last year, from technical book clubs to interviews. It focuses on how you design your application, including the language and naming used within it. Namely, everything should match the business domain it is serving, a so-called &lt;a href=&quot;https://en.wikipedia.org/wiki/Domain-driven_design#concepts&quot;&gt;“ubiquitous language”&lt;/a&gt;.&lt;!--more--&gt;&lt;/p&gt;
 
 &lt;p&gt;The &lt;a href=&quot;https://www.amazon.com/Domain-Driven-Design-Tackling-Complexity-Software-ebook/dp/B00794TAUG/ref=sr_1_3?crid=1CTX2TZEYWY3E&amp;amp;dchild=1&amp;amp;keywords=domain+driven+design&amp;amp;qid=1590456005&amp;amp;s=books&amp;amp;sprefix=domain+dri%2Caps%2C152&amp;amp;sr=1-3&quot;&gt;book&lt;/a&gt; that first introduced this concept is quite long, and goes into very specific detail on the concepts and how to implement this method, including it’s own specific patterns, such as entities, values, repositories, etc. &lt;a href=&quot;https://www.explorableplaces.com&quot;&gt;Explorable Places’&lt;/a&gt; domain logic started off simple years ago, but over time, the complexity grew. Models got fat, controllers got fat, and we had business logic in a few views. It was bad and it needed to be wrangled. However, most of the app remained simple CRUD actions.&lt;/p&gt;
 
@@ -37,15 +39,15 @@
 
 &lt;h3 id=&quot;interactors&quot;&gt;Interactors&lt;/h3&gt;
 
-&lt;p&gt;An “interactor” is basically a reimplementation of the Command Design Pattern, but specifically intended to encapsulate and manage business logic. Each interactor handles one small piece of logic, such as “send email” or “save record”. These are small, reusable, and easily testable, but rarely do we need to do something so small when a user performs some action in our app. That’s where the real power of this gem shines through. We can group multiple interactors together with an “organizer”. Each interactor has a shared context and can fail the while chain if need be. At the end, a result is returned where you can store the success or failure of the action. Conceptually, a single interactor or organizer could represent a domain event in this case.&lt;/p&gt;
+&lt;p&gt;An “interactor” is basically a reimplementation of the Command Design Pattern, but specifically intended to encapsulate and manage business logic. Each interactor handles one small piece of logic, such as “send email” or “save record”. These are small, reusable, and easily testable, but rarely do we need to do something so small when a user performs some action in our app. That’s where the real power of this gem shines through. We can group multiple interactors together with an “organizer”. Each interactor has a shared context and can fail the whole chain if need be. At the end, a result is returned where you can store the success or failure of the action. Conceptually, a single interactor or organizer could represent a domain event in this case.&lt;/p&gt;
 
-&lt;p&gt;I like this solution because we get the same benefit of something like a pub/sub solution, but we can see with a glance at the code all that happens with a specific action and the order that they will happen in. Below I’ll go over a small example that we had that I think illustrates this well.&lt;/p&gt;
+&lt;p&gt;I like this solution because we get the same benefit of something like a pub/sub solution, but we can see with just a glance at the code all that happens with a specific action and the order that they will happen in. Below I’ll go over a small example that we had that I think illustrates this well.&lt;/p&gt;
 
 &lt;h2 id=&quot;example-confirm-a-booking&quot;&gt;Example: Confirm a booking&lt;/h2&gt;
 
-&lt;p&gt;Previously, we relied on a mix of methods defined directly on the model along with ActiveRecord callbacks. Beyond that, some of the logic was also executed via delayed jobs, but that’s essentially how it would “work”. This resulted in a massive pile of spaghetti code that was difficult to maintain and reason about.&lt;/p&gt;
+&lt;p&gt;At Explorable Places, we have bookings for learning experiences. Once a booking is made, the learning institution must confirm or decline it. Previously, we relied on a mix of methods defined directly on the booking model along with ActiveRecord callbacks. Beyond that, some of the logic was also executed via delayed jobs, but that’s essentially how it would “work”. This resulted in a massive pile of spaghetti code that was difficult to maintain and reason about.&lt;/p&gt;
 
-&lt;p&gt;Using interactors, we could encapsulate all the logic a user’s action of confirming a booking to a single file. It is highly readable, and we can see the steps that are taken at each stage. If there is a failure, we can catch it and roll back any database changes. Of course, we only fail in such cases where we would want to roll back.&lt;/p&gt;
+&lt;p&gt;Using interactors, we could encapsulate all the logic of a user’s action of confirming a booking to a single file. It is highly readable, and we can see the steps that are taken at each stage. If there is a failure, we can catch it and roll back any database changes. Of course, we only fail in such cases where we would want to roll back.&lt;/p&gt;
 
 &lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-ruby&quot; data-lang=&quot;ruby&quot;&gt;&lt;span class=&quot;k&quot;&gt;class&lt;/span&gt; &lt;span class=&quot;nc&quot;&gt;ConfirmBooking&lt;/span&gt;
   &lt;span class=&quot;kp&quot;&gt;include&lt;/span&gt; &lt;span class=&quot;no&quot;&gt;Interactor&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;::&lt;/span&gt;&lt;span class=&quot;no&quot;&gt;Organizer&lt;/span&gt;
@@ -75,11 +77,11 @@
   &lt;span class=&quot;kp&quot;&gt;include&lt;/span&gt; &lt;span class=&quot;no&quot;&gt;Interactor&lt;/span&gt;
 
   &lt;span class=&quot;k&quot;&gt;def&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;call&lt;/span&gt;
-    &lt;span class=&quot;n&quot;&gt;booking&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;context&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;booking&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;||=&lt;/span&gt; &lt;span class=&quot;no&quot;&gt;Booking&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;find&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;context&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;booking_id&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;booking&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;context&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;booking&lt;/span&gt;
     &lt;span class=&quot;n&quot;&gt;message_times&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;context&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;message_times&lt;/span&gt;
 
     &lt;span class=&quot;n&quot;&gt;booking&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;messages&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;for_times&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;message_times&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;).&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;each&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;do&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;|&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;message&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;|&lt;/span&gt;
-			&lt;span class=&quot;no&quot;&gt;UserMailer&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;send_message&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;booking&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;id&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;message&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;id&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;).&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;deliver_later&lt;/span&gt;
+      &lt;span class=&quot;no&quot;&gt;UserMailer&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;send_message&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;booking&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;id&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;message&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;id&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;).&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;deliver_later&lt;/span&gt;
     &lt;span class=&quot;k&quot;&gt;end&lt;/span&gt;
   &lt;span class=&quot;k&quot;&gt;end&lt;/span&gt;
 &lt;span class=&quot;k&quot;&gt;end&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
@@ -108,7 +110,7 @@
 &lt;p&gt;In our other organizers for creating a booking, canceling, declining or rescheduling, we reuse nearly all the same interactors. While we haven’t followed the DDD methodology to a tee, we’ve successfully encapsulated our domain logic, used the common language that our domain experts and users would use, and made it the primary focus of our app. By designing everything around that, we made managing our complex business logic easier, clearer, and more reliable.&lt;/p&gt;
 
 </description>
-        <pubDate>Tue, 26 May 2020 21:56:56 -0400</pubDate>
+        <pubDate>Sat, 30 May 2020 12:47:06 -0400</pubDate>
         <link>http://localhost:4000/blog/applying-domain-driven-design-principles</link>
         <guid isPermaLink="true">http://localhost:4000/blog/applying-domain-driven-design-principles</guid>
         
