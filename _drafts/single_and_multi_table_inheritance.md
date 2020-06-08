@@ -45,3 +45,37 @@ end
 {% endhighlight %}
 
 ## Multiple Table Inheritance
+
+When the requirements for various subclasses differ too much, such as having some data in common, but not all, but there is still significant logic shared between them, MTI may be another good fit.
+
+Similar to STI, we can subclass a model class to share logic, but we want to store the data separately, as if they are traditional models. This gives us the advantage of efficiently storing our data, as well as remaining DRY. Since data is stored in separate tables, a new `type` column is no longer required, but there is another problem (at least in Rails). Rails assumes the name of the table from the first class to inherit from `ApplicationRecord`, which would be the parent class. So to solve this, each model is responsible for specifying its own table name.
+
+Another example of how I refactored EP, was to utilize MTI. Since we offer scheduling as a service, we need two important models to make this work, a `Booking` that a user makes, and a `Hold` that a learning institution may want to place for a user themselves, until the user can then book.
+
+As both of these are meant to reserve a spot, they share much of the same functionality and logic. However, the booking model is vastly more complex, as it is reponsible for far more than is needed to just reserve a spot. Since the data and logic are that different, it makes a good use case for MTI.
+
+Below, you can also see a simplified version of how we solved this.
+
+{% highlight ruby %}
+class Blocking < ApplicationRecord
+  validates_with BlockingValidator
+  # lots of common logic
+end
+
+class Booking < Blocking
+  self.table_name = "bookings"
+  validates_with BookingValidator
+end
+
+class Hold < Blocking
+  self.table_name = "holds"
+  validates_with HoldValidator
+end
+{% endhighlight %}
+
+You can't see it here, but 90% of the validation logic alone between these two is shared within `BlockingValidator`. Not only do we not repeat ourselves, we ensure that these two classes stay in lock step with each other as they are and will always meant to behave similarly.
+
+## What not to use STI or MTI for
+
+Often, it can be confusing when to use these methods. One common misconception is to use them when you want a model to be able to 'belong' (as in a has_many or has_one association) to multiple class types. The best approach for cases like this is to use the built-in polymorphism supported by most frameworks, including Rails.
+
