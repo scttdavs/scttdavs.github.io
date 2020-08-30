@@ -32,7 +32,7 @@ With Stimulus, we have controllers that aptly attach to and control some part of
 First, I’ll start out with a simple tooltip. Our HTML could just look like this:
 
 &lt;div data-controller="tooltip"&gt;
-  click me
+  &lt;span data-target="tooltip.host"&gt;click me&lt;/span&gt;
   &lt;span role="tooltip" data-target="tooltip.content"&gt;
     some content!
   &lt;/span&gt;
@@ -40,28 +40,29 @@ First, I’ll start out with a simple tooltip. Our HTML could just look like thi
 
 And our controller could look like:
 
-import { Controller } from "stimulus"
-import Expander from "makeup-expander"
+import { Controller } from "stimulus";
+import Expander from "makeup-expander";
 
 export default class extends Controller {
   /*
     this controller is for controlling a tooltip
   */
 
-  tooltip: Expander
-  contentTarget: HTMLElement
+  tooltip: Expander;
+  contentTarget: HTMLElement;
 
-  static targets = ["content"]
+  static targets = ["content"];
 
   connect() {
     this.tooltip = new Expander(this.element, {
-      content: this.contentTarget,
-      expandOnClick: true
-    })
+      contentSelector: "[data-target='tooltip.content']",
+      hostSelector: "[data-target='tooltip.host']",
+      expandOnClick: true,
+    });
   }
 
   disconnect() {
-    this.tooltip.destroy()
+    this.tooltip.destroy();
   }
 }
 
@@ -76,7 +77,8 @@ Suppose we need to copy some text, and clicking a button will copy it to the cli
 &lt;button
   data-controller="copy"
   data-copy-target="#importantText"
-  aria-label="click to copy important text"&gt;
+  aria-label="click to copy important text"
+&gt;
   &lt;svg class="clipboard-icon"&gt;
     &lt;use xlink:href="#clipboard-icon"&gt;&lt;/use&gt;
   &lt;/svg&gt;
@@ -84,30 +86,32 @@ Suppose we need to copy some text, and clicking a button will copy it to the cli
 
 And our Stimulus controller:
 
-import { Controller } from "stimulus"
-import Clipboard from "clipboard"
+import { Controller } from "stimulus";
+import Clipboard from "clipboard";
 
 export default class extends Controller {
   /*
     this controller is enabling copying text to the clipboard
   */
 
-  clipboard: Clipboard
+  clipboard: Clipboard;
 
   connect() {
-    const targetToCopySelector = this.data.get("target")
+    const targetToCopySelector = this.data.get("target");
 
     this.clipboard = new Clipboard(this.element, {
-      target: () =&gt; document.querySelector(targetToCopySelector)
-    }).on("success", () =&gt; {
-      // show tooltip?
-    }).on("error", () =&gt; {
-      // do something?
+      target: () =&gt; document.querySelector(targetToCopySelector),
     })
+      .on("success", () =&gt; {
+        // show tooltip?
+      })
+      .on("error", () =&gt; {
+        // do something?
+      });
   }
 
   disconnect() {
-    this.clipboard.destroy()
+    this.clipboard.destroy();
   }
 }
 
@@ -115,81 +119,105 @@ Now we have a button that copies some text, but as you can see, we need to give 
 
 We can treat our tooltip element like custom element or web component, and expose some functionality for others to use to directly control it. Let’s expose a couple of properties on the tooltip, one that will expand or contract it, and another to set the content. We’ll also need a way to disable the default click behavior.
 
-import { Controller } from "stimulus"
-import Expander from "makeup-expander"
+import { Controller } from "stimulus";
+import Expander from "makeup-expander";
 
 export type Tooltip = HTMLElement &amp; {
   expanded: boolean,
-  content: string
-}
+  content: string,
+};
 
 export default class extends Controller {
   /*
     this controller is for controlling a tooltip
   */
 
-  tooltip: Expander
-  contentTarget: HTMLElement
-  element: Tooltip
+  tooltip: Expander;
+  contentTarget: HTMLElement;
+  element: Tooltip;
 
-  static targets = ["content"]
+  static targets = ["content"];
 
   connect() {
-    const trigger = this.data.get("trigger")
+    const trigger = this.data.get("trigger");
     this.tooltip = new Expander(this.element, {
-      content: this.contentTarget,
-      expandOnClick: trigger !== "manual"
-    })
+      contentSelector: "[data-target='tooltip.content']",
+      hostSelector: "[data-target='tooltip.host']",
+      expandOnClick: trigger !== "manual",
+    });
   }
 
   disconnect() {
-    this.tooltip.destroy()
+    this.tooltip.destroy();
   }
 
   set content(content) {
-    this.contentTarget.innerHTML = content || ""
+    this.contentTarget.innerHTML = content || "";
   }
 
   get expanded() {
-    return this.tooltip.expanded
+    return this.tooltip.expanded;
   }
 
   set expanded(value) {
-    this.tooltip.expanded = value
+    this.tooltip.expanded = value;
   }
 }
 
-Now, our copy button controller has the ability to target the tooltip, and expand it when it needs to, even setting the content:
+Now, we can add the tooltip to our copy button, and its controller has the ability to target the tooltip,  expand it when it needs to, and even setting the content:
 
-import { Controller } from "stimulus"
-import Clipboard from "clipboard"
-import Tooltip from "./tooltip_clipboard"
+&lt;span id="importantText"&gt;text to copy&lt;/span&gt;
+
+&lt;div data-controller="tooltip" data-tooltip-trigger="manual"&gt;
+  &lt;button
+    data-controller="copy"
+    data-copy-target="#importantText"
+    data-target="tooltip.host"
+    aria-label="click to copy important text"
+  &gt;
+    &lt;svg class="clipboard-icon"&gt;
+      &lt;use xlink:href="#clipboard-icon"&gt;&lt;/use&gt;
+    &lt;/svg&gt;
+  &lt;/button&gt;
+
+  &lt;span role="tooltip" data-target="tooltip.content"&gt;
+    copied!
+  &lt;/span&gt;
+&lt;/div&gt;
+
+And in the controller:
+
+import { Controller } from "stimulus";
+import Clipboard from "clipboard";
+import Tooltip from "./tooltip_clipboard";
 
 export default class extends Controller {
   /*
     this controller is enabling copying text to the clipboard
   */
 
-  clipboard: Clipboard
-  tooltipTarget: Tooltip
+  clipboard: Clipboard;
+  tooltipTarget: Tooltip;
 
-  static targets = ["tooltip"]
+  static targets = ["tooltip"];
 
   connect() {
-    const targetToCopySelector = this.data.get("target")
+    const targetToCopySelector = this.data.get("target");
 
     this.clipboard = new Clipboard(this.element, {
-      target: () =&gt; document.querySelector(targetToCopySelector)
-    }).on("success", () =&gt; {
-      this.tooltipTarget.expanded = true
-    }).on("error", () =&gt; {
-      this.tooltipTarget.content = "press Ctrl+C to copy"
-      this.tooltipTarget.expanded = true
+      target: () =&gt; document.querySelector(targetToCopySelector),
     })
+      .on("success", () =&gt; {
+        this.tooltipTarget.expanded = true;
+      })
+      .on("error", () =&gt; {
+        this.tooltipTarget.content = "press Ctrl+C to copy";
+        this.tooltipTarget.expanded = true;
+      });
   }
 
   disconnect() {
-    this.clipboard.destroy()
+    this.clipboard.destroy();
   }
 }
 
@@ -259,7 +287,7 @@ By designing our components theis way, we can use them as building blocks to con
     ,
   </span>
   <span class="date">
-    <time datetime="2020-08-30T14:04:06-04:00" itemprop="datePublished">
+    <time datetime="2020-08-30T19:48:28-04:00" itemprop="datePublished">
       Aug 30, 2020
     </time>
   </span>
@@ -276,7 +304,7 @@ By designing our components theis way, we can use them as building blocks to con
 <p>First, I’ll start out with a simple tooltip. Our HTML could just look like this:</p>
 
 <figure class="highlight"><pre><code class="language-html" data-lang="html"><span class="nt">&lt;div</span> <span class="na">data-controller=</span><span class="s">"tooltip"</span><span class="nt">&gt;</span>
-  click me
+  <span class="nt">&lt;span</span> <span class="na">data-target=</span><span class="s">"tooltip.host"</span><span class="nt">&gt;</span>click me<span class="nt">&lt;/span&gt;</span>
   <span class="nt">&lt;span</span> <span class="na">role=</span><span class="s">"tooltip"</span> <span class="na">data-target=</span><span class="s">"tooltip.content"</span><span class="nt">&gt;</span>
     some content!
   <span class="nt">&lt;/span&gt;</span>
@@ -284,28 +312,29 @@ By designing our components theis way, we can use them as building blocks to con
 
 <p>And our controller could look like:</p>
 
-<figure class="highlight"><pre><code class="language-typescript" data-lang="typescript"><span class="k">import</span> <span class="p">{</span> <span class="nx">Controller</span> <span class="p">}</span> <span class="k">from</span> <span class="dl">"</span><span class="s2">stimulus</span><span class="dl">"</span>
-<span class="k">import</span> <span class="nx">Expander</span> <span class="k">from</span> <span class="dl">"</span><span class="s2">makeup-expander</span><span class="dl">"</span>
+<figure class="highlight"><pre><code class="language-typescript" data-lang="typescript"><span class="k">import</span> <span class="p">{</span> <span class="nx">Controller</span> <span class="p">}</span> <span class="k">from</span> <span class="dl">"</span><span class="s2">stimulus</span><span class="dl">"</span><span class="p">;</span>
+<span class="k">import</span> <span class="nx">Expander</span> <span class="k">from</span> <span class="dl">"</span><span class="s2">makeup-expander</span><span class="dl">"</span><span class="p">;</span>
 
 <span class="k">export</span> <span class="k">default</span> <span class="kd">class</span> <span class="kd">extends</span> <span class="nx">Controller</span> <span class="p">{</span>
   <span class="cm">/*
     this controller is for controlling a tooltip
   */</span>
 
-  <span class="nl">tooltip</span><span class="p">:</span> <span class="nx">Expander</span>
-  <span class="nx">contentTarget</span><span class="p">:</span> <span class="nx">HTMLElement</span>
+  <span class="nl">tooltip</span><span class="p">:</span> <span class="nx">Expander</span><span class="p">;</span>
+  <span class="nl">contentTarget</span><span class="p">:</span> <span class="nx">HTMLElement</span><span class="p">;</span>
 
-  <span class="kd">static</span> <span class="nx">targets</span> <span class="o">=</span> <span class="p">[</span><span class="dl">"</span><span class="s2">content</span><span class="dl">"</span><span class="p">]</span>
+  <span class="kd">static</span> <span class="nx">targets</span> <span class="o">=</span> <span class="p">[</span><span class="dl">"</span><span class="s2">content</span><span class="dl">"</span><span class="p">];</span>
 
   <span class="nx">connect</span><span class="p">()</span> <span class="p">{</span>
     <span class="k">this</span><span class="p">.</span><span class="nx">tooltip</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Expander</span><span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">element</span><span class="p">,</span> <span class="p">{</span>
-      <span class="na">content</span><span class="p">:</span> <span class="k">this</span><span class="p">.</span><span class="nx">contentTarget</span><span class="p">,</span>
-      <span class="na">expandOnClick</span><span class="p">:</span> <span class="kc">true</span>
-    <span class="p">})</span>
+      <span class="na">contentSelector</span><span class="p">:</span> <span class="dl">"</span><span class="s2">[data-target='tooltip.content']</span><span class="dl">"</span><span class="p">,</span>
+      <span class="na">hostSelector</span><span class="p">:</span> <span class="dl">"</span><span class="s2">[data-target='tooltip.host']</span><span class="dl">"</span><span class="p">,</span>
+      <span class="na">expandOnClick</span><span class="p">:</span> <span class="kc">true</span><span class="p">,</span>
+    <span class="p">});</span>
   <span class="p">}</span>
 
   <span class="nx">disconnect</span><span class="p">()</span> <span class="p">{</span>
-    <span class="k">this</span><span class="p">.</span><span class="nx">tooltip</span><span class="p">.</span><span class="nx">destroy</span><span class="p">()</span>
+    <span class="k">this</span><span class="p">.</span><span class="nx">tooltip</span><span class="p">.</span><span class="nx">destroy</span><span class="p">();</span>
   <span class="p">}</span>
 <span class="p">}</span></code></pre></figure>
 
@@ -320,7 +349,8 @@ By designing our components theis way, we can use them as building blocks to con
 <span class="nt">&lt;button</span>
   <span class="na">data-controller=</span><span class="s">"copy"</span>
   <span class="na">data-copy-target=</span><span class="s">"#importantText"</span>
-  <span class="na">aria-label=</span><span class="s">"click to copy important text"</span><span class="nt">&gt;</span>
+  <span class="na">aria-label=</span><span class="s">"click to copy important text"</span>
+<span class="nt">&gt;</span>
   <span class="nt">&lt;svg</span> <span class="na">class=</span><span class="s">"clipboard-icon"</span><span class="nt">&gt;</span>
     <span class="nt">&lt;use</span> <span class="na">xlink:href=</span><span class="s">"#clipboard-icon"</span><span class="nt">&gt;&lt;/use&gt;</span>
   <span class="nt">&lt;/svg&gt;</span>
@@ -328,30 +358,32 @@ By designing our components theis way, we can use them as building blocks to con
 
 <p>And our Stimulus controller:</p>
 
-<figure class="highlight"><pre><code class="language-typescript" data-lang="typescript"><span class="k">import</span> <span class="p">{</span> <span class="nx">Controller</span> <span class="p">}</span> <span class="k">from</span> <span class="dl">"</span><span class="s2">stimulus</span><span class="dl">"</span>
-<span class="k">import</span> <span class="nx">Clipboard</span> <span class="k">from</span> <span class="dl">"</span><span class="s2">clipboard</span><span class="dl">"</span>
+<figure class="highlight"><pre><code class="language-typescript" data-lang="typescript"><span class="k">import</span> <span class="p">{</span> <span class="nx">Controller</span> <span class="p">}</span> <span class="k">from</span> <span class="dl">"</span><span class="s2">stimulus</span><span class="dl">"</span><span class="p">;</span>
+<span class="k">import</span> <span class="nx">Clipboard</span> <span class="k">from</span> <span class="dl">"</span><span class="s2">clipboard</span><span class="dl">"</span><span class="p">;</span>
 
 <span class="k">export</span> <span class="k">default</span> <span class="kd">class</span> <span class="kd">extends</span> <span class="nx">Controller</span> <span class="p">{</span>
   <span class="cm">/*
     this controller is enabling copying text to the clipboard
   */</span>
 
-  <span class="nl">clipboard</span><span class="p">:</span> <span class="nx">Clipboard</span>
+  <span class="nl">clipboard</span><span class="p">:</span> <span class="nx">Clipboard</span><span class="p">;</span>
 
   <span class="nx">connect</span><span class="p">()</span> <span class="p">{</span>
-    <span class="kd">const</span> <span class="nx">targetToCopySelector</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">data</span><span class="p">.</span><span class="kd">get</span><span class="p">(</span><span class="dl">"</span><span class="s2">target</span><span class="dl">"</span><span class="p">)</span>
+    <span class="kd">const</span> <span class="nx">targetToCopySelector</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">data</span><span class="p">.</span><span class="kd">get</span><span class="p">(</span><span class="dl">"</span><span class="s2">target</span><span class="dl">"</span><span class="p">);</span>
 
     <span class="k">this</span><span class="p">.</span><span class="nx">clipboard</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Clipboard</span><span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">element</span><span class="p">,</span> <span class="p">{</span>
-      <span class="na">target</span><span class="p">:</span> <span class="p">()</span> <span class="o">=&gt;</span> <span class="nb">document</span><span class="p">.</span><span class="nx">querySelector</span><span class="p">(</span><span class="nx">targetToCopySelector</span><span class="p">)</span>
-    <span class="p">}).</span><span class="nx">on</span><span class="p">(</span><span class="dl">"</span><span class="s2">success</span><span class="dl">"</span><span class="p">,</span> <span class="p">()</span> <span class="o">=&gt;</span> <span class="p">{</span>
-      <span class="c1">// show tooltip?</span>
-    <span class="p">}).</span><span class="nx">on</span><span class="p">(</span><span class="dl">"</span><span class="s2">error</span><span class="dl">"</span><span class="p">,</span> <span class="p">()</span> <span class="o">=&gt;</span> <span class="p">{</span>
-      <span class="c1">// do something?</span>
+      <span class="na">target</span><span class="p">:</span> <span class="p">()</span> <span class="o">=&gt;</span> <span class="nb">document</span><span class="p">.</span><span class="nx">querySelector</span><span class="p">(</span><span class="nx">targetToCopySelector</span><span class="p">),</span>
     <span class="p">})</span>
+      <span class="p">.</span><span class="nx">on</span><span class="p">(</span><span class="dl">"</span><span class="s2">success</span><span class="dl">"</span><span class="p">,</span> <span class="p">()</span> <span class="o">=&gt;</span> <span class="p">{</span>
+        <span class="c1">// show tooltip?</span>
+      <span class="p">})</span>
+      <span class="p">.</span><span class="nx">on</span><span class="p">(</span><span class="dl">"</span><span class="s2">error</span><span class="dl">"</span><span class="p">,</span> <span class="p">()</span> <span class="o">=&gt;</span> <span class="p">{</span>
+        <span class="c1">// do something?</span>
+      <span class="p">});</span>
   <span class="p">}</span>
 
   <span class="nx">disconnect</span><span class="p">()</span> <span class="p">{</span>
-    <span class="k">this</span><span class="p">.</span><span class="nx">clipboard</span><span class="p">.</span><span class="nx">destroy</span><span class="p">()</span>
+    <span class="k">this</span><span class="p">.</span><span class="nx">clipboard</span><span class="p">.</span><span class="nx">destroy</span><span class="p">();</span>
   <span class="p">}</span>
 <span class="p">}</span></code></pre></figure>
 
@@ -359,81 +391,105 @@ By designing our components theis way, we can use them as building blocks to con
 
 <p>We can treat our tooltip element like custom element or web component, and expose some functionality for others to use to directly control it. Let’s expose a couple of properties on the tooltip, one that will expand or contract it, and another to set the content. We’ll also need a way to disable the default click behavior.</p>
 
-<figure class="highlight"><pre><code class="language-typescript" data-lang="typescript"><span class="k">import</span> <span class="p">{</span> <span class="nx">Controller</span> <span class="p">}</span> <span class="k">from</span> <span class="dl">"</span><span class="s2">stimulus</span><span class="dl">"</span>
-<span class="k">import</span> <span class="nx">Expander</span> <span class="k">from</span> <span class="dl">"</span><span class="s2">makeup-expander</span><span class="dl">"</span>
+<figure class="highlight"><pre><code class="language-typescript" data-lang="typescript"><span class="k">import</span> <span class="p">{</span> <span class="nx">Controller</span> <span class="p">}</span> <span class="k">from</span> <span class="dl">"</span><span class="s2">stimulus</span><span class="dl">"</span><span class="p">;</span>
+<span class="k">import</span> <span class="nx">Expander</span> <span class="k">from</span> <span class="dl">"</span><span class="s2">makeup-expander</span><span class="dl">"</span><span class="p">;</span>
 
 <span class="k">export</span> <span class="nx">type</span> <span class="nx">Tooltip</span> <span class="o">=</span> <span class="nx">HTMLElement</span> <span class="o">&amp;</span> <span class="p">{</span>
   <span class="na">expanded</span><span class="p">:</span> <span class="nx">boolean</span><span class="p">,</span>
-  <span class="na">content</span><span class="p">:</span> <span class="nx">string</span>
-<span class="p">}</span>
+  <span class="na">content</span><span class="p">:</span> <span class="nx">string</span><span class="p">,</span>
+<span class="p">};</span>
 
 <span class="k">export</span> <span class="k">default</span> <span class="kd">class</span> <span class="kd">extends</span> <span class="nx">Controller</span> <span class="p">{</span>
   <span class="cm">/*
     this controller is for controlling a tooltip
   */</span>
 
-  <span class="nl">tooltip</span><span class="p">:</span> <span class="nx">Expander</span>
-  <span class="nx">contentTarget</span><span class="p">:</span> <span class="nx">HTMLElement</span>
-  <span class="nx">element</span><span class="p">:</span> <span class="nx">Tooltip</span>
+  <span class="nl">tooltip</span><span class="p">:</span> <span class="nx">Expander</span><span class="p">;</span>
+  <span class="nl">contentTarget</span><span class="p">:</span> <span class="nx">HTMLElement</span><span class="p">;</span>
+  <span class="nl">element</span><span class="p">:</span> <span class="nx">Tooltip</span><span class="p">;</span>
 
-  <span class="kd">static</span> <span class="nx">targets</span> <span class="o">=</span> <span class="p">[</span><span class="dl">"</span><span class="s2">content</span><span class="dl">"</span><span class="p">]</span>
+  <span class="kd">static</span> <span class="nx">targets</span> <span class="o">=</span> <span class="p">[</span><span class="dl">"</span><span class="s2">content</span><span class="dl">"</span><span class="p">];</span>
 
   <span class="nx">connect</span><span class="p">()</span> <span class="p">{</span>
-    <span class="kd">const</span> <span class="nx">trigger</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">data</span><span class="p">.</span><span class="kd">get</span><span class="p">(</span><span class="dl">"</span><span class="s2">trigger</span><span class="dl">"</span><span class="p">)</span>
+    <span class="kd">const</span> <span class="nx">trigger</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">data</span><span class="p">.</span><span class="kd">get</span><span class="p">(</span><span class="dl">"</span><span class="s2">trigger</span><span class="dl">"</span><span class="p">);</span>
     <span class="k">this</span><span class="p">.</span><span class="nx">tooltip</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Expander</span><span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">element</span><span class="p">,</span> <span class="p">{</span>
-      <span class="na">content</span><span class="p">:</span> <span class="k">this</span><span class="p">.</span><span class="nx">contentTarget</span><span class="p">,</span>
-      <span class="na">expandOnClick</span><span class="p">:</span> <span class="nx">trigger</span> <span class="o">!==</span> <span class="dl">"</span><span class="s2">manual</span><span class="dl">"</span>
-    <span class="p">})</span>
+      <span class="na">contentSelector</span><span class="p">:</span> <span class="dl">"</span><span class="s2">[data-target='tooltip.content']</span><span class="dl">"</span><span class="p">,</span>
+      <span class="na">hostSelector</span><span class="p">:</span> <span class="dl">"</span><span class="s2">[data-target='tooltip.host']</span><span class="dl">"</span><span class="p">,</span>
+      <span class="na">expandOnClick</span><span class="p">:</span> <span class="nx">trigger</span> <span class="o">!==</span> <span class="dl">"</span><span class="s2">manual</span><span class="dl">"</span><span class="p">,</span>
+    <span class="p">});</span>
   <span class="p">}</span>
 
   <span class="nx">disconnect</span><span class="p">()</span> <span class="p">{</span>
-    <span class="k">this</span><span class="p">.</span><span class="nx">tooltip</span><span class="p">.</span><span class="nx">destroy</span><span class="p">()</span>
+    <span class="k">this</span><span class="p">.</span><span class="nx">tooltip</span><span class="p">.</span><span class="nx">destroy</span><span class="p">();</span>
   <span class="p">}</span>
 
   <span class="kd">set</span> <span class="nx">content</span><span class="p">(</span><span class="nx">content</span><span class="p">)</span> <span class="p">{</span>
-    <span class="k">this</span><span class="p">.</span><span class="nx">contentTarget</span><span class="p">.</span><span class="nx">innerHTML</span> <span class="o">=</span> <span class="nx">content</span> <span class="o">||</span> <span class="dl">""</span>
+    <span class="k">this</span><span class="p">.</span><span class="nx">contentTarget</span><span class="p">.</span><span class="nx">innerHTML</span> <span class="o">=</span> <span class="nx">content</span> <span class="o">||</span> <span class="dl">""</span><span class="p">;</span>
   <span class="p">}</span>
 
   <span class="kd">get</span> <span class="nx">expanded</span><span class="p">()</span> <span class="p">{</span>
-    <span class="k">return</span> <span class="k">this</span><span class="p">.</span><span class="nx">tooltip</span><span class="p">.</span><span class="nx">expanded</span>
+    <span class="k">return</span> <span class="k">this</span><span class="p">.</span><span class="nx">tooltip</span><span class="p">.</span><span class="nx">expanded</span><span class="p">;</span>
   <span class="p">}</span>
 
   <span class="kd">set</span> <span class="nx">expanded</span><span class="p">(</span><span class="nx">value</span><span class="p">)</span> <span class="p">{</span>
-    <span class="k">this</span><span class="p">.</span><span class="nx">tooltip</span><span class="p">.</span><span class="nx">expanded</span> <span class="o">=</span> <span class="nx">value</span>
+    <span class="k">this</span><span class="p">.</span><span class="nx">tooltip</span><span class="p">.</span><span class="nx">expanded</span> <span class="o">=</span> <span class="nx">value</span><span class="p">;</span>
   <span class="p">}</span>
 <span class="p">}</span></code></pre></figure>
 
-<p>Now, our copy button controller has the ability to target the tooltip, and expand it when it needs to, even setting the content:</p>
+<p>Now, we can add the tooltip to our copy button, and its controller has the ability to target the tooltip,  expand it when it needs to, and even setting the content:</p>
 
-<figure class="highlight"><pre><code class="language-typescript" data-lang="typescript"><span class="k">import</span> <span class="p">{</span> <span class="nx">Controller</span> <span class="p">}</span> <span class="k">from</span> <span class="dl">"</span><span class="s2">stimulus</span><span class="dl">"</span>
-<span class="k">import</span> <span class="nx">Clipboard</span> <span class="k">from</span> <span class="dl">"</span><span class="s2">clipboard</span><span class="dl">"</span>
-<span class="k">import</span> <span class="nx">Tooltip</span> <span class="k">from</span> <span class="dl">"</span><span class="s2">./tooltip_clipboard</span><span class="dl">"</span>
+<figure class="highlight"><pre><code class="language-html" data-lang="html"><span class="nt">&lt;span</span> <span class="na">id=</span><span class="s">"importantText"</span><span class="nt">&gt;</span>text to copy<span class="nt">&lt;/span&gt;</span>
+
+<span class="nt">&lt;div</span> <span class="na">data-controller=</span><span class="s">"tooltip"</span> <span class="na">data-tooltip-trigger=</span><span class="s">"manual"</span><span class="nt">&gt;</span>
+  <span class="nt">&lt;button</span>
+    <span class="na">data-controller=</span><span class="s">"copy"</span>
+    <span class="na">data-copy-target=</span><span class="s">"#importantText"</span>
+    <span class="na">data-target=</span><span class="s">"tooltip.host"</span>
+    <span class="na">aria-label=</span><span class="s">"click to copy important text"</span>
+  <span class="nt">&gt;</span>
+    <span class="nt">&lt;svg</span> <span class="na">class=</span><span class="s">"clipboard-icon"</span><span class="nt">&gt;</span>
+      <span class="nt">&lt;use</span> <span class="na">xlink:href=</span><span class="s">"#clipboard-icon"</span><span class="nt">&gt;&lt;/use&gt;</span>
+    <span class="nt">&lt;/svg&gt;</span>
+  <span class="nt">&lt;/button&gt;</span>
+
+  <span class="nt">&lt;span</span> <span class="na">role=</span><span class="s">"tooltip"</span> <span class="na">data-target=</span><span class="s">"tooltip.content"</span><span class="nt">&gt;</span>
+    copied!
+  <span class="nt">&lt;/span&gt;</span>
+<span class="nt">&lt;/div&gt;</span></code></pre></figure>
+
+<p>And in the controller:</p>
+
+<figure class="highlight"><pre><code class="language-typescript" data-lang="typescript"><span class="k">import</span> <span class="p">{</span> <span class="nx">Controller</span> <span class="p">}</span> <span class="k">from</span> <span class="dl">"</span><span class="s2">stimulus</span><span class="dl">"</span><span class="p">;</span>
+<span class="k">import</span> <span class="nx">Clipboard</span> <span class="k">from</span> <span class="dl">"</span><span class="s2">clipboard</span><span class="dl">"</span><span class="p">;</span>
+<span class="k">import</span> <span class="nx">Tooltip</span> <span class="k">from</span> <span class="dl">"</span><span class="s2">./tooltip_clipboard</span><span class="dl">"</span><span class="p">;</span>
 
 <span class="k">export</span> <span class="k">default</span> <span class="kd">class</span> <span class="kd">extends</span> <span class="nx">Controller</span> <span class="p">{</span>
   <span class="cm">/*
     this controller is enabling copying text to the clipboard
   */</span>
 
-  <span class="nl">clipboard</span><span class="p">:</span> <span class="nx">Clipboard</span>
-  <span class="nx">tooltipTarget</span><span class="p">:</span> <span class="nx">Tooltip</span>
+  <span class="nl">clipboard</span><span class="p">:</span> <span class="nx">Clipboard</span><span class="p">;</span>
+  <span class="nl">tooltipTarget</span><span class="p">:</span> <span class="nx">Tooltip</span><span class="p">;</span>
 
-  <span class="kd">static</span> <span class="nx">targets</span> <span class="o">=</span> <span class="p">[</span><span class="dl">"</span><span class="s2">tooltip</span><span class="dl">"</span><span class="p">]</span>
+  <span class="kd">static</span> <span class="nx">targets</span> <span class="o">=</span> <span class="p">[</span><span class="dl">"</span><span class="s2">tooltip</span><span class="dl">"</span><span class="p">];</span>
 
   <span class="nx">connect</span><span class="p">()</span> <span class="p">{</span>
-    <span class="kd">const</span> <span class="nx">targetToCopySelector</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">data</span><span class="p">.</span><span class="kd">get</span><span class="p">(</span><span class="dl">"</span><span class="s2">target</span><span class="dl">"</span><span class="p">)</span>
+    <span class="kd">const</span> <span class="nx">targetToCopySelector</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">data</span><span class="p">.</span><span class="kd">get</span><span class="p">(</span><span class="dl">"</span><span class="s2">target</span><span class="dl">"</span><span class="p">);</span>
 
     <span class="k">this</span><span class="p">.</span><span class="nx">clipboard</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Clipboard</span><span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">element</span><span class="p">,</span> <span class="p">{</span>
-      <span class="na">target</span><span class="p">:</span> <span class="p">()</span> <span class="o">=&gt;</span> <span class="nb">document</span><span class="p">.</span><span class="nx">querySelector</span><span class="p">(</span><span class="nx">targetToCopySelector</span><span class="p">)</span>
-    <span class="p">}).</span><span class="nx">on</span><span class="p">(</span><span class="dl">"</span><span class="s2">success</span><span class="dl">"</span><span class="p">,</span> <span class="p">()</span> <span class="o">=&gt;</span> <span class="p">{</span>
-      <span class="k">this</span><span class="p">.</span><span class="nx">tooltipTarget</span><span class="p">.</span><span class="nx">expanded</span> <span class="o">=</span> <span class="kc">true</span>
-    <span class="p">}).</span><span class="nx">on</span><span class="p">(</span><span class="dl">"</span><span class="s2">error</span><span class="dl">"</span><span class="p">,</span> <span class="p">()</span> <span class="o">=&gt;</span> <span class="p">{</span>
-      <span class="k">this</span><span class="p">.</span><span class="nx">tooltipTarget</span><span class="p">.</span><span class="nx">content</span> <span class="o">=</span> <span class="dl">"</span><span class="s2">press Ctrl+C to copy</span><span class="dl">"</span>
-      <span class="k">this</span><span class="p">.</span><span class="nx">tooltipTarget</span><span class="p">.</span><span class="nx">expanded</span> <span class="o">=</span> <span class="kc">true</span>
+      <span class="na">target</span><span class="p">:</span> <span class="p">()</span> <span class="o">=&gt;</span> <span class="nb">document</span><span class="p">.</span><span class="nx">querySelector</span><span class="p">(</span><span class="nx">targetToCopySelector</span><span class="p">),</span>
     <span class="p">})</span>
+      <span class="p">.</span><span class="nx">on</span><span class="p">(</span><span class="dl">"</span><span class="s2">success</span><span class="dl">"</span><span class="p">,</span> <span class="p">()</span> <span class="o">=&gt;</span> <span class="p">{</span>
+        <span class="k">this</span><span class="p">.</span><span class="nx">tooltipTarget</span><span class="p">.</span><span class="nx">expanded</span> <span class="o">=</span> <span class="kc">true</span><span class="p">;</span>
+      <span class="p">})</span>
+      <span class="p">.</span><span class="nx">on</span><span class="p">(</span><span class="dl">"</span><span class="s2">error</span><span class="dl">"</span><span class="p">,</span> <span class="p">()</span> <span class="o">=&gt;</span> <span class="p">{</span>
+        <span class="k">this</span><span class="p">.</span><span class="nx">tooltipTarget</span><span class="p">.</span><span class="nx">content</span> <span class="o">=</span> <span class="dl">"</span><span class="s2">press Ctrl+C to copy</span><span class="dl">"</span><span class="p">;</span>
+        <span class="k">this</span><span class="p">.</span><span class="nx">tooltipTarget</span><span class="p">.</span><span class="nx">expanded</span> <span class="o">=</span> <span class="kc">true</span><span class="p">;</span>
+      <span class="p">});</span>
   <span class="p">}</span>
 
   <span class="nx">disconnect</span><span class="p">()</span> <span class="p">{</span>
-    <span class="k">this</span><span class="p">.</span><span class="nx">clipboard</span><span class="p">.</span><span class="nx">destroy</span><span class="p">()</span>
+    <span class="k">this</span><span class="p">.</span><span class="nx">clipboard</span><span class="p">.</span><span class="nx">destroy</span><span class="p">();</span>
   <span class="p">}</span>
 <span class="p">}</span></code></pre></figure>
 

@@ -17,7 +17,7 @@ With Stimulus, we have controllers that aptly attach to and control some part of
 First, I'll start out with a simple tooltip. Our HTML could just look like this:
 {% highlight html %}
 <div data-controller="tooltip">
-  click me
+  <span data-target="tooltip.host">click me</span>
   <span role="tooltip" data-target="tooltip.content">
     some content!
   </span>
@@ -27,28 +27,29 @@ First, I'll start out with a simple tooltip. Our HTML could just look like this:
 And our controller could look like:
 
 {% highlight typescript %}
-import { Controller } from "stimulus"
-import Expander from "makeup-expander"
+import { Controller } from "stimulus";
+import Expander from "makeup-expander";
 
 export default class extends Controller {
   /*
     this controller is for controlling a tooltip
   */
 
-  tooltip: Expander
-  contentTarget: HTMLElement
+  tooltip: Expander;
+  contentTarget: HTMLElement;
 
-  static targets = ["content"]
+  static targets = ["content"];
 
   connect() {
     this.tooltip = new Expander(this.element, {
-      content: this.contentTarget,
-      expandOnClick: true
-    })
+      contentSelector: "[data-target='tooltip.content']",
+      hostSelector: "[data-target='tooltip.host']",
+      expandOnClick: true,
+    });
   }
 
   disconnect() {
-    this.tooltip.destroy()
+    this.tooltip.destroy();
   }
 }
 {% endhighlight %}
@@ -65,7 +66,8 @@ Suppose we need to copy some text, and clicking a button will copy it to the cli
 <button
   data-controller="copy"
   data-copy-target="#importantText"
-  aria-label="click to copy important text">
+  aria-label="click to copy important text"
+>
   <svg class="clipboard-icon">
     <use xlink:href="#clipboard-icon"></use>
   </svg>
@@ -75,30 +77,32 @@ Suppose we need to copy some text, and clicking a button will copy it to the cli
 And our Stimulus controller:
 
 {% highlight typescript %}
-import { Controller } from "stimulus"
-import Clipboard from "clipboard"
+import { Controller } from "stimulus";
+import Clipboard from "clipboard";
 
 export default class extends Controller {
   /*
     this controller is enabling copying text to the clipboard
   */
 
-  clipboard: Clipboard
+  clipboard: Clipboard;
 
   connect() {
-    const targetToCopySelector = this.data.get("target")
+    const targetToCopySelector = this.data.get("target");
 
     this.clipboard = new Clipboard(this.element, {
-      target: () => document.querySelector(targetToCopySelector)
-    }).on("success", () => {
-      // show tooltip?
-    }).on("error", () => {
-      // do something?
+      target: () => document.querySelector(targetToCopySelector),
     })
+      .on("success", () => {
+        // show tooltip?
+      })
+      .on("error", () => {
+        // do something?
+      });
   }
 
   disconnect() {
-    this.clipboard.destroy()
+    this.clipboard.destroy();
   }
 }
 {% endhighlight %}
@@ -108,83 +112,109 @@ Now we have a button that copies some text, but as you can see, we need to give 
 We can treat our tooltip element like custom element or web component, and expose some functionality for others to use to directly control it. Let's expose a couple of properties on the tooltip, one that will expand or contract it, and another to set the content. We'll also need a way to disable the default click behavior.
 
 {% highlight typescript %}
-import { Controller } from "stimulus"
-import Expander from "makeup-expander"
+import { Controller } from "stimulus";
+import Expander from "makeup-expander";
 
 export type Tooltip = HTMLElement & {
   expanded: boolean,
-  content: string
-}
+  content: string,
+};
 
 export default class extends Controller {
   /*
     this controller is for controlling a tooltip
   */
 
-  tooltip: Expander
-  contentTarget: HTMLElement
-  element: Tooltip
+  tooltip: Expander;
+  contentTarget: HTMLElement;
+  element: Tooltip;
 
-  static targets = ["content"]
+  static targets = ["content"];
 
   connect() {
-    const trigger = this.data.get("trigger")
+    const trigger = this.data.get("trigger");
     this.tooltip = new Expander(this.element, {
-      content: this.contentTarget,
-      expandOnClick: trigger !== "manual"
-    })
+      contentSelector: "[data-target='tooltip.content']",
+      hostSelector: "[data-target='tooltip.host']",
+      expandOnClick: trigger !== "manual",
+    });
   }
 
   disconnect() {
-    this.tooltip.destroy()
+    this.tooltip.destroy();
   }
 
   set content(content) {
-    this.contentTarget.innerHTML = content || ""
+    this.contentTarget.innerHTML = content || "";
   }
 
   get expanded() {
-    return this.tooltip.expanded
+    return this.tooltip.expanded;
   }
 
   set expanded(value) {
-    this.tooltip.expanded = value
+    this.tooltip.expanded = value;
   }
 }
 {% endhighlight %}
 
-Now, our copy button controller has the ability to target the tooltip, and expand it when it needs to, even setting the content:
+Now, we can add the tooltip to our copy button, and its controller has the ability to target the tooltip,  expand it when it needs to, and even setting the content:
+
+{% highlight html %}
+<span id="importantText">text to copy</span>
+
+<div data-controller="tooltip" data-tooltip-trigger="manual">
+  <button
+    data-controller="copy"
+    data-copy-target="#importantText"
+    data-target="tooltip.host"
+    aria-label="click to copy important text"
+  >
+    <svg class="clipboard-icon">
+      <use xlink:href="#clipboard-icon"></use>
+    </svg>
+  </button>
+
+  <span role="tooltip" data-target="tooltip.content">
+    copied!
+  </span>
+</div>
+{% endhighlight %}
+
+And in the controller:
 
 {% highlight typescript %}
-import { Controller } from "stimulus"
-import Clipboard from "clipboard"
-import Tooltip from "./tooltip_clipboard"
+import { Controller } from "stimulus";
+import Clipboard from "clipboard";
+import Tooltip from "./tooltip_clipboard";
 
 export default class extends Controller {
   /*
     this controller is enabling copying text to the clipboard
   */
 
-  clipboard: Clipboard
-  tooltipTarget: Tooltip
+  clipboard: Clipboard;
+  tooltipTarget: Tooltip;
 
-  static targets = ["tooltip"]
+  static targets = ["tooltip"];
 
   connect() {
-    const targetToCopySelector = this.data.get("target")
+    const targetToCopySelector = this.data.get("target");
 
     this.clipboard = new Clipboard(this.element, {
-      target: () => document.querySelector(targetToCopySelector)
-    }).on("success", () => {
-      this.tooltipTarget.expanded = true
-    }).on("error", () => {
-      this.tooltipTarget.content = "press Ctrl+C to copy"
-      this.tooltipTarget.expanded = true
+      target: () => document.querySelector(targetToCopySelector),
     })
+      .on("success", () => {
+        this.tooltipTarget.expanded = true;
+      })
+      .on("error", () => {
+        this.tooltipTarget.content = "press Ctrl+C to copy";
+        this.tooltipTarget.expanded = true;
+      });
   }
 
   disconnect() {
-    this.clipboard.destroy()
+    this.clipboard.destroy();
   }
 }
 {% endhighlight %}
