@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html>
+
+  <head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+
+  
+    <meta name="twitter:card" content="summary" />
+    <meta name="twitter:site" content="@scttdavs" />
+    <meta name="twitter:image" content="http://localhost:4000/images/.jpg">
+    <meta name="twitter:title" content="Single and Multi Table Inheritance" />
+    <meta name="twitter:description" content="Recently, among the major refactoring of Explorable Places I’ve been doing, some of the cleanup has centered around better making use of Single Table and Multi Table Inheritance.
+
+" />
+
+    <meta property="og:title" content="Single and Multi Table Inheritance">
+    <meta property="og:url" content="http://localhost:4000/blog/single_and_multi_table_inheritance">
+    <meta property="og:image" content="http://localhost:4000/images/.jpg">
+    <meta property="og:image:type" content="image/jpeg" />
+    <meta property="og:site_name" content="Scott Davis">
+    <meta property="og:description" content="Recently, among the major refactoring of Explorable Places I’ve been doing, some of the cleanup has centered around better making use of Single Table and Multi Table Inheritance.
+
+Single Table Inheritance
+
+Often in object oriented programming, it is beneficial to inherit common logic from a parent or abstract class. In Rails and other frameworks, where model classes are associated with database tables, this can be a little trickly.
+
+With STI though, we can allow inheritance with models while sharing the same table by adding a new column called type, where the framework will save the class type on the record. This way, when fetching a record for any subclass, it will query the same table, but return the correct class instance for that record.
+
+STI gives us a few advantages if our use case meets a couple criteria. If our subclasses all use the same data, but require different logic or behavior around that data, then this would be a good solution. We don’t want to waste database space with several unused columns between the two that are not shared, and will likely just grow over time.
+
+If we also expect to query across all subclasses at once, this is more easily achieved with STI as we still have just the one parent class to query. In the case of Rails, you will even get an ActiveRecord::Relation that contains the correct model instances of each subclass, even though we queried through the parent class.
+
+Example with TimeSlots
+
+In a simplified example of how we utilized STI at EP, we have a concept of TimeSlots for scheduling bookings. We have learning experiences that are in person, but we now also support virtual learning experiences.
+
+Virtual experiences do not have such strict time requirements, and usually have a range of available times that can work, as opposed to ‘physical’ or in-person experiences, that depend on the actual space being open.
+
+Below, you can see how we set up our classes to support this. All time slots share the same types of data, but the logic around how that data is treated is different. Virtual time slots have a list of times that are available. Physical time slots have just one. We can grab the time off of a physical time slot, but a virual time slot will not have a single time.
+
+class TimeSlot &lt; ApplicationRecord
+  validates :times, length: { minimum: 1, message: "are required. Please add at least one." }
+
+  # lots of other common logic
+end
+
+class VirtualTimeSlot &lt; TimeSlot  
+  def time
+  end
+end
+
+class PhysicalTimeSlot &lt; TimeSlot
+  validates :times, length: { maximum: 1, message: "may only have one." }
+  
+  def time
+    times.first
+  end
+end
+
+Multiple Table Inheritance
+
+When the requirements for various subclasses differ too much, such as having some data in common, but not all, but there is still significant logic shared between them, MTI may be another good fit.
+
+Similar to STI, we can subclass a model class to share logic, but we want to store the data separately, as if they are traditional models. This gives us the advantage of efficiently storing our data, as well as remaining DRY. Since data is stored in separate tables, a new type column is no longer required, but there is another problem (at least in Rails). Rails assumes the name of the table from the first class to inherit from ApplicationRecord, which would be the parent class. So to solve this, each model is responsible for specifying its own table name.
+
+Example with Bookings and Holds
+
+Another example of how I refactored EP, was to utilize MTI. Since we offer scheduling as a service, we need two important models to make this work, a Booking that a user makes, and a Hold that a learning institution may want to place for a user themselves, until the user can then book.
+
+As both of these are meant to reserve a spot, they share much of the same functionality and logic. However, the booking model is vastly more complex, as it is reponsible for far more than is needed to just reserve a spot. Since the data and logic are that different, it makes a good use case for MTI.
+
+Below, you can also see a simplified version of how we solved this.
+
+class Blocking &lt; ApplicationRecord
+  validates_with BlockingValidator
+  # lots of common logic
+end
+
+class Booking &lt; Blocking
+  self.table_name = "bookings"
+  validates_with BookingValidator
+end
+
+class Hold &lt; Blocking
+  self.table_name = "holds"
+  validates_with HoldValidator
+end
+
+You can’t see it here, but 90% of the validation logic alone between these two is shared within BlockingValidator. Not only do we not repeat ourselves, we ensure that these two classes stay in lock step with each other as they are and will always meant to behave similarly.
+
+What not to use STI or MTI for
+
+Often, it can be confusing when to use these methods. One common misconception is to use them when you want a model to be able to ‘belong’ (as in a has_many or has_one association) to multiple class types. The best approach for cases like this is to use the built-in polymorphism supported by most frameworks, including Rails.
+
+">
+  
+
+  <title>Single and Multi Table Inheritance | Scott Davis</title>
+  <meta name="description" content="Recently, among the major refactoring of Explorable Places I’ve been doing, some of the cleanup has centered around better making use of Single Table and Mul...">
+
+  <meta content='width=device-width, initial-scale=1.0, maximum-scale=1' name='viewport'>
+  <meta charset='utf-8'>
+  <meta content='Scott Davis' name='author'>
+  <link href='/favicon.png' rel='shortcut icon' sizes='16x16' type='image/png'>
+  <link rel="stylesheet" href="/css/main.css" type='text/css'>
+  <link rel='stylesheet' href="/fonts/ss-social-regular.css" type='text/css'>
+
+  <link rel="canonical" href="http://localhost:4000/blog/single_and_multi_table_inheritance">
+  <link rel="alternate" type="application/rss+xml" title="Scott Davis | Software Engineer" href="http://localhost:4000/feed.xml">
+  <script>
+    var _gaq = _gaq || [];
+    _gaq.push(["_setAccount", "UA-9400337-1"]);
+    _gaq.push(["_trackPageview"]);
+    (function () {
+    var e = document.createElement("script");
+    e.type = "text/javascript";
+    e.async = !0;
+    e.src = ("https:" == document.location.protocol ? "https://ssl" : "http://www") + ".google-analytics.com/ga.js";
+    var t = document.getElementsByTagName("script")[0];
+    t.parentNode.insertBefore(e, t)
+    })();
+  </script>
+</head>
+
+
+  <body class='group'>
+
+    <header>
+  <h1><a href="/"><img src="/images/sdlogo.svg" alt="Scott Davis"></a></h1>
+  <nav>
+    <ul>
+      <li>
+        <a href="/">writing</a>
+      </li>
+      <li>
+        <a href="/photos">photos</a>
+      </li>
+      <li>
+        <a href="/about">about</a>
+      </li>
+    </ul>
+  </nav>
+</header>
+
+
+    <div class='gradient-bar'></div>
+
+    <div class='group' itemscope itemtype="http://schema.org/Blog">
+      <section class='main article-list show-aside'>
+        <article class='article-item group' itemscope itemtype="http://schema.org/BlogPosting">
+  <h1 itemprop="name headline">Single and Multi Table Inheritance</h1>
+  <span class="author" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    By
+    <meta itemprop="email" content="sc@ttdavis.com" />
+    <span itemprop="givenName">Scott</span>
+    <span itemprop="familyName">Davis</span>
+    ,
+  </span>
+  <span class="date">
+    <time datetime="2020-06-08T20:05:30-04:00" itemprop="datePublished">
+      Jun 8, 2020
+    </time>
+  </span>
+
+  <div class="post-content" itemprop="articleBody">
+    <p>Recently, among the major refactoring of Explorable Places I’ve been doing, some of the cleanup has centered around better making use of Single Table and Multi Table Inheritance.<!--more--></p>
+
+<h2 id="single-table-inheritance">Single Table Inheritance</h2>
+
+<p>Often in object oriented programming, it is beneficial to inherit common logic from a parent or abstract class. In Rails and other frameworks, where model classes are associated with database tables, this can be a little trickly.</p>
+
+<p>With STI though, we can allow inheritance with models while sharing the same table by adding a new column called <code class="language-plaintext highlighter-rouge">type</code>, where the framework will save the class type on the record. This way, when fetching a record for any subclass, it will query the same table, but return the correct class instance for that record.</p>
+
+<p>STI gives us a few advantages if our use case meets a couple criteria. If our subclasses all use the same data, but require different logic or behavior around that data, then this would be a good solution. We don’t want to waste database space with several unused columns between the two that are not shared, and will likely just grow over time.</p>
+
+<p>If we also expect to query across all subclasses at once, this is more easily achieved with STI as we still have just the one parent class to query. In the case of Rails, you will even get an ActiveRecord::Relation that contains the correct model instances of each subclass, even though we queried through the parent class.</p>
+
+<h3 id="example-with-timeslots">Example with TimeSlots</h3>
+
+<p>In a simplified example of how we utilized STI at EP, we have a concept of <code class="language-plaintext highlighter-rouge">TimeSlots</code> for scheduling bookings. We have learning experiences that are in person, but we now also support virtual learning experiences.</p>
+
+<p>Virtual experiences do not have such strict time requirements, and usually have a range of available times that can work, as opposed to ‘physical’ or in-person experiences, that depend on the actual space being open.</p>
+
+<p>Below, you can see how we set up our classes to support this. All time slots share the same types of data, but the logic around how that data is treated is different. Virtual time slots have a list of times that are available. Physical time slots have just one. We can grab the time off of a physical time slot, but a virual time slot will not have a single time.</p>
+
+<figure class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="k">class</span> <span class="nc">TimeSlot</span> <span class="o">&lt;</span> <span class="no">ApplicationRecord</span>
+  <span class="n">validates</span> <span class="ss">:times</span><span class="p">,</span> <span class="ss">length: </span><span class="p">{</span> <span class="ss">minimum: </span><span class="mi">1</span><span class="p">,</span> <span class="ss">message: </span><span class="s2">"are required. Please add at least one."</span> <span class="p">}</span>
+
+  <span class="c1"># lots of other common logic</span>
+<span class="k">end</span>
+
+<span class="k">class</span> <span class="nc">VirtualTimeSlot</span> <span class="o">&lt;</span> <span class="no">TimeSlot</span>  
+  <span class="k">def</span> <span class="nf">time</span>
+  <span class="k">end</span>
+<span class="k">end</span>
+
+<span class="k">class</span> <span class="nc">PhysicalTimeSlot</span> <span class="o">&lt;</span> <span class="no">TimeSlot</span>
+  <span class="n">validates</span> <span class="ss">:times</span><span class="p">,</span> <span class="ss">length: </span><span class="p">{</span> <span class="ss">maximum: </span><span class="mi">1</span><span class="p">,</span> <span class="ss">message: </span><span class="s2">"may only have one."</span> <span class="p">}</span>
+  
+  <span class="k">def</span> <span class="nf">time</span>
+    <span class="n">times</span><span class="p">.</span><span class="nf">first</span>
+  <span class="k">end</span>
+<span class="k">end</span></code></pre></figure>
+
+<h2 id="multiple-table-inheritance">Multiple Table Inheritance</h2>
+
+<p>When the requirements for various subclasses differ too much, such as having some data in common, but not all, but there is still significant logic shared between them, MTI may be another good fit.</p>
+
+<p>Similar to STI, we can subclass a model class to share logic, but we want to store the data separately, as if they are traditional models. This gives us the advantage of efficiently storing our data, as well as remaining DRY. Since data is stored in separate tables, a new <code class="language-plaintext highlighter-rouge">type</code> column is no longer required, but there is another problem (at least in Rails). Rails assumes the name of the table from the first class to inherit from <code class="language-plaintext highlighter-rouge">ApplicationRecord</code>, which would be the parent class. So to solve this, each model is responsible for specifying its own table name.</p>
+
+<h3 id="example-with-bookings-and-holds">Example with Bookings and Holds</h3>
+
+<p>Another example of how I refactored EP, was to utilize MTI. Since we offer scheduling as a service, we need two important models to make this work, a <code class="language-plaintext highlighter-rouge">Booking</code> that a user makes, and a <code class="language-plaintext highlighter-rouge">Hold</code> that a learning institution may want to place for a user themselves, until the user can then book.</p>
+
+<p>As both of these are meant to reserve a spot, they share much of the same functionality and logic. However, the booking model is vastly more complex, as it is reponsible for far more than is needed to just reserve a spot. Since the data and logic are that different, it makes a good use case for MTI.</p>
+
+<p>Below, you can also see a simplified version of how we solved this.</p>
+
+<figure class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="k">class</span> <span class="nc">Blocking</span> <span class="o">&lt;</span> <span class="no">ApplicationRecord</span>
+  <span class="n">validates_with</span> <span class="no">BlockingValidator</span>
+  <span class="c1"># lots of common logic</span>
+<span class="k">end</span>
+
+<span class="k">class</span> <span class="nc">Booking</span> <span class="o">&lt;</span> <span class="no">Blocking</span>
+  <span class="nb">self</span><span class="p">.</span><span class="nf">table_name</span> <span class="o">=</span> <span class="s2">"bookings"</span>
+  <span class="n">validates_with</span> <span class="no">BookingValidator</span>
+<span class="k">end</span>
+
+<span class="k">class</span> <span class="nc">Hold</span> <span class="o">&lt;</span> <span class="no">Blocking</span>
+  <span class="nb">self</span><span class="p">.</span><span class="nf">table_name</span> <span class="o">=</span> <span class="s2">"holds"</span>
+  <span class="n">validates_with</span> <span class="no">HoldValidator</span>
+<span class="k">end</span></code></pre></figure>
+
+<p>You can’t see it here, but 90% of the validation logic alone between these two is shared within <code class="language-plaintext highlighter-rouge">BlockingValidator</code>. Not only do we not repeat ourselves, we ensure that these two classes stay in lock step with each other as they are and will always meant to behave similarly.</p>
+
+<h2 id="what-not-to-use-sti-or-mti-for">What not to use STI or MTI for</h2>
+
+<p>Often, it can be confusing when to use these methods. One common misconception is to use them when you want a model to be able to ‘belong’ (as in a has_many or has_one association) to multiple class types. The best approach for cases like this is to use the built-in polymorphism supported by most frameworks, including Rails.</p>
+
+
+  </div>
+</article>
+
+      </section>
+
+      
+        <aside itemprop="creator" itemscope itemtype="http://schema.org/Person">
+  <div class='avatar-wrap'>
+    <div class='avatar'>
+      <meta itemprop="image" content="/images/me.jpg" />
+      <div class='pic'></div>
+    </div>
+  </div>
+  <p class='summary text-center' itemprop="description">
+    <strong itemprop="name">
+      Scott Davis
+    </strong>
+    is a NY-based software engineer.
+  </p>
+  
+</aside>
+
+      
+    </div>
+
+    <footer>
+  <div class='footer-inner'>
+    &copy; 2020 Scott Davis | Software Engineer, made with &hearts; in <strike>Brooklyn</strike> Washington Heights
+  </div>
+</footer>
+
+
+  </body>
+
+</html>

@@ -16,26 +16,27 @@ STI gives us a few advantages if our use case meets a couple criteria. If our su
 
 If we also expect to query across all subclasses at once, this is more easily achieved with STI as we still have just the one parent class to query. In the case of Rails, you will even get an ActiveRecord::Relation that contains the correct model instances of each subclass, even though we queried through the parent class.
 
-Below is a simplified example of how we utilized STI. At EP, we have a concept of `TimeSlots` for scheduling bookings. We have learning experiences that are in person, but we now also support virtual learning experiences.
+### Example with TimeSlots
+
+In a simplified example of how we utilized STI at EP, we have a concept of `TimeSlots` for scheduling bookings. We have learning experiences that are in person, but we now also support virtual learning experiences.
 
 Virtual experiences do not have such strict time requirements, and usually have a range of available times that can work, as opposed to 'physical' or in-person experiences, that depend on the actual space being open.
 
-Below, you can see how we set up our classes to support this. All time slots share the same types of data, but the logic around how that data is treated is different. Virtual time slots have a list of times that are available. Physical time sots have just one. We can grab the time off of a physical time slot, but a virual time slot will not have a single time available.
+Below, you can see how we set up our classes to support this. All time slots share the same types of data, but the logic around how that data is treated is different. Virtual time slots have a list of times that are available. Physical time slots have just one. We can grab the time off of a physical time slot, but a virual time slot will not have a single time.
 
 {% highlight ruby %}
 class TimeSlot < ApplicationRecord
-  # lots of common logic
+  validates :times, length: { minimum: 1, message: "are required. Please add at least one." }
+
+  # lots of other common logic
 end
 
-class VirtualTimeSlot < TimeSlot
-  validates :times, length: { minimum: 1, message: "are required. Please add at least one." }
-  
+class VirtualTimeSlot < TimeSlot  
   def time
   end
 end
 
 class PhysicalTimeSlot < TimeSlot
-  validates :times, length: { minimum: 1, message: "are required. Please add at least one." }
   validates :times, length: { maximum: 1, message: "may only have one." }
   
   def time
@@ -49,6 +50,8 @@ end
 When the requirements for various subclasses differ too much, such as having some data in common, but not all, but there is still significant logic shared between them, MTI may be another good fit.
 
 Similar to STI, we can subclass a model class to share logic, but we want to store the data separately, as if they are traditional models. This gives us the advantage of efficiently storing our data, as well as remaining DRY. Since data is stored in separate tables, a new `type` column is no longer required, but there is another problem (at least in Rails). Rails assumes the name of the table from the first class to inherit from `ApplicationRecord`, which would be the parent class. So to solve this, each model is responsible for specifying its own table name.
+
+### Example with Bookings and Holds
 
 Another example of how I refactored EP, was to utilize MTI. Since we offer scheduling as a service, we need two important models to make this work, a `Booking` that a user makes, and a `Hold` that a learning institution may want to place for a user themselves, until the user can then book.
 
