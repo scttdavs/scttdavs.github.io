@@ -239,7 +239,7 @@ jekyll new my-awesome-site</span></code></pre></figure>
 
 <p>Folders starting with <code class="language-plaintext highlighter-rouge">_</code> are special. They are used by Jekyll for specific purposes. For example <code class="language-plaintext highlighter-rouge">_posts</code> is where all your posts live (not rocket science here). <code class="language-plaintext highlighter-rouge">_includes</code> are where partials live. So you can do:</p>
 
-<figure class="highlight"><pre><code class="language-liquid" data-lang="liquid"><span class="p">{%</span><span class="w"> </span><span class="nt">include</span><span class="w"> </span><span class="nx">footer.html</span><span class="w"> </span><span class="p">%}</span></code></pre></figure>
+<figure class="highlight"><pre><code class="language-liquid" data-lang="liquid"><span class="p">{%</span><span class="w"> </span><span class="nt">include</span><span class="w"> </span>footer.html<span class="w"> </span><span class="p">%}</span></code></pre></figure>
 
 <p>in your template to include a footer you made. By default, Jekyll will look in the <code class="language-plaintext highlighter-rouge">_includes</code> folder. <code class="language-plaintext highlighter-rouge">_layouts</code> are where your layouts live, which probably all of your pages will have a layout associated with them. <code class="language-plaintext highlighter-rouge">_site</code> is where all your converted files for your static site live. This should never be used for anything else. If you upload your site to your own host, these are the contents that you upload.
 I think the rest are easily understood. There is a <code class="language-plaintext highlighter-rouge">_drafts</code> folder you can create yourself for drafing posts. When you run your server with a <code class="language-plaintext highlighter-rouge">--drafts</code> flag, it will convert these for you for previewing them.</p>
@@ -304,7 +304,7 @@ I think the rest are easily understood. There is a <code class="language-plainte
 
     <footer>
   <div class='footer-inner'>
-    &copy; 2020 Scott Davis | Software Engineer, made with &hearts; in <strike>Brooklyn</strike> Washington Heights
+    &copy; 2026 Scott Davis | Software Engineer, made with &hearts; in <strike>Brooklyn</strike> Washington Heights
   </div>
 </footer>
 

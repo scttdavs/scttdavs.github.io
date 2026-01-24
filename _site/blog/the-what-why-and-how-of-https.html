@@ -212,14 +212,14 @@ Now I just need to wait for Github to allow for https of github pages with a cus
     <span class="kn">ssl_certificate</span> <span class="n">/etc/ssl/certs/YOUR-DOMAIN.crt</span><span class="p">;</span>
     <span class="kn">ssl_certificate_key</span> <span class="n">/etc/ssl/private/YOUR-DOMAIN.key</span><span class="p">;</span>
 
-    <span class="c1"># EVERYTHING ELSE IS THE SAME AS PORT 80 CONFIG EXCEPT:
-</span>
-    <span class="kn">location</span> <span class="s">@unicorn</span> <span class="p">{</span>
-        <span class="c1"># YOU'LL WANT TO ADD THIS TOO IF YOU USE RAILS
-</span>        <span class="kn">proxy_set_header</span> <span class="s">X-Forwarded-Proto</span> <span class="s">https</span><span class="p">;</span>
+    <span class="c1"># EVERYTHING ELSE IS THE SAME AS PORT 80 CONFIG EXCEPT:</span>
 
-        <span class="c1"># OTHER SETTINGS ARE THE SAME
-</span>    <span class="p">}</span>
+    <span class="kn">location</span> <span class="s">@unicorn</span> <span class="p">{</span>
+        <span class="c1"># YOU'LL WANT TO ADD THIS TOO IF YOU USE RAILS</span>
+        <span class="kn">proxy_set_header</span> <span class="s">X-Forwarded-Proto</span> <span class="s">https</span><span class="p">;</span>
+
+        <span class="c1"># OTHER SETTINGS ARE THE SAME</span>
+    <span class="p">}</span>
 <span class="p">}</span></code></pre></figure>
 
 <p>If you use rails, you’ll likely use <code class="language-plaintext highlighter-rouge">force_ssl</code> in your controllers. I use it in the application controller to force https for all routes. It relies on the <code class="language-plaintext highlighter-rouge">X-Forwarded-Proto</code> header to work and is why rails needs it.</p>
@@ -260,7 +260,7 @@ Now I just need to wait for Github to allow for https of github pages with a cus
 
     <footer>
   <div class='footer-inner'>
-    &copy; 2020 Scott Davis | Software Engineer, made with &hearts; in <strike>Brooklyn</strike> Washington Heights
+    &copy; 2026 Scott Davis | Software Engineer, made with &hearts; in <strike>Brooklyn</strike> Washington Heights
   </div>
 </footer>
 
