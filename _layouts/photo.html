@@ -12,13 +12,19 @@ layout: photos
   </span>
   <span class="date" itemprop="datePublished">
     <time>
-      {{ page.time | date: "%b %-d, %Y" }}
+      {{ page.time | date: "%b %-d, %Y" }}{% if page.camera %},{% endif %}
     </time>
   </span>
+  <span class="camera">
+    {% if page.camera %}
+      {{ page.camera }}
+    {% endif %}
+  </span>
 
-  <img itemprop="image" src="/images/photos/{{ page.name }}.jpg">
-
-  <p>{{ content }}</p>
+  <figure>
+    <img itemprop="image" src="/images/photos/{{ page.name }}.jpg" {% if page.format == 'square' %}style="max-width: 700px; width: 100%;"{% endif %}>
+    <figcaption>{{ content }}</figcaption>
+  </figure>
 
   <meta itemprop="creator" content="Scott Davis">
   <meta itemprop="copyrightHolder" content="Scott Davis">

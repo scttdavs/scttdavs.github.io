@@ -4,6 +4,7 @@ title: "Grandfather Mtn."
 time: 2016-01-28
 name: grandfather-mtn
 meta: photo
+camera: "Horizon S3"
 width: 2184
 height: 863
 ---

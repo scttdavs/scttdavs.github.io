@@ -318,8 +318,8 @@ aside { width: 35%; float: left; }
 p.summary { font: 400 16px "Lato", sans-serif; color: #779098; max-width: 220px; margin: 45px auto 0; }
 p.summary strong { font-weight: 700; color: #2f464d; }
 
-span.date, span.author { font: 400 12px "Lato", sans-serif; color: #779098; }
-span.date span, span.author span { color: #2f464d; }
+span.date, span.author, span.camera { font: 400 12px "Lato", sans-serif; color: #779098; text-transform: capitalize; }
+span.date span, span.author span, span.camera span { color: #2f464d; }
 
 .excerpt img { display: none; }
 
@@ -343,7 +343,7 @@ span.date span, span.author span { color: #2f464d; }
 .photo-item h2, .photo-item .excerpt { margin-top: 0; color: white; opacity: 0; transition: opacity 0.5s ease; }
 
 .photo { width: 100%; }
-.photo img { margin-top: 20px; }
+.photo img { width: 100%; margin-top: 20px; display: block; }
 
 .get-in-touch { margin-top: 45px; }
 @media (max-width: 767px) { .get-in-touch { margin-top: 0; } }

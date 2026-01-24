@@ -152,9 +152,10 @@ p.summary {
   }
 }
 
-span.date, span.author {
+span.date, span.author, span.camera {
   font: 400 12px "Lato", sans-serif;
   color: $offmiddle;
+  text-transform: capitalize;
 
   span {
     color: $offmiddle-dark;
